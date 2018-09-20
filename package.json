@@ -1,0 +1,23 @@
+{
+  "name": "longtake",
+  "version": "0.0.1",
+  "description": "Very simple canvas library.",
+  "main": "./dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KHC-ZhiHao/LongTake.git"
+  },
+  "keywords": [
+    "canvas",
+    "library"
+  ],
+  "author": "khczhihao",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KHC-ZhiHao/LongTake/issues"
+  },
+  "homepage": "https://github.com/KHC-ZhiHao/LongTake#readme"
+}
