@@ -1,3 +1,5 @@
+
+
 (function (root, factory) {
 
     let moduleName = 'LongTake';
@@ -13,7 +15,7 @@
     }
 
 })(this || (typeof window !== 'undefined' ? window : global), function () {
-
+    
     /**
      * @class ModuleBase
      * @desc 所有的模塊父類
@@ -120,7 +122,7 @@
     }
 
     let Helper = new HelperModuel;
-    
+
     /**
      * @class Loader
      * @desc 一個簡易的載入載具
@@ -866,7 +868,7 @@
          */
 
         move() {
-            if (this.over) {
+            if (this.over === false) {
                 let time = this.actionEasing(this.time += this.reverse ? -this.pace : this.pace, this.duration);
                 this.action(time);
                 if (this.alternate) {
@@ -878,8 +880,9 @@
                 } else if (this.time >= this.duration) {
                     this.over = true;
                 }
+                return time;
             }
-            return time || 1;
+            return 1;
         }
 
         /**
