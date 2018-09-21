@@ -83,7 +83,7 @@ class Animate extends ModuleBase {
                 this.over = true;
             }
         }
-        return time;
+        return time || 1;
     }
 
     /**

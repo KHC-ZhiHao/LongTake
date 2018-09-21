@@ -102,6 +102,7 @@
         }
 
     }
+
     class HelperModuel {
 
         constructor() {
@@ -119,7 +120,7 @@
     }
 
     let Helper = new HelperModuel;
-
+    
     /**
      * @class Loader
      * @desc 一個簡易的載入載具
@@ -878,7 +879,7 @@
                     this.over = true;
                 }
             }
-            return time;
+            return time || 1;
         }
 
         /**
