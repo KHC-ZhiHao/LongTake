@@ -1,5 +1,3 @@
-
-
 (function (root, factory) {
 
     let moduleName = 'LongTake';
@@ -104,7 +102,6 @@
         }
 
     }
-
     class HelperModuel {
 
         constructor() {
@@ -809,7 +806,7 @@
          * @member {function} action 執行動作
          */
 
-        constructor(sprite, begin, duration, easing, alternate) {
+        constructor(sprite, begin, duration, easing, alternate, action) {
             super("Animate");
             this.sprite = sprite;
             this.checkSprite();
@@ -818,6 +815,7 @@
                 duration: [duration, 0],
                 easing: [easing, "linear"],
                 alternate: [alternate, false],
+                action: [action, function () { }],
             });
             this.over = false;
             this.reverse = false;

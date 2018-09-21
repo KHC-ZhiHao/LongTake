@@ -1,6 +1,6 @@
 {
   "name": "longtake",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Very simple canvas library.",
   "main": "./dist/index.js",
   "scripts": {

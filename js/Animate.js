@@ -11,7 +11,7 @@ class Animate extends ModuleBase {
      * @member {function} action 執行動作
      */
 
-    constructor( sprite, begin, duration, easing, alternate ){
+    constructor( sprite, begin, duration, easing, alternate, action ){
         super("Animate");
         this.sprite = sprite;
         this.checkSprite();
@@ -20,6 +20,7 @@ class Animate extends ModuleBase {
             duration : [duration, 0],
             easing : [easing, "linear"],
             alternate : [alternate, false],
+            action : [action, function(){}],
         });
         this.over = false;
         this.reverse = false;
