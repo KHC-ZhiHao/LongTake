@@ -114,8 +114,12 @@ class Sprite extends ModuleBase {
      */
 
     resize( width, height ){
-        if( typeof width === "object" && width.width && width.height ){
-            this.bitmap.resize( width.width, width.height )
+        if( typeof width === "object" ){
+            if( width.width && width.height ){
+                this.bitmap.resize( width.width, width.height )
+            }else{
+                this.systemError( "resize", "Object must have width and height.", width );
+            }
         }else{
             this.bitmap.resize(width, height)
         }
@@ -182,6 +186,12 @@ class Sprite extends ModuleBase {
             use : false,
         }
     }
+
+    /**
+     * @function setShadow(data)
+     * @desc 設定陰影
+     * @param {object} data offsetX,offsetY,color,blur
+     */
     
     setShadow(data){
         if( typeof data === "object" ){
@@ -190,6 +200,15 @@ class Sprite extends ModuleBase {
         }else{
             this.systemError( "setShadow", "Data must a object.", data );
         }
+    }
+
+    /**
+     * @function unShadow()
+     * @desc 關閉陰影
+     */
+
+    unShadow(){
+        this.shadowData.use = false;
     }
 
     //=============================
@@ -288,7 +307,9 @@ class Sprite extends ModuleBase {
 
     get opacity(){ return this.container.opacity };
     set opacity(val){
-        this.container.opacity = val > 255 ? 255 : val;
+        if( val <= 0 ){ val = 0; }
+        if( val >= 255 ){ val = 255; }
+        this.container.opacity = val;
     }
 
     get skewX(){ return this.container.skewX }
@@ -341,9 +362,11 @@ class Sprite extends ModuleBase {
      }
 
     get z(){ return this.position.z }
-    set z(val){ 
-        this.position.z = val;
-        if( this.parent ){ this.parent.status.sort = true; }
+    set z(val){
+        if( typeof val === "number" ){
+            this.position.z = val;
+            if( this.parent ){ this.parent.status.sort = true; }
+        }
     }
 
     get screenX(){ return (this.parent ? this.parent.screenX + this.parent.width * this.parent.anchorX : 0) + this.x - this.width * this.anchorX }
@@ -732,6 +755,11 @@ class Sprite extends ModuleBase {
     //
     // check
     //
+
+    /**
+     * @function inRect(x,y)
+     * @desc 測試座標是否在精靈的矩形範圍內
+     */
 
     inRect(x,y){
         let rect = this.getRealSize();

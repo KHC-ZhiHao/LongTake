@@ -2,18 +2,22 @@
 class Animate extends ModuleBase {
 
     /**
+     * @member {Sprite} sprite 目標精靈
+     * @member {number} begin 起始時間
+     * @member {number} duration 持續時間
+     * @member {string} easing 緩動函數
      * @member {boolean} reverse 反轉前進
      * @member {boolean} alternate 巡迴播放
+     * @member {function} action 執行動作
      */
 
-    constructor( sprite, begin, duration, easing, alternate, action ){
+    constructor( sprite, begin, duration, easing, alternate ){
         super("Animate");
         this.sprite = sprite;
         this.checkSprite();
-        this.validated({
+        this.validate({
             time : [begin, 0],
             duration : [duration, 0],
-            action : [action, function(){}],
             easing : [easing, "linear"],
             alternate : [alternate, false],
         });
@@ -22,6 +26,11 @@ class Animate extends ModuleBase {
         this.actionEasing = this.sprite.main.getEasing(this.easing);
         this.pace = 1000 / this.sprite.main.framePerSecond;
     }
+
+    /**
+     * @function checkSprite()
+     * @desc 確認是否為可執行的精靈
+     */
 
     checkSprite(){
         if( Sprite.isSprite(this.sprite) ){
@@ -33,7 +42,12 @@ class Animate extends ModuleBase {
         }
     }
 
-    validated(data){
+    /**
+     * @function validate(data)
+     * @desc 驗證正確並賦予資料
+     */
+
+    validate(data){
         for( let key in data ){
             let head = data[key][0];
             let aims = data[key][1];
@@ -55,21 +69,28 @@ class Animate extends ModuleBase {
      */
     
     move(){
-        let time = this.actionEasing( this.time += this.reverse ? -this.pace : this.pace, this.duration);
-        this.action( time, this.over );
-        if( this.alternate ){
-            if( this.time >= this.duration ){
-                this.reverse = true;
-            }else if( this.reverse && this.time <= 0 ){
-                this.reverse = false;
+        if( this.over ){
+            let time = this.actionEasing( this.time += this.reverse ? -this.pace : this.pace, this.duration );
+            this.action( time );
+            if( this.alternate ){
+                if( this.time >= this.duration ){
+                    this.reverse = true;
+                }else if( this.reverse && this.time <= 0 ){
+                    this.reverse = false;
+                }
+            }else if( this.time >= this.duration ){
+                this.over = true;
             }
-        }else if( this.time >= this.duration ){
-            this.over = true;
         }
         return time;
     }
 
-    reStart(){
+    /**
+     * @function restart()
+     * @desc 重起計算
+     */
+
+    restart(){
         this.time = 0;
         this.over = false;
     }

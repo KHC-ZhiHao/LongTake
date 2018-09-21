@@ -1,3 +1,5 @@
+
+
 (function (root, factory) {
 
     let moduleName = 'LongTake';
@@ -128,15 +130,10 @@
 
     class Loader extends ModuleBase {
 
-        /**
-         * @param {array} types 限制的檔案類型
-         */
-
         constructor() {
             super("Loader");
             this.data = {};
             this.files = {};
-            this.types = ["jpg", "png"];
             this.fileLength = 0;
             this.completed = 0;
         }
@@ -183,20 +180,32 @@
 
         /**
          * @function add(name,src)
-         * @desc 加入一個待載檔案
+         * @desc 加入一個等待載入檔案
          */
 
         add(name, src) {
-            let type = src.split(".").pop();
-            if (this.types.indexOf(type) === -1) {
-                this.systemError("name", "File type not allowed(png,jpg).", src);
-            }
             if (this.files[name] == null) {
                 this.fileLength += 1;
-                this.files[name] = src;
+                this.files[name] = this.validateFile(src);
             } else {
                 this.systemError("add", "Name conflict.", name);
             }
+        }
+
+        /**
+         * @function validateFile(file)
+         * @param 驗證檔案是否正確
+         */
+
+        validateFile(file) {
+            let type = file.split(".").pop();
+            if (['png', 'jpg'].indexOf(type) !== -1 || file.slice(0, 5) === 'data:') {
+                return file;
+            }
+            if (file instanceof Element && file.tagName("CANVAS")) {
+                return canvas.toDataURL("image/png");
+            }
+            this.systemError("validateFile", "File type not allowed( png, jpg, canvas element, base64url ).", file);
         }
 
         /**
@@ -385,7 +394,7 @@
         }
 
     }
-    
+
     class Bitmap extends ModuleBase {
 
         constructor(width = 100, height = 100, element) {
@@ -394,45 +403,60 @@
             this.canvas = element || document.createElement('canvas');
             this.context = this.canvas.getContext('2d');
             this.imgData = null;
-            if (element == null) {
-                this.resize(width, height);
-            }
+            if (element == null) { this.resize(width, height) }
         }
 
         static isBitmap(object) {
             return object instanceof this;
         }
 
-        setAutoResize(bool) {
-            this.autoResize = !!bool;
-        }
-
         get width() { return this.canvas.width }
-        set width(val) {
-            this.canvas.width = val;
-        }
+        set width(val) { this.canvas.width = val; }
 
         get height() { return this.canvas.height }
-        set height(val) {
-            this.canvas.height = val;
-        }
+        set height(val) { this.canvas.height = val; }
+
+        /**
+         * @function resize(width,height)
+         * @desc 調整畫布大小
+         */
 
         resize(width, height) {
             this.width = width || this.width;
             this.height = height || this.height;
         }
 
+        /**
+         * @function clear()
+         * @desc 清空畫布
+         */
+
         clear() {
             this.context.clearRect(0, 0, this.width, this.height);
         }
+
+        /**
+         * @function draw(bitmap,x,y)
+         * @desc 繪製一個bitmap在畫布上
+         */
 
         draw(bitmap, x, y) {
             this.context.drawImage(bitmap.canvas, x, y);
         }
 
+        /**
+         * @function clearImgDataCache()
+         * @desc 清除圖片資料快取
+         */
+
         clearImgDataCache() {
             this.imgData = null;
         }
+
+        /**
+         * @function getPixel(x,y)
+         * @desc 取得位元位置的像素元素
+         */
 
         getPixel(x, y) {
             let imgData = this.getImageData();
@@ -445,12 +469,22 @@
             ];
         }
 
+        /**
+         * @function getImageData()
+         * @desc 獲取快取圖片資料
+         */
+
         getImageData() {
             if (this.imgData == null) {
                 this.imgData = this.context.getImageData(0, 0, this.width, this.height);
             }
             return this.imgData;
         }
+
+        /**
+         * @function putImageData()
+         * @desc 清空圖片並貼上圖片資料
+         */
 
         putImageData(imgData) {
             this.clear();
@@ -567,6 +601,12 @@
             }
         }
 
+        /**
+         * @function getVisibility(view)
+         * @desc 檢測目前螢幕裝置大小
+         * @param {string} view sm, xs, md, le, xl
+         */
+
         getVisibility(view) {
             let width = document.body.clientWidth;
             if (width < 600) { return view === "xs"; }
@@ -574,7 +614,7 @@
             if (width >= 960 && width < 1264) { return ['sm', 'xs', 'md'].indexOf(view) !== -1 }
             if (width >= 1264 && width < 1904) { return ['sm', 'xs', 'md', 'lg'].indexOf(view) !== -1 }
             if (width >= 1904) { return ['sm', 'xs', 'md', 'lg', 'xl'].indexOf(view) !== -1 }
-            return document.body.clientWidth;
+            return false;
         }
 
         //=============================
@@ -709,6 +749,10 @@
         // stage
         //
 
+        /**
+         * @member {Sprite} stage 頂層精靈，由此往下加入精靈
+         */
+
         initStage() {
             this.stage = new Sprite("Stage");
             this.stage.install(this);
@@ -737,8 +781,8 @@
             this.buffer.clear();
             this.stage.mainEvent();
             this.stage.mainUpdate(this.ticker + 1);
-            this.stage.mainRender();
             if (this.baseFps <= 0) {
+                this.stage.mainRender();
                 this.stage.drawBuffer(this.buffer);
             }
         }
@@ -756,18 +800,22 @@
     class Animate extends ModuleBase {
 
         /**
+         * @member {Sprite} sprite 目標精靈
+         * @member {number} begin 起始時間
+         * @member {number} duration 持續時間
+         * @member {string} easing 緩動函數
          * @member {boolean} reverse 反轉前進
          * @member {boolean} alternate 巡迴播放
+         * @member {function} action 執行動作
          */
 
-        constructor(sprite, begin, duration, easing, alternate, action) {
+        constructor(sprite, begin, duration, easing, alternate) {
             super("Animate");
             this.sprite = sprite;
             this.checkSprite();
-            this.validated({
+            this.validate({
                 time: [begin, 0],
                 duration: [duration, 0],
-                action: [action, function () { }],
                 easing: [easing, "linear"],
                 alternate: [alternate, false],
             });
@@ -776,6 +824,11 @@
             this.actionEasing = this.sprite.main.getEasing(this.easing);
             this.pace = 1000 / this.sprite.main.framePerSecond;
         }
+
+        /**
+         * @function checkSprite()
+         * @desc 確認是否為可執行的精靈
+         */
 
         checkSprite() {
             if (Sprite.isSprite(this.sprite)) {
@@ -787,7 +840,12 @@
             }
         }
 
-        validated(data) {
+        /**
+         * @function validate(data)
+         * @desc 驗證正確並賦予資料
+         */
+
+        validate(data) {
             for (let key in data) {
                 let head = data[key][0];
                 let aims = data[key][1];
@@ -809,27 +867,33 @@
          */
 
         move() {
-            let time = this.actionEasing(this.time += this.reverse ? -this.pace : this.pace, this.duration);
-            this.action(time, this.over);
-            if (this.alternate) {
-                if (this.time >= this.duration) {
-                    this.reverse = true;
-                } else if (this.reverse && this.time <= 0) {
-                    this.reverse = false;
+            if (this.over) {
+                let time = this.actionEasing(this.time += this.reverse ? -this.pace : this.pace, this.duration);
+                this.action(time);
+                if (this.alternate) {
+                    if (this.time >= this.duration) {
+                        this.reverse = true;
+                    } else if (this.reverse && this.time <= 0) {
+                        this.reverse = false;
+                    }
+                } else if (this.time >= this.duration) {
+                    this.over = true;
                 }
-            } else if (this.time >= this.duration) {
-                this.over = true;
             }
             return time;
         }
 
-        reStart() {
+        /**
+         * @function restart()
+         * @desc 重起計算
+         */
+
+        restart() {
             this.time = 0;
             this.over = false;
         }
 
     }
-
 
     /**
      * @class Sprite(moduleName)
@@ -946,8 +1010,12 @@
          */
 
         resize(width, height) {
-            if (typeof width === "object" && width.width && width.height) {
-                this.bitmap.resize(width.width, width.height)
+            if (typeof width === "object") {
+                if (width.width && width.height) {
+                    this.bitmap.resize(width.width, width.height)
+                } else {
+                    this.systemError("resize", "Object must have width and height.", width);
+                }
             } else {
                 this.bitmap.resize(width, height)
             }
@@ -1015,6 +1083,12 @@
             }
         }
 
+        /**
+         * @function setShadow(data)
+         * @desc 設定陰影
+         * @param {object} data offsetX,offsetY,color,blur
+         */
+
         setShadow(data) {
             if (typeof data === "object") {
                 this.shadowData = Object.assign(this.shadowData, data);
@@ -1022,6 +1096,15 @@
             } else {
                 this.systemError("setShadow", "Data must a object.", data);
             }
+        }
+
+        /**
+         * @function unShadow()
+         * @desc 關閉陰影
+         */
+
+        unShadow() {
+            this.shadowData.use = false;
         }
 
         //=============================
@@ -1120,7 +1203,9 @@
 
         get opacity() { return this.container.opacity };
         set opacity(val) {
-            this.container.opacity = val > 255 ? 255 : val;
+            if (val <= 0) { val = 0; }
+            if (val >= 255) { val = 255; }
+            this.container.opacity = val;
         }
 
         get skewX() { return this.container.skewX }
@@ -1174,8 +1259,10 @@
 
         get z() { return this.position.z }
         set z(val) {
-            this.position.z = val;
-            if (this.parent) { this.parent.status.sort = true; }
+            if (typeof val === "number") {
+                this.position.z = val;
+                if (this.parent) { this.parent.status.sort = true; }
+            }
         }
 
         get screenX() { return (this.parent ? this.parent.screenX + this.parent.width * this.parent.anchorX : 0) + this.x - this.width * this.anchorX }
@@ -1565,6 +1652,11 @@
         // check
         //
 
+        /**
+         * @function inRect(x,y)
+         * @desc 測試座標是否在精靈的矩形範圍內
+         */
+
         inRect(x, y) {
             let rect = this.getRealSize();
             return (x >= this.screenX && x <= this.screenX + rect.width)
@@ -1572,7 +1664,6 @@
         }
 
     }
-
 
     let __re = LongTake;
     __re.Sprite = Sprite;

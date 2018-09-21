@@ -5,15 +5,10 @@
 
 class Loader extends ModuleBase {
 
-    /**
-     * @param {array} types 限制的檔案類型
-     */
-
     constructor(){
         super("Loader");
         this.data = {};
         this.files = {};
-        this.types = ["jpg","png"];
         this.fileLength = 0;
         this.completed = 0;
     }
@@ -60,20 +55,32 @@ class Loader extends ModuleBase {
 
     /**
      * @function add(name,src)
-     * @desc 加入一個待載檔案
+     * @desc 加入一個等待載入檔案
      */
 
     add( name, src ){
-        let type = src.split(".").pop();
-        if( this.types.indexOf(type) === -1 ){
-            this.systemError("name", "File type not allowed(png,jpg).", src);
-        }
         if( this.files[name] == null ){
             this.fileLength += 1;
-            this.files[name] = src;
+            this.files[name] = this.validateFile(src);
         }else{
             this.systemError("add", "Name conflict.", name);
         }
+    }
+
+    /**
+     * @function validateFile(file)
+     * @param 驗證檔案是否正確
+     */
+
+    validateFile( file ){
+        let type = file.split(".").pop();
+        if( ['png','jpg'].indexOf(type) !== -1 || file.slice( 0, 5 ) === 'data:' ){
+            return file;
+        }
+        if( file instanceof Element && file.tagName("CANVAS") ){
+            return canvas.toDataURL("image/png");
+        }
+        this.systemError( "validateFile", "File type not allowed( png, jpg, canvas element, base64url ).", file );
     }
 
     /**

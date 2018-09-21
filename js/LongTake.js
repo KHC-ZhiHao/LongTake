@@ -80,6 +80,12 @@ class LongTake extends ModuleBase {
         }
     }
 
+    /**
+     * @function getVisibility(view)
+     * @desc 檢測目前螢幕裝置大小
+     * @param {string} view sm, xs, md, le, xl
+     */
+
     getVisibility(view){
         let width = document.body.clientWidth;
         if( width < 600 ){ return view === "xs"; }
@@ -87,7 +93,7 @@ class LongTake extends ModuleBase {
         if( width >= 960 && width < 1264 ){ return ['sm','xs','md'].indexOf(view) !== -1 }
         if( width >= 1264 && width < 1904 ){ return ['sm','xs','md','lg'].indexOf(view) !== -1 }
         if( width >= 1904 ){ return ['sm','xs','md','lg','xl'].indexOf(view) !== -1 }
-        return document.body.clientWidth;
+        return false;
     }
 
     //=============================
@@ -222,6 +228,10 @@ class LongTake extends ModuleBase {
     // stage
     //
 
+    /**
+     * @member {Sprite} stage 頂層精靈，由此往下加入精靈
+     */
+
     initStage(){
         this.stage = new Sprite("Stage");
         this.stage.install(this);
@@ -250,8 +260,8 @@ class LongTake extends ModuleBase {
         this.buffer.clear();
         this.stage.mainEvent();
         this.stage.mainUpdate(this.ticker + 1);
-        this.stage.mainRender();
         if( this.baseFps <= 0 ){
+            this.stage.mainRender();
             this.stage.drawBuffer(this.buffer);
         }
     }
