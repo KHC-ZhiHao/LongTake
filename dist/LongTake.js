@@ -508,6 +508,7 @@ class LongTake extends ModuleBase {
      * @member {object} target 目前運行的canvas
      * @member {number} framePerSecond 最大FPS數
      * @member {number} baseFps 目前實際運行的fps
+     * @member {boolean} stopOfAboveWindow 超出視窗外是否停止渲染
      */
 
     constructor( target, width, height ){
@@ -518,6 +519,7 @@ class LongTake extends ModuleBase {
         this.target = target;
         this.targetRect = this.target.getBoundingClientRect();
         this.framePerSecond = 60;
+        this.stopOfAboveWindow = true;
         this.baseFps = 0;
  
         this.initBitmap();
@@ -711,7 +713,7 @@ class LongTake extends ModuleBase {
             this.target.addEventListener( eventName, this.event[eventName] );
         }
     }
-
+    
     pointerMove(event){
         this.pointerX = ( event.offsetX - this.camera.offsetX ) * this.target.width / this.targetRect.width;
         this.pointerY = ( event.offsetY - this.camera.offsetY ) * this.target.height / this.targetRect.height;
@@ -743,9 +745,11 @@ class LongTake extends ModuleBase {
 
     update(){
         this.baseFps -= 1;
-        this.stageUpdate();
-        this.bitmapUpdate();
-        this.eventAction = {};
+        if( this.stopOfAboveWindow === false || window.pageYOffset < this.target.offsetTop + this.targetRect.height ){
+            this.stageUpdate();
+            this.bitmapUpdate();
+            this.eventAction = {};
+        }
         if( this.baseFps <= 0 ){ 
             this.baseFps = 60 / this.framePerSecond;
         }
@@ -758,15 +762,13 @@ class LongTake extends ModuleBase {
         this.buffer.clear();
         this.stage.mainEvent();
         this.stage.mainUpdate(this.ticker + 1);
-        if( this.baseFps <= 0 ){
-            this.stage.mainRender();
-            this.stage.drawBuffer(this.buffer);
-        }
     }
 
     bitmapUpdate(){
         if( this.baseFps <= 0 ){
             if( this.camera.sprite ){ this.updateCamera(); }
+            this.stage.mainRender();
+            this.stage.drawBuffer(this.buffer);
             this.bitmap.clear();
             this.bitmap.context.drawImage( this.buffer.canvas, this.camera.offsetX, this.camera.offsetY );
         }
