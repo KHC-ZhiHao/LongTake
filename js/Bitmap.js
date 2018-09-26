@@ -1,3 +1,8 @@
+/**
+ * @class Bitmap
+ * @desc 為掌管位元圖的物件
+ */
+
 class Bitmap extends ModuleBase {
 
     constructor( width = 100, height = 100, element ){

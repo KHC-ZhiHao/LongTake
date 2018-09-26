@@ -1,3 +1,8 @@
+/**
+ * @class LongTake(canvasDom,width,height)
+ * @desc 核心驅動
+ */
+
 class LongTake extends ModuleBase {
 
     /**
@@ -39,7 +44,6 @@ class LongTake extends ModuleBase {
     //
 
     /**
-     * @private
      * @function initBitmap()
      * @desc 初始化位元圖
      */
@@ -54,7 +58,6 @@ class LongTake extends ModuleBase {
     }
 
     /**
-     * @private
      * @function register(sprite)
      * @desc 當sprite優先註冊過事件，在此回補註冊至LongTake
      */
@@ -83,7 +86,7 @@ class LongTake extends ModuleBase {
     /**
      * @function getVisibility(view)
      * @desc 檢測目前螢幕裝置大小
-     * @param {string} view sm, xs, md, le, xl
+     * @param {string} view xs, sm, md, le, xl
      */
 
     getVisibility(view){
@@ -163,7 +166,6 @@ class LongTake extends ModuleBase {
     }
 
     /**
-     * @private
      * @function updateCameraOfSide(screen,rect,main)
      * @desc 計算是否在畫面邊緣
      */

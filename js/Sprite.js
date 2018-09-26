@@ -15,7 +15,6 @@ class Sprite extends ModuleBase {
         this.initStatus();
         this.initBitmap();
         this.initFamily();
-        this.initShadow();
         this.initPosition();
         this.initContainer();
     }
@@ -75,7 +74,6 @@ class Sprite extends ModuleBase {
     //
 
     /**
-     * @private
      * @function install(main)
      * @desc 被加入LongTake時執行，並載入LongTake
      */
@@ -104,6 +102,11 @@ class Sprite extends ModuleBase {
         this.context = this.bitmap.context;
     }
 
+    /**
+     * @member {number} width 精靈寬(和位圖同步)
+     * @member {number} height 精靈高(和位圖同步)
+     */
+
     get width(){ return this.bitmap.width }
     get height(){ return this.bitmap.height }
 
@@ -129,6 +132,11 @@ class Sprite extends ModuleBase {
     //
     // family
     //
+
+    /**
+     * @member {Sprite} parent 父精靈
+     * @member {array} children 子精靈組
+     */
 
     initFamily(){
         this.parent = null;
@@ -170,45 +178,6 @@ class Sprite extends ModuleBase {
             if( Array.isArray(list) ){ newData = newData.concat(list); }
         });
         this.children = newData;
-    }
-
-    //=============================
-    //
-    // shadow
-    //
-
-    initShadow(){
-        this.shadowData = {
-            offsetX : 0,
-            offsetY : 0,
-            color : "#000",
-            blur : 0,
-            use : false,
-        }
-    }
-
-    /**
-     * @function setShadow(data)
-     * @desc 設定陰影
-     * @param {object} data offsetX,offsetY,color,blur
-     */
-    
-    setShadow(data){
-        if( typeof data === "object" ){
-            this.shadowData = Object.assign( this.shadowData, data );
-            this.shadowData.use = true;
-        }else{
-            this.systemError( "setShadow", "Data must a object.", data );
-        }
-    }
-
-    /**
-     * @function unShadow()
-     * @desc 關閉陰影
-     */
-
-    unShadow(){
-        this.shadowData.use = false;
     }
 
     //=============================
@@ -262,6 +231,16 @@ class Sprite extends ModuleBase {
     //
     // container
     //
+
+    /**
+     * @member {number} skewX 傾斜X
+     * @member {number} skewY 傾斜Y
+     * @member {number} scaleWidth 放大寬
+     * @member {number} scaleHeight 放大高
+     * @member {number} rotation 旋轉
+     * @member {number} opacity 透明度
+     * @member {number} blendMode 合成模式
+     */
 
     initContainer(){
         this.container = {
@@ -326,6 +305,14 @@ class Sprite extends ModuleBase {
     //
     // position
     //
+
+    /**
+     * @member {number} x 定位點X
+     * @member {number} y 定位點Y
+     * @member {number} z 高度，每次設定會重新排序
+     * @member {number} anchorX 錨點X
+     * @member {number} anchorY 錨點Y
+     */
 
     initPosition(){
         this.position = {
@@ -737,17 +724,7 @@ class Sprite extends ModuleBase {
      */
 
     drawBitmap(buffer){
-        if( this.shadowData.use ){
-            buffer.context.save();
-            buffer.context.shadowBlur = this.shadowData.blur;
-            buffer.context.shadowColor = this.shadowData.color;
-            buffer.context.shadowOffsetX = this.shadowData.offsetX;
-            buffer.context.shadowOffsetY = this.shadowData.offsetY;
-            buffer.draw( this.bitmap, this.screenX, this.screenY );
-            buffer.context.restore();
-        }else{
-            buffer.draw( this.bitmap, this.screenX, this.screenY );
-        }
+        buffer.draw( this.bitmap, this.screenX, this.screenY );
         this.eachChildren((children)=>{ children.drawBuffer(buffer); });
     }
 

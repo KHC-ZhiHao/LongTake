@@ -69,7 +69,8 @@ class Loader extends ModuleBase {
 
     /**
      * @function validateFile(file)
-     * @param 驗證檔案是否正確
+     * @private
+     * @desc 驗證檔案是否正確
      */
 
     validateFile( file ){
