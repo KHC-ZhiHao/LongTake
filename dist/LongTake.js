@@ -401,7 +401,6 @@ class Bitmap extends ModuleBase {
 
     constructor( width = 100, height = 100, element ){
         super("Bitmap");
-        this.autoResize = false;
         this.canvas = element || document.createElement('canvas');
         this.context = this.canvas.getContext('2d');
         this.imgData = null;
@@ -443,7 +442,7 @@ class Bitmap extends ModuleBase {
      */
 
     draw( bitmap, x, y ){
-        this.context.drawImage( bitmap.canvas, x, y );
+        this.context.drawImage( bitmap.canvas, Math.round(x), Math.round(y) );
     }
 
     /**
@@ -491,32 +490,6 @@ class Bitmap extends ModuleBase {
     putImageData(imgData){
         this.clear();
         this.context.putImageData(imgData,0,0);
-    }
-
-    /**
-     * @function crop()
-     * @desc 裁切掉透明的部分並回傳新的bitmap
-     */
-
-    crop(){
-        let pix = { x : [], y : [], }
-        for( let y = 0; y < this.height ; y++ ){
-            for( let x = 0; x < this.width ; x++ ){
-                if( this.getPixel(x,y)[3] > 0 ){
-                    pix.x.push(x);
-                    pix.y.push(y);
-                }
-            }
-        }
-        if( pix.x.length === 0 || pix.y.length === 0 ){ return new Bitmap( 0, 0 ); }
-        pix.x.sort(function(a,b){return a-b});
-        pix.y.sort(function(a,b){return a-b});
-        let n = pix.x.length - 1;
-        let w = pix.x[n] - pix.x[0];
-        let h = pix.y[n] - pix.y[0];
-        let bitmap = new Bitmap( this.width, this.height );
-            bitmap.putImageData( this.context.getImageData(pix.x[0], pix.y[0], w, h) );
-        return bitmap;
     }
 
 }
@@ -1577,7 +1550,7 @@ class Sprite extends ModuleBase {
      * @desc 對一個buffer準備進行繪製
      */
 
-    drawBuffer(buffer){
+    drawBuffer( buffer ){
         if( this.canShow ){
             buffer.context.save();
             this.drawTransform(buffer);
@@ -1595,30 +1568,31 @@ class Sprite extends ModuleBase {
         //中心
         let posX = this.posX;
         let posY = this.posY;
-        buffer.context.translate( posX, posY );
+        let context = buffer.context;
+        context.translate( posX, posY );
         //遮罩
         if( this.mask ){
             this.mask();
             this.context.clip();
         }
         if( this.opacity !== 255 ){
-            buffer.context.globalAlpha = this.opacity / 255;
+            context.globalAlpha = this.opacity / 255;
         }
         //合成
         if( this.blendMode ){
-            buffer.context.globalCompositeOperation = this.blendMode;
+            context.globalCompositeOperation = this.blendMode;
         }
         if( this.rotation !== 0 ){
-            buffer.context.rotate( this.rotation * this.main.math.arc );
+            context.rotate( this.rotation * this.main.math.arc );
         }
         if( this.scaleHeight !== 1 || this.scaleWidth !== 1 ){
-            buffer.context.scale( this.scaleWidth, this.scaleHeight );
+            context.scale( this.scaleWidth, this.scaleHeight );
         }
         if( this.skewX !== 0 || this.skewY !== 0 ){
-            buffer.context.transform( 1, this.skewX, this.skewY, 1, 0, 0 );
+            context.transform( 1, this.skewX, this.skewY, 1, 0, 0 );
         }
         //回歸原點
-        buffer.context.translate( -(posX), -(posY) );
+        context.translate( -(posX), -(posY) );
     }
 
     /**

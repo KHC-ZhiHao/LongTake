@@ -674,7 +674,7 @@ class Sprite extends ModuleBase {
      * @desc 對一個buffer準備進行繪製
      */
 
-    drawBuffer(buffer){
+    drawBuffer( buffer ){
         if( this.canShow ){
             buffer.context.save();
             this.drawTransform(buffer);
@@ -692,30 +692,31 @@ class Sprite extends ModuleBase {
         //中心
         let posX = this.posX;
         let posY = this.posY;
-        buffer.context.translate( posX, posY );
+        let context = buffer.context;
+        context.translate( posX, posY );
         //遮罩
         if( this.mask ){
             this.mask();
             this.context.clip();
         }
         if( this.opacity !== 255 ){
-            buffer.context.globalAlpha = this.opacity / 255;
+            context.globalAlpha = this.opacity / 255;
         }
         //合成
         if( this.blendMode ){
-            buffer.context.globalCompositeOperation = this.blendMode;
+            context.globalCompositeOperation = this.blendMode;
         }
         if( this.rotation !== 0 ){
-            buffer.context.rotate( this.rotation * this.main.math.arc );
+            context.rotate( this.rotation * this.main.math.arc );
         }
         if( this.scaleHeight !== 1 || this.scaleWidth !== 1 ){
-            buffer.context.scale( this.scaleWidth, this.scaleHeight );
+            context.scale( this.scaleWidth, this.scaleHeight );
         }
         if( this.skewX !== 0 || this.skewY !== 0 ){
-            buffer.context.transform( 1, this.skewX, this.skewY, 1, 0, 0 );
+            context.transform( 1, this.skewX, this.skewY, 1, 0, 0 );
         }
         //回歸原點
-        buffer.context.translate( -(posX), -(posY) );
+        context.translate( -(posX), -(posY) );
     }
 
     /**
