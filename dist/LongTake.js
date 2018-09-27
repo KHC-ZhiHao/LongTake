@@ -581,6 +581,7 @@ class LongTake extends ModuleBase {
         this.framePerSecond = 60;
         this.stopOfAboveWindow = true;
         this.baseFps = 0;
+        this.asyncRefresh = false;
  
         this.initBitmap();
         this.initCamera();
@@ -809,11 +810,12 @@ class LongTake extends ModuleBase {
             || window.pageYOffset < this.target.offsetTop + this.targetRect.height
             || window.pageYOffset + document.body.scrollHeight > this.target.offsetTop  ){
             this.stageUpdate();
-            this.bitmapUpdate();
+            if( this.baseFps <= 0 && this.asyncRefresh === false ){
+                this.asyncRefresh = true;
+                this.bitmapUpdate();
+                this.baseFps = 60 / this.framePerSecond;
+            }
             this.eventAction = {};
-        }
-        if( this.baseFps <= 0 ){ 
-            this.baseFps = 60 / this.framePerSecond;
         }
         this.ticker = window.requestAnimationFrame(()=>{
             this.update();
@@ -826,14 +828,13 @@ class LongTake extends ModuleBase {
         this.stage.mainUpdate(this.ticker + 1);
     }
 
-    bitmapUpdate(){
-        if( this.baseFps <= 0 ){
-            if( this.camera.sprite ){ this.updateCamera(); }
-            this.stage.mainRender();
-            this.buffer.render(this.stage);
-            this.bitmap.clearRect( 0, 0, this.target.width, this.target.height );
-            this.bitmap.drawImage( this.buffer.canvas, this.camera.offsetX, this.camera.offsetY );
-        }
+    async bitmapUpdate(){
+        if( this.camera.sprite ){ this.updateCamera(); }
+        this.stage.mainRender();
+        this.buffer.render(this.stage);
+        this.bitmap.clearRect( 0, 0, this.target.width, this.target.height );
+        this.bitmap.drawImage( this.buffer.canvas, this.camera.offsetX, this.camera.offsetY );
+        this.asyncRefresh = false;
     }
 
 }
