@@ -240,6 +240,7 @@ class Sprite extends ModuleBase {
      * @member {number} rotation 旋轉
      * @member {number} opacity 透明度
      * @member {number} blendMode 合成模式
+     * @member {number} transform 是否啟用變形
      */
 
     initContainer(){
@@ -299,6 +300,11 @@ class Sprite extends ModuleBase {
     get skewY(){ return this.container.skewY }
     set skewY(val){
         this.container.skewY = val;
+    }
+
+    get transform(){ return this.bitmap.transform }
+    set transform(val){
+        this.bitmap.transform = !!val;
     }
 
     //=============================
@@ -397,6 +403,7 @@ class Sprite extends ModuleBase {
 
     cache(){
         this.status.cache = true;
+        this.bitmap.cache = true;
     }
 
     /**
@@ -406,6 +413,7 @@ class Sprite extends ModuleBase {
 
     unCache(){
         this.status.cache = false;
+        this.bitmap.cache = false;
     }
 
     /**
@@ -613,7 +621,7 @@ class Sprite extends ModuleBase {
             this.context.restore();
             this.renderFilter(this.filter);
             this.context.restore();
-            this.bitmap.clearImgDataCache();
+            this.bitmap.clearCache();
         }
     }
 
@@ -662,71 +670,6 @@ class Sprite extends ModuleBase {
         }else{
             this.systemError("resizeMax", "Function call must in the create or update.");
         }
-    }
-
-    //=============================
-    //
-    // draw
-    //
-
-    /**
-     * @function drawBuffer(buffer)
-     * @desc 對一個buffer準備進行繪製
-     */
-
-    drawBuffer( buffer ){
-        if( this.canShow ){
-            buffer.context.save();
-            this.drawTransform(buffer);
-            this.drawBitmap(buffer);
-            buffer.context.restore();
-        }
-    }
-
-    /**
-     * @function drawTransform(buffer)
-     * @desc 繪製buffer前的轉換行為
-     */
-
-    drawTransform(buffer){
-        //中心
-        let posX = this.posX;
-        let posY = this.posY;
-        let context = buffer.context;
-        context.translate( posX, posY );
-        //遮罩
-        if( this.mask ){
-            this.mask();
-            this.context.clip();
-        }
-        if( this.opacity !== 255 ){
-            context.globalAlpha = this.opacity / 255;
-        }
-        //合成
-        if( this.blendMode ){
-            context.globalCompositeOperation = this.blendMode;
-        }
-        if( this.rotation !== 0 ){
-            context.rotate( this.rotation * this.main.math.arc );
-        }
-        if( this.scaleHeight !== 1 || this.scaleWidth !== 1 ){
-            context.scale( this.scaleWidth, this.scaleHeight );
-        }
-        if( this.skewX !== 0 || this.skewY !== 0 ){
-            context.transform( 1, this.skewX, this.skewY, 1, 0, 0 );
-        }
-        //回歸原點
-        context.translate( -(posX), -(posY) );
-    }
-
-    /**
-     * @function drawBitmap(buffer)
-     * @desc 將自身的bitmap繪製buffer上
-     */
-
-    drawBitmap(buffer){
-        buffer.draw( this.bitmap, this.screenX, this.screenY );
-        this.eachChildren((children)=>{ children.drawBuffer(buffer); });
     }
 
     //=============================

@@ -52,7 +52,8 @@ class LongTake extends ModuleBase {
 
     initBitmap(){
         if( this.target instanceof Element && this.target.tagName === "CANVAS" ){
-            this.bitmap = new Bitmap( 0 , 0, this.target );
+            this.bitmap = new Bitmap( 0, 0, this.target );
+            this.bitmap.context.globalCompositeOperation = "copy";
             this.buffer = new Bitmap( this.width, this.height );
         }else{
             this.systemError("initBitmap", "Object not a cavnas.", this.target);
@@ -249,7 +250,9 @@ class LongTake extends ModuleBase {
 
     update(){
         this.baseFps -= 1;
-        if( this.stopOfAboveWindow === false || window.pageYOffset < this.target.offsetTop + this.targetRect.height ){
+        if( this.stopOfAboveWindow === false 
+            || window.pageYOffset < this.target.offsetTop + this.targetRect.height
+            || window.pageYOffset + document.body.scrollHeight > this.target.offsetTop  ){
             this.stageUpdate();
             this.bitmapUpdate();
             this.eventAction = {};
@@ -272,8 +275,7 @@ class LongTake extends ModuleBase {
         if( this.baseFps <= 0 ){
             if( this.camera.sprite ){ this.updateCamera(); }
             this.stage.mainRender();
-            this.stage.drawBuffer(this.buffer);
-            this.bitmap.clear();
+            this.buffer.render(this.stage);
             this.bitmap.context.drawImage( this.buffer.canvas, this.camera.offsetX, this.camera.offsetY );
         }
     }

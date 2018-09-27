@@ -403,7 +403,10 @@ class Bitmap extends ModuleBase {
         super("Bitmap");
         this.canvas = element || document.createElement('canvas');
         this.context = this.canvas.getContext('2d');
+        this.transform = true;
+        this.cacheMode = false;
         this.imgData = null;
+        this.image = null;
         if( element == null ){ this.resize( width, height ) }
     }
 
@@ -416,6 +419,62 @@ class Bitmap extends ModuleBase {
 
     get height(){ return this.canvas.height }
     set height(val){ this.canvas.height = val; }
+
+    getRenderTarget(){
+        if( this.image ){
+            return this.image;
+        }else if( this.cache == false ){
+            return this.canvas;
+        }else {
+            let img = new Image();
+                img.onload = ()=>{ this.image = img }
+                img.src = this.canvas.toDataURL();
+            return this.canvas;
+        }
+    }
+
+    render(sprite){
+        if( this.transform ){
+            this.context.save();
+            this.drawTransform(sprite);
+        }
+        this.draw( sprite.bitmap, sprite.screenX, sprite.screenY );
+        sprite.eachChildren((child)=>{ this.render(child); });
+        if( this.transform ){
+            this.context.restore();
+        }
+    }
+
+    drawTransform(sprite){
+        //中心
+        let posX = sprite.posX;
+        let posY = sprite.posY;
+        let context = this.context;
+        context.translate( posX, posY );
+        //遮罩
+        if( sprite.mask ){
+            sprite.mask();
+            sprite.context.clip();
+        }
+        if( sprite.opacity !== 255 ){
+            context.globalAlpha = sprite.opacity / 255;
+        }
+        //合成
+        if( sprite.blendMode ){
+            context.globalCompositeOperation = sprite.blendMode;
+        }
+        if( sprite.rotation !== 0 ){
+            context.rotate( sprite.rotation * sprite.main.math.arc );
+        }
+        if( sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1 ){
+            context.scale( sprite.scaleWidth, sprite.scaleHeight );
+        }
+        if( sprite.skewX !== 0 || sprite.skewY !== 0 ){
+            context.transform( 1, sprite.skewX, sprite.skewY, 1, 0, 0 );
+        }
+        //回歸原點
+        context.translate( -(posX), -(posY) );
+    }
 
     /**
      * @function resize(width,height)
@@ -442,16 +501,17 @@ class Bitmap extends ModuleBase {
      */
 
     draw( bitmap, x, y ){
-        this.context.drawImage( bitmap.canvas, Math.round(x), Math.round(y) );
+        this.context.drawImage( bitmap.getRenderTarget(), Math.floor(x), Math.floor(y) );
     }
 
     /**
-     * @function clearImgDataCache()
-     * @desc 清除圖片資料快取
+     * @function clearCache()
+     * @desc 解除並清除圖片資料快取
      */
 
-    clearImgDataCache(){
+    clearCache(){
         this.imgData = null;
+        this.image = null;
     }
 
     /**
@@ -548,7 +608,8 @@ class LongTake extends ModuleBase {
 
     initBitmap(){
         if( this.target instanceof Element && this.target.tagName === "CANVAS" ){
-            this.bitmap = new Bitmap( 0 , 0, this.target );
+            this.bitmap = new Bitmap( 0, 0, this.target );
+            this.bitmap.context.globalCompositeOperation = "copy";
             this.buffer = new Bitmap( this.width, this.height );
         }else{
             this.systemError("initBitmap", "Object not a cavnas.", this.target);
@@ -745,7 +806,9 @@ class LongTake extends ModuleBase {
 
     update(){
         this.baseFps -= 1;
-        if( this.stopOfAboveWindow === false || window.pageYOffset < this.target.offsetTop + this.targetRect.height ){
+        if( this.stopOfAboveWindow === false 
+            || window.pageYOffset < this.target.offsetTop + this.targetRect.height
+            || window.pageYOffset + document.body.scrollHeight > this.target.offsetTop  ){
             this.stageUpdate();
             this.bitmapUpdate();
             this.eventAction = {};
@@ -768,8 +831,7 @@ class LongTake extends ModuleBase {
         if( this.baseFps <= 0 ){
             if( this.camera.sprite ){ this.updateCamera(); }
             this.stage.mainRender();
-            this.stage.drawBuffer(this.buffer);
-            this.bitmap.clear();
+            this.buffer.render(this.stage);
             this.bitmap.context.drawImage( this.buffer.canvas, this.camera.offsetX, this.camera.offsetY );
         }
     }
@@ -1118,6 +1180,7 @@ class Sprite extends ModuleBase {
      * @member {number} rotation 旋轉
      * @member {number} opacity 透明度
      * @member {number} blendMode 合成模式
+     * @member {number} transform 是否啟用變形
      */
 
     initContainer(){
@@ -1177,6 +1240,11 @@ class Sprite extends ModuleBase {
     get skewY(){ return this.container.skewY }
     set skewY(val){
         this.container.skewY = val;
+    }
+
+    get transform(){ return this.bitmap.transform }
+    set transform(val){
+        this.bitmap.transform = !!val;
     }
 
     //=============================
@@ -1275,6 +1343,7 @@ class Sprite extends ModuleBase {
 
     cache(){
         this.status.cache = true;
+        this.bitmap.cache = true;
     }
 
     /**
@@ -1284,6 +1353,7 @@ class Sprite extends ModuleBase {
 
     unCache(){
         this.status.cache = false;
+        this.bitmap.cache = false;
     }
 
     /**
@@ -1491,7 +1561,7 @@ class Sprite extends ModuleBase {
             this.context.restore();
             this.renderFilter(this.filter);
             this.context.restore();
-            this.bitmap.clearImgDataCache();
+            this.bitmap.clearCache();
         }
     }
 
@@ -1540,71 +1610,6 @@ class Sprite extends ModuleBase {
         }else{
             this.systemError("resizeMax", "Function call must in the create or update.");
         }
-    }
-
-    //=============================
-    //
-    // draw
-    //
-
-    /**
-     * @function drawBuffer(buffer)
-     * @desc 對一個buffer準備進行繪製
-     */
-
-    drawBuffer( buffer ){
-        if( this.canShow ){
-            buffer.context.save();
-            this.drawTransform(buffer);
-            this.drawBitmap(buffer);
-            buffer.context.restore();
-        }
-    }
-
-    /**
-     * @function drawTransform(buffer)
-     * @desc 繪製buffer前的轉換行為
-     */
-
-    drawTransform(buffer){
-        //中心
-        let posX = this.posX;
-        let posY = this.posY;
-        let context = buffer.context;
-        context.translate( posX, posY );
-        //遮罩
-        if( this.mask ){
-            this.mask();
-            this.context.clip();
-        }
-        if( this.opacity !== 255 ){
-            context.globalAlpha = this.opacity / 255;
-        }
-        //合成
-        if( this.blendMode ){
-            context.globalCompositeOperation = this.blendMode;
-        }
-        if( this.rotation !== 0 ){
-            context.rotate( this.rotation * this.main.math.arc );
-        }
-        if( this.scaleHeight !== 1 || this.scaleWidth !== 1 ){
-            context.scale( this.scaleWidth, this.scaleHeight );
-        }
-        if( this.skewX !== 0 || this.skewY !== 0 ){
-            context.transform( 1, this.skewX, this.skewY, 1, 0, 0 );
-        }
-        //回歸原點
-        context.translate( -(posX), -(posY) );
-    }
-
-    /**
-     * @function drawBitmap(buffer)
-     * @desc 將自身的bitmap繪製buffer上
-     */
-
-    drawBitmap(buffer){
-        buffer.draw( this.bitmap, this.screenX, this.screenY );
-        this.eachChildren((children)=>{ children.drawBuffer(buffer); });
     }
 
     //=============================
