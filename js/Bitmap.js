@@ -10,7 +10,7 @@ class Bitmap extends ModuleBase {
         this.canvas = element || document.createElement('canvas');
         this.context = this.canvas.getContext('2d');
         this.transform = true;
-        this.cacheMode = false;
+        this.cache = false;
         this.imgData = null;
         this.image = null;
         if( element == null ){ this.resize( width, height ) }
