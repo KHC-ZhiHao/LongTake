@@ -407,6 +407,7 @@ class Bitmap extends ModuleBase {
         this.cache = false;
         this.imgData = null;
         this.image = null;
+        this.bindRender = this.render.bind(this);
         if( element == null ){ this.resize( width, height ) }
     }
 
@@ -439,7 +440,7 @@ class Bitmap extends ModuleBase {
             this.drawTransform(sprite);
         }
         this.draw( sprite.bitmap, sprite.screenX, sprite.screenY );
-        sprite.eachChildren((child)=>{ this.render(child); });
+        sprite.eachChildren(this.bindRender);
         if( this.transform ){
             this.context.restore();
         }
@@ -582,6 +583,8 @@ class LongTake extends ModuleBase {
         this.stopOfAboveWindow = true;
         this.baseFps = 0;
         this.asyncRefresh = false;
+        this.bindUpdate = this.update.bind(this);
+        this.remove = false;
  
         this.initBitmap();
         this.initCamera();
@@ -595,6 +598,15 @@ class LongTake extends ModuleBase {
         function(callback) { window.setTimeout(callback, 1000 / 60); };
 
         this.update();
+    }
+
+    close(){
+        this.remove = true;
+        this.target = null;
+        this.stage.eachChildrenDeep((child)=>{
+            child.close();
+        });
+        this.stage = null;
     }
 
     //=============================
@@ -658,6 +670,8 @@ class LongTake extends ModuleBase {
         if( width >= 1904 ){ return ['sm','xs','md','lg','xl'].indexOf(view) !== -1 }
         return false;
     }
+
+    
 
     //=============================
     //
@@ -806,10 +820,13 @@ class LongTake extends ModuleBase {
     //
 
     update(){
+        if( this.remove == true ){
+            window.cancelAnimationFrame(this.ticker);
+        }
         this.baseFps += this.framePerSecond;
         if( this.stopOfAboveWindow === false 
             || window.pageYOffset < this.target.offsetTop + this.targetRect.height
-            || window.pageYOffset + document.body.scrollHeight > this.target.offsetTop  ){
+            || window.pageYOffset + document.body.scrollHeight > this.target.offsetTop ){
             this.stageUpdate();
             if( this.baseFps >= 60 && this.asyncRefresh === false ){
                 this.asyncRefresh = true;
@@ -818,15 +835,13 @@ class LongTake extends ModuleBase {
             }
             this.eventAction = {};
         }
-        this.ticker = window.requestAnimationFrame(()=>{
-            this.update();
-        });
+        this.ticker = window.requestAnimationFrame(this.bindUpdate);
     }
 
     stageUpdate(){
         this.buffer.clear();
         this.stage.mainEvent();
-        this.stage.mainUpdate(this.ticker + 1);
+        this.stage.mainUpdate();
     }
 
     async bitmapUpdate(){
@@ -1331,6 +1346,7 @@ class Sprite extends ModuleBase {
             remove : false,
             hidden : false,
             readSize : null,
+            childrenDead : false,
         }
     }
 
@@ -1426,32 +1442,40 @@ class Sprite extends ModuleBase {
 
     /**
      * @function mainUpdate()
+     * @private
      * @desc 每次執行update時呼叫此函式，處理Z值更動的排序與移除子精靈
      */
 
-    mainUpdate(ticker){
+    mainUpdate(){
         this.status.readSize = null;
-        let remove = false;
         if( this.status.sort ){
             this.status.sort = false;
             this.sortChildren();
         }
-        this.update(ticker);
-        this.eachChildren((children)=>{
-            if( children.status.remove == false ){
-                children.mainUpdate(ticker);
-            }else{
-                remove = true;
-            }
-        });
-        if( remove ){
-            this.children = this.children.filter((c)=>{
-                if( c.status.remove ){ 
-                    c.id = -1; 
-                    c.parent = null; 
+        this.update();
+        this.eachChildren(this.updateForChild);
+        if( this.childrenDead ){
+            this.childrenDead = false;
+            this.children = this.children.filter((child)=>{
+                if( child.status.remove ){ 
+                    child.close();
                 }
                 return !c.status.remove;
             });
+        }
+    }
+
+    /**
+     * @function updateForChild(child)
+     * @private
+     * @desc 呼叫子精靈更新
+     */
+
+    updateForChild(child){
+        if( child.status.remove == false ){
+            child.mainUpdate();
+        }else{
+            this.childrenDead = true;
         }
     }
 
@@ -1459,6 +1483,17 @@ class Sprite extends ModuleBase {
     //
     // remove
     //
+
+    /**
+     * @function close()
+     * @private
+     * @desc 移除自身的綁定資訊(容易出錯，請使用remove讓精靈在迭代過程中被移除)
+     */
+
+    close(){
+        this.id = -1; 
+        this.parent = null; 
+    }
 
     /**
      * @function remove()
@@ -1550,12 +1585,13 @@ class Sprite extends ModuleBase {
 
     /**
      * @function mainRender(force)
+     * @private
      * @desc 主要渲染程序，包含渲染與濾鏡
      * @param {boolean} force 無視快取強制重新渲染(切忌渲染需要高效能的成本付出)
      */
 
     mainRender(force){
-        this.eachChildren((children)=>{children.mainRender();})
+        this.eachChildren(this.renderForChild)
         if( this.canRender || force ){ 
             this.context.save();
             this.render(this);
@@ -1564,6 +1600,16 @@ class Sprite extends ModuleBase {
             this.context.restore();
             this.bitmap.clearCache();
         }
+    }
+
+    /**
+     * @function renderForChild(child)
+     * @private
+     * @desc 呼叫子精靈渲染
+     */
+
+    renderForChild(child){
+        child.mainRender();
     }
 
     /**

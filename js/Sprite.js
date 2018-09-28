@@ -390,6 +390,7 @@ class Sprite extends ModuleBase {
             remove : false,
             hidden : false,
             readSize : null,
+            childrenDead : false,
         }
     }
 
@@ -485,32 +486,40 @@ class Sprite extends ModuleBase {
 
     /**
      * @function mainUpdate()
+     * @private
      * @desc 每次執行update時呼叫此函式，處理Z值更動的排序與移除子精靈
      */
 
-    mainUpdate(ticker){
+    mainUpdate(){
         this.status.readSize = null;
-        let remove = false;
         if( this.status.sort ){
             this.status.sort = false;
             this.sortChildren();
         }
-        this.update(ticker);
-        this.eachChildren((children)=>{
-            if( children.status.remove == false ){
-                children.mainUpdate(ticker);
-            }else{
-                remove = true;
-            }
-        });
-        if( remove ){
-            this.children = this.children.filter((c)=>{
-                if( c.status.remove ){ 
-                    c.id = -1; 
-                    c.parent = null; 
+        this.update();
+        this.eachChildren(this.updateForChild);
+        if( this.childrenDead ){
+            this.childrenDead = false;
+            this.children = this.children.filter((child)=>{
+                if( child.status.remove ){ 
+                    child.close();
                 }
                 return !c.status.remove;
             });
+        }
+    }
+
+    /**
+     * @function updateForChild(child)
+     * @private
+     * @desc 呼叫子精靈更新
+     */
+
+    updateForChild(child){
+        if( child.status.remove == false ){
+            child.mainUpdate();
+        }else{
+            this.childrenDead = true;
         }
     }
 
@@ -518,6 +527,17 @@ class Sprite extends ModuleBase {
     //
     // remove
     //
+
+    /**
+     * @function close()
+     * @private
+     * @desc 移除自身的綁定資訊(容易出錯，請使用remove讓精靈在迭代過程中被移除)
+     */
+
+    close(){
+        this.id = -1; 
+        this.parent = null; 
+    }
 
     /**
      * @function remove()
@@ -609,12 +629,13 @@ class Sprite extends ModuleBase {
 
     /**
      * @function mainRender(force)
+     * @private
      * @desc 主要渲染程序，包含渲染與濾鏡
      * @param {boolean} force 無視快取強制重新渲染(切忌渲染需要高效能的成本付出)
      */
 
     mainRender(force){
-        this.eachChildren((children)=>{children.mainRender();})
+        this.eachChildren(this.renderForChild)
         if( this.canRender || force ){ 
             this.context.save();
             this.render(this);
@@ -623,6 +644,16 @@ class Sprite extends ModuleBase {
             this.context.restore();
             this.bitmap.clearCache();
         }
+    }
+
+    /**
+     * @function renderForChild(child)
+     * @private
+     * @desc 呼叫子精靈渲染
+     */
+
+    renderForChild(child){
+        child.mainRender();
     }
 
     /**

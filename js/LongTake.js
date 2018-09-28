@@ -26,6 +26,8 @@ class LongTake extends ModuleBase {
         this.stopOfAboveWindow = true;
         this.baseFps = 0;
         this.asyncRefresh = false;
+        this.bindUpdate = this.update.bind(this);
+        this.remove = false;
  
         this.initBitmap();
         this.initCamera();
@@ -39,6 +41,15 @@ class LongTake extends ModuleBase {
         function(callback) { window.setTimeout(callback, 1000 / 60); };
 
         this.update();
+    }
+
+    close(){
+        this.remove = true;
+        this.target = null;
+        this.stage.eachChildrenDeep((child)=>{
+            child.close();
+        });
+        this.stage = null;
     }
 
     //=============================
@@ -102,6 +113,8 @@ class LongTake extends ModuleBase {
         if( width >= 1904 ){ return ['sm','xs','md','lg','xl'].indexOf(view) !== -1 }
         return false;
     }
+
+    
 
     //=============================
     //
@@ -250,10 +263,13 @@ class LongTake extends ModuleBase {
     //
 
     update(){
+        if( this.remove == true ){
+            window.cancelAnimationFrame(this.ticker);
+        }
         this.baseFps += this.framePerSecond;
         if( this.stopOfAboveWindow === false 
             || window.pageYOffset < this.target.offsetTop + this.targetRect.height
-            || window.pageYOffset + document.body.scrollHeight > this.target.offsetTop  ){
+            || window.pageYOffset + document.body.scrollHeight > this.target.offsetTop ){
             this.stageUpdate();
             if( this.baseFps >= 60 && this.asyncRefresh === false ){
                 this.asyncRefresh = true;
@@ -262,15 +278,13 @@ class LongTake extends ModuleBase {
             }
             this.eventAction = {};
         }
-        this.ticker = window.requestAnimationFrame(()=>{
-            this.update();
-        });
+        this.ticker = window.requestAnimationFrame(this.bindUpdate);
     }
 
     stageUpdate(){
         this.buffer.clear();
         this.stage.mainEvent();
-        this.stage.mainUpdate(this.ticker + 1);
+        this.stage.mainUpdate();
     }
 
     async bitmapUpdate(){

@@ -13,6 +13,7 @@ class Bitmap extends ModuleBase {
         this.cache = false;
         this.imgData = null;
         this.image = null;
+        this.bindRender = this.render.bind(this);
         if( element == null ){ this.resize( width, height ) }
     }
 
@@ -45,7 +46,7 @@ class Bitmap extends ModuleBase {
             this.drawTransform(sprite);
         }
         this.draw( sprite.bitmap, sprite.screenX, sprite.screenY );
-        sprite.eachChildren((child)=>{ this.render(child); });
+        sprite.eachChildren(this.bindRender);
         if( this.transform ){
             this.context.restore();
         }
