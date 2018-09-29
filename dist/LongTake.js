@@ -501,12 +501,7 @@ class Bitmap extends ModuleBase {
         this.transform = true;
         this.cache = false;
         this.imgData = null;
-<<<<<<< HEAD
         this.imgBitmap = null;
-=======
-        this.image = null;
-        this.bindRender = this.render.bind(this);
->>>>>>> 8c09db8b235c315e6359216644507634a5e31bce
         if( element == null ){ this.resize( width, height ) }
     }
 
@@ -531,52 +526,6 @@ class Bitmap extends ModuleBase {
         }
     }
 
-<<<<<<< HEAD
-=======
-    render(sprite){
-        if( this.transform ){
-            this.context.save();
-            this.drawTransform(sprite);
-        }
-        this.draw( sprite.bitmap, sprite.screenX, sprite.screenY );
-        sprite.eachChildren(this.bindRender);
-        if( this.transform ){
-            this.context.restore();
-        }
-    }
-
-    drawTransform(sprite){
-        //中心
-        let posX = sprite.posX;
-        let posY = sprite.posY;
-        let context = this.context;
-        context.translate( posX, posY );
-        //遮罩
-        if( sprite.mask ){
-            sprite.mask();
-            sprite.context.clip();
-        }
-        if( sprite.opacity !== 255 ){
-            context.globalAlpha = sprite.opacity / 255;
-        }
-        //合成
-        if( sprite.blendMode ){
-            context.globalCompositeOperation = sprite.blendMode;
-        }
-        if( sprite.rotation !== 0 ){
-            context.rotate( sprite.rotation * sprite.main.math.arc );
-        }
-        if( sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1 ){
-            context.scale( sprite.scaleWidth, sprite.scaleHeight );
-        }
-        if( sprite.skewX !== 0 || sprite.skewY !== 0 ){
-            context.transform( 1, sprite.skewX, sprite.skewY, 1, 0, 0 );
-        }
-        //回歸原點
-        context.translate( -(posX), -(posY) );
-    }
-
->>>>>>> 8c09db8b235c315e6359216644507634a5e31bce
     /**
      * @function resize(width,height)
      * @desc 調整畫布大小
@@ -689,17 +638,9 @@ class LongTake extends ModuleBase {
         this.stopOfAboveWindow = true;
         this.baseFps = 0;
         this.asyncRefresh = false;
-<<<<<<< HEAD
         this.remove = false;
         this.bindUpdate = this.update.bind(this);
 
-=======
-        this.bindUpdate = this.update.bind(this);
-        this.remove = false;
- 
-        this.initBitmap();
-        this.initCamera();
->>>>>>> 8c09db8b235c315e6359216644507634a5e31bce
         this.initStage();
         this.initEvent();
         this.initBitmap();
@@ -737,11 +678,7 @@ class LongTake extends ModuleBase {
         if( this.target instanceof Element && this.target.tagName === "CANVAS" ){
             this.bitmap = this.target.getContext('2d');
             this.bitmap.globalCompositeOperation = "copy";
-<<<<<<< HEAD
             this.buffer = new RenderBuffer(this);
-=======
-            this.buffer = new Bitmap( this.width, this.height );
->>>>>>> 8c09db8b235c315e6359216644507634a5e31bce
         }else{
             this.systemError("initBitmap", "Object not a cavnas.", this.target);
         }
@@ -964,16 +901,11 @@ class LongTake extends ModuleBase {
     async bitmapUpdate(){
         if( this.camera.sprite ){ this.updateCamera(); }
         this.stage.mainRender();
-<<<<<<< HEAD
         this.buffer.draw();
     }
 
     drawTarget(img){
         this.bitmap.drawImage( img, this.camera.offsetX, this.camera.offsetY );
-=======
-        this.buffer.render(this.stage);
-        this.bitmap.drawImage( this.buffer.canvas, this.camera.offsetX, this.camera.offsetY );
->>>>>>> 8c09db8b235c315e6359216644507634a5e31bce
         this.asyncRefresh = false;
     }
 
@@ -1703,24 +1635,14 @@ class Sprite extends ModuleBase {
     render(){ /* module set */ }
 
     /**
-<<<<<<< HEAD
      * @function mainRender()
-=======
-     * @function mainRender(force)
->>>>>>> 8c09db8b235c315e6359216644507634a5e31bce
      * @private
      * @desc 主要渲染程序，包含渲染與濾鏡
      */
 
-<<<<<<< HEAD
     mainRender(){
         this.eachChildren(this.renderForChild)
         if( this.canRender ){ 
-=======
-    mainRender(force){
-        this.eachChildren(this.renderForChild)
-        if( this.canRender || force ){ 
->>>>>>> 8c09db8b235c315e6359216644507634a5e31bce
             this.context.save();
             this.render();
             this.context.restore();
