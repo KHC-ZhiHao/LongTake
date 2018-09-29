@@ -170,7 +170,7 @@ class RenderBuffer extends ModuleBase {
         let context = this.context;
             context.translate( posX, posY );
         if( sprite.opacity !== 255 ){
-            context.globalAlpha = 255;
+            context.globalAlpha = 1;
         }
         if( sprite.blendMode ){
             context.globalCompositeOperation = "source-over";
