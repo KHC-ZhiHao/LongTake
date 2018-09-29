@@ -26,11 +26,13 @@ class LongTake extends ModuleBase {
         this.stopOfAboveWindow = true;
         this.baseFps = 0;
         this.asyncRefresh = false;
- 
-        this.initBitmap();
-        this.initCamera();
+        this.remove = false;
+        this.bindUpdate = this.update.bind(this);
+
         this.initStage();
         this.initEvent();
+        this.initBitmap();
+        this.initCamera();
         
         window.requestAnimationFrame = window.requestAnimationFrame || 
         window.mozRequestAnimationFrame || 
@@ -39,6 +41,15 @@ class LongTake extends ModuleBase {
         function(callback) { window.setTimeout(callback, 1000 / 60); };
 
         this.update();
+    }
+
+    close(){
+        this.remove = true;
+        this.target = null;
+        this.stage.eachChildrenDeep((child)=>{
+            child.close();
+        });
+        this.stage = null;
     }
 
     //=============================
@@ -54,7 +65,8 @@ class LongTake extends ModuleBase {
     initBitmap(){
         if( this.target instanceof Element && this.target.tagName === "CANVAS" ){
             this.bitmap = this.target.getContext('2d');
-            this.buffer = new Bitmap( this.width, this.height );
+            this.bitmap.globalCompositeOperation = "copy";
+            this.buffer = new RenderBuffer(this);
         }else{
             this.systemError("initBitmap", "Object not a cavnas.", this.target);
         }
@@ -220,8 +232,8 @@ class LongTake extends ModuleBase {
     }
     
     pointerMove(event){
-        this.pointerX = ( event.offsetX - this.camera.offsetX ) * this.target.width / this.targetRect.width;
-        this.pointerY = ( event.offsetY - this.camera.offsetY ) * this.target.height / this.targetRect.height;
+        this.pointerX = ( event.offsetX - this.camera.offsetX * this.targetRect.width / this.target.width ) * this.target.width / this.targetRect.width;
+        this.pointerY = ( event.offsetY - this.camera.offsetY * this.targetRect.height / this.target.height ) * this.target.height / this.targetRect.height;
     }
 
     targetResize(){
@@ -249,35 +261,37 @@ class LongTake extends ModuleBase {
     //
 
     update(){
-        this.baseFps -= 1;
+        if( this.remove == true ){
+            window.cancelAnimationFrame(this.ticker);
+        }
+        this.baseFps += this.framePerSecond;
         if( this.stopOfAboveWindow === false 
             || window.pageYOffset < this.target.offsetTop + this.targetRect.height
-            || window.pageYOffset + document.body.scrollHeight > this.target.offsetTop  ){
+            || window.pageYOffset + document.body.scrollHeight > this.target.offsetTop ){
             this.stageUpdate();
-            if( this.baseFps <= 0 && this.asyncRefresh === false ){
+            if( this.baseFps >= 60 && this.asyncRefresh === false ){
                 this.asyncRefresh = true;
                 this.bitmapUpdate();
-                this.baseFps = 60 / this.framePerSecond;
+                this.baseFps = this.baseFps % 60;
             }
             this.eventAction = {};
         }
-        this.ticker = window.requestAnimationFrame(()=>{
-            this.update();
-        });
+        this.ticker = window.requestAnimationFrame(this.bindUpdate);
     }
 
     stageUpdate(){
-        this.buffer.clear();
         this.stage.mainEvent();
-        this.stage.mainUpdate(this.ticker + 1);
+        this.stage.mainUpdate();
     }
 
     async bitmapUpdate(){
         if( this.camera.sprite ){ this.updateCamera(); }
         this.stage.mainRender();
-        this.buffer.render(this.stage);
-        this.bitmap.clearRect( 0, 0, this.target.width, this.target.height );
-        this.bitmap.drawImage( this.buffer.canvas, this.camera.offsetX, this.camera.offsetY );
+        this.buffer.draw();
+    }
+
+    drawTarget(img){
+        this.bitmap.drawImage( img, this.camera.offsetX, this.camera.offsetY );
         this.asyncRefresh = false;
     }
 

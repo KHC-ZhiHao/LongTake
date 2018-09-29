@@ -10,6 +10,7 @@ class Sprite extends ModuleBase {
         super( moduleName || "Sprite" );
         this.name = moduleName || "No name",
         this.main = null;
+        this.helper = Helper;
         this.initEvent();
         this.initRender();
         this.initStatus();
@@ -390,6 +391,7 @@ class Sprite extends ModuleBase {
             remove : false,
             hidden : false,
             readSize : null,
+            childrenDead : false,
         }
     }
 
@@ -443,8 +445,8 @@ class Sprite extends ModuleBase {
         if( this.status.readSize == null ){
             let width = this.width + this.skewY * this.height;
             let height = this.height + this.skewX * this.width;
-            let s = Math.abs(Helper.sinByDeg(this.rotation));
-            let c = Math.abs(Helper.cosByDeg(this.rotation));
+            let s = Math.abs( this.helper.sinByDeg(this.rotation) );
+            let c = Math.abs( this.helper.cosByDeg(this.rotation) );
             this.status.readSize = {
                 width : ( width * c + height * s ) * this.scaleWidth,
                 height : ( height * c + width * s ) * this.scaleHeight,
@@ -485,32 +487,40 @@ class Sprite extends ModuleBase {
 
     /**
      * @function mainUpdate()
+     * @private
      * @desc 每次執行update時呼叫此函式，處理Z值更動的排序與移除子精靈
      */
 
-    mainUpdate(ticker){
+    mainUpdate(){
         this.status.readSize = null;
-        let remove = false;
         if( this.status.sort ){
             this.status.sort = false;
             this.sortChildren();
         }
-        this.update(ticker);
-        this.eachChildren((children)=>{
-            if( children.status.remove == false ){
-                children.mainUpdate(ticker);
-            }else{
-                remove = true;
-            }
-        });
-        if( remove ){
-            this.children = this.children.filter((c)=>{
-                if( c.status.remove ){ 
-                    c.id = -1; 
-                    c.parent = null; 
+        this.update();
+        this.eachChildren(this.updateForChild);
+        if( this.childrenDead ){
+            this.childrenDead = false;
+            this.children = this.children.filter((child)=>{
+                if( child.status.remove ){ 
+                    child.close();
                 }
                 return !c.status.remove;
             });
+        }
+    }
+
+    /**
+     * @function updateForChild(child)
+     * @private
+     * @desc 呼叫子精靈更新
+     */
+
+    updateForChild(child){
+        if( child.status.remove == false ){
+            child.mainUpdate();
+        }else{
+            this.childrenDead = true;
         }
     }
 
@@ -518,6 +528,17 @@ class Sprite extends ModuleBase {
     //
     // remove
     //
+
+    /**
+     * @function close()
+     * @private
+     * @desc 移除自身的綁定資訊(容易出錯，請使用remove讓精靈在迭代過程中被移除)
+     */
+
+    close(){
+        this.id = -1; 
+        this.parent = null; 
+    }
 
     /**
      * @function remove()
@@ -589,40 +610,43 @@ class Sprite extends ModuleBase {
      * @desc 渲染濾鏡的函式
      */
 
-    /**
-     * @function mask()
-     * @default null
-     * @desc 建立遮罩的函式
-     */
-
     initRender(){
-        this.mask = null;
         this.filter == null;
     }
 
     /**
-     * @function render(this)
+     * @function render()
      * @desc 渲染bitmap的方法
      */
     
     render(){ /* module set */ }
 
     /**
-     * @function mainRender(force)
+     * @function mainRender()
+     * @private
      * @desc 主要渲染程序，包含渲染與濾鏡
-     * @param {boolean} force 無視快取強制重新渲染(切忌渲染需要高效能的成本付出)
      */
 
-    mainRender(force){
-        this.eachChildren((children)=>{children.mainRender();})
-        if( this.canRender || force ){ 
+    mainRender(){
+        this.eachChildren(this.renderForChild)
+        if( this.canRender ){ 
             this.context.save();
-            this.render(this);
+            this.render();
             this.context.restore();
             this.renderFilter(this.filter);
             this.context.restore();
             this.bitmap.clearCache();
         }
+    }
+
+    /**
+     * @function renderForChild(child)
+     * @private
+     * @desc 呼叫子精靈渲染
+     */
+
+    renderForChild(child){
+        child.mainRender();
     }
 
     /**
@@ -669,6 +693,29 @@ class Sprite extends ModuleBase {
             this.resize( this.main.width, this.main.height );
         }else{
             this.systemError("resizeMax", "Function call must in the create or update.");
+        }
+    }
+
+    /**
+     * @function getRenderData()
+     * @desc 當render對象是個offScreenCanvas時會需要的資料
+     */
+
+    getRenderData(){
+        return {
+            bitmap : this.bitmap.getRenderTarget(),
+            posX : this.posX,
+            posY : this.posY,
+            screenX : this.screenX,
+            screenY : this.screenY,
+            skewX : this.skewX,
+            skewY : this.skewY,
+            scaleWidth : this.scaleWidth,
+            scaleHeight : this.scaleHeight,
+            rotation : this.rotation,
+            opacity : this.opacity,
+            blendMode : this.blendMode,
+            transform : this.transform,
         }
     }
 

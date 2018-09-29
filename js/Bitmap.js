@@ -12,7 +12,7 @@ class Bitmap extends ModuleBase {
         this.transform = true;
         this.cache = false;
         this.imgData = null;
-        this.image = null;
+        this.imgBitmap = null;
         if( element == null ){ this.resize( width, height ) }
     }
 
@@ -27,59 +27,14 @@ class Bitmap extends ModuleBase {
     set height(val){ this.canvas.height = val; }
 
     getRenderTarget(){
-        if( this.image ){
-            return this.image;
+        if( this.imgBitmap ){
+            return this.imgBitmap;
         }else if( this.cache == false ){
             return this.canvas;
         }else {
-            let img = new Image();
-                img.onload = ()=>{ this.image = img }
-                img.src = this.canvas.toDataURL();
+            this.cacheImgBitmap();
             return this.canvas;
         }
-    }
-
-    render(sprite){
-        if( this.transform ){
-            this.context.save();
-            this.drawTransform(sprite);
-        }
-        this.draw( sprite.bitmap, sprite.screenX, sprite.screenY );
-        sprite.eachChildren((child)=>{ this.render(child); });
-        if( this.transform ){
-            this.context.restore();
-        }
-    }
-
-    drawTransform(sprite){
-        //中心
-        let posX = sprite.posX;
-        let posY = sprite.posY;
-        let context = this.context;
-        context.translate( posX, posY );
-        //遮罩
-        if( sprite.mask ){
-            sprite.mask();
-            sprite.context.clip();
-        }
-        if( sprite.opacity !== 255 ){
-            context.globalAlpha = sprite.opacity / 255;
-        }
-        //合成
-        if( sprite.blendMode ){
-            context.globalCompositeOperation = sprite.blendMode;
-        }
-        if( sprite.rotation !== 0 ){
-            context.rotate( sprite.rotation * sprite.main.math.arc );
-        }
-        if( sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1 ){
-            context.scale( sprite.scaleWidth, sprite.scaleHeight );
-        }
-        if( sprite.skewX !== 0 || sprite.skewY !== 0 ){
-            context.transform( 1, sprite.skewX, sprite.skewY, 1, 0, 0 );
-        }
-        //回歸原點
-        context.translate( -(posX), -(posY) );
     }
 
     /**
@@ -110,6 +65,12 @@ class Bitmap extends ModuleBase {
         this.context.drawImage( bitmap.getRenderTarget(), Math.floor(x), Math.floor(y) );
     }
 
+    cacheImgBitmap(){
+        let img = new Image();
+            img.onload = ()=>{ this.imgBitmap = img }
+            img.src = this.canvas.toDataURL();
+    }
+
     /**
      * @function clearCache()
      * @desc 解除並清除圖片資料快取
@@ -117,7 +78,7 @@ class Bitmap extends ModuleBase {
 
     clearCache(){
         this.imgData = null;
-        this.image = null;
+        this.imgBitmap = null;
     }
 
     /**

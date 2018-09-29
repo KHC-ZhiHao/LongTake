@@ -103,6 +103,101 @@ class ModuleBase {
     }
 
 }
+class RenderBuffer extends ModuleBase {
+
+    constructor(main){
+        super("RenderBuffer");
+        this.main = main;
+        this.stage = main.stage;
+        this.width = main.width;
+        this.height = main.height;
+        this.canvas = document.createElement('canvas');
+        this.canvas.width = main.width;
+        this.canvas.height = main.height;
+        this.context = this.canvas.getContext('2d');
+        this.speedRender = null;
+    }
+
+    useSuperRender(){
+        if( this.canvas.toBlob && window.createImageBitmap && window.Worker ){
+            let script = `
+                function getImg(img){
+                    postMessage(img);
+                }
+                onmessage = function(message){
+                    self.createImageBitmap(message.data).then(getImg);
+                }
+            `;
+            let blob = new Blob([script], {type: 'application/javascript'});
+            this.speedRender = new Worker(URL.createObjectURL(blob));
+            this.speedRender.onmessage = (message)=>{
+                this.main.drawTarget(message.data);
+            }
+            this.workerPost = (blob)=>{
+                this.speedRender.postMessage(blob);
+            }
+        }else{
+            this.systemError( "useSuperRender", "UseSuperRender can't use, something function not support." );
+        }
+    }
+
+    draw(){
+        this.context.clearRect( 0, 0, this.width, this.height );
+        this.render(this.stage);
+        this.finish();
+    }
+
+    finish(){
+        if( this.speedRender ){
+            this.canvas.toBlob(this.workerPost);
+        }else{
+            this.main.drawTarget(this.canvas);
+        }
+    }
+
+    render(sprite){
+        if( sprite.transform ){
+            this.context.save();
+            this.drawTransform(sprite);
+        }
+        this.context.drawImage( sprite.bitmap.getRenderTarget(), Math.floor(sprite.screenX), Math.floor(sprite.screenY) );
+        let len = sprite.children.length;
+        for( let i = 0 ; i < len ; i++ ){
+            this.render(sprite.children[i]);
+        }
+        if( sprite.transform ){ 
+            this.context.restore();
+        }
+    }
+
+    drawTransform(sprite){
+        //中心
+        let posX = sprite.posX;
+        let posY = sprite.posY;
+        let context = this.context;
+            context.translate( posX, posY );
+        if( sprite.opacity !== 255 ){
+            context.globalAlpha = sprite.opacity / 255;
+        }
+        //合成
+        if( sprite.blendMode ){
+            context.globalCompositeOperation = sprite.blendMode;
+        }
+        if( sprite.rotation !== 0 ){
+            context.rotate( sprite.rotation * sprite.helper.arc );
+        }
+        if( sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1 ){
+            context.scale( sprite.scaleWidth, sprite.scaleHeight );
+        }
+        if( sprite.skewX !== 0 || sprite.skewY !== 0 ){
+            context.transform( 1, sprite.skewX, sprite.skewY, 1, 0, 0 );
+        }
+        //回歸原點
+        context.translate( -(posX), -(posY) );
+    }
+
+}
+
 class HelperModuel {
 
     constructor(){
@@ -406,7 +501,7 @@ class Bitmap extends ModuleBase {
         this.transform = true;
         this.cache = false;
         this.imgData = null;
-        this.image = null;
+        this.imgBitmap = null;
         if( element == null ){ this.resize( width, height ) }
     }
 
@@ -421,59 +516,14 @@ class Bitmap extends ModuleBase {
     set height(val){ this.canvas.height = val; }
 
     getRenderTarget(){
-        if( this.image ){
-            return this.image;
+        if( this.imgBitmap ){
+            return this.imgBitmap;
         }else if( this.cache == false ){
             return this.canvas;
         }else {
-            let img = new Image();
-                img.onload = ()=>{ this.image = img }
-                img.src = this.canvas.toDataURL();
+            this.cacheImgBitmap();
             return this.canvas;
         }
-    }
-
-    render(sprite){
-        if( this.transform ){
-            this.context.save();
-            this.drawTransform(sprite);
-        }
-        this.draw( sprite.bitmap, sprite.screenX, sprite.screenY );
-        sprite.eachChildren((child)=>{ this.render(child); });
-        if( this.transform ){
-            this.context.restore();
-        }
-    }
-
-    drawTransform(sprite){
-        //中心
-        let posX = sprite.posX;
-        let posY = sprite.posY;
-        let context = this.context;
-        context.translate( posX, posY );
-        //遮罩
-        if( sprite.mask ){
-            sprite.mask();
-            sprite.context.clip();
-        }
-        if( sprite.opacity !== 255 ){
-            context.globalAlpha = sprite.opacity / 255;
-        }
-        //合成
-        if( sprite.blendMode ){
-            context.globalCompositeOperation = sprite.blendMode;
-        }
-        if( sprite.rotation !== 0 ){
-            context.rotate( sprite.rotation * sprite.main.math.arc );
-        }
-        if( sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1 ){
-            context.scale( sprite.scaleWidth, sprite.scaleHeight );
-        }
-        if( sprite.skewX !== 0 || sprite.skewY !== 0 ){
-            context.transform( 1, sprite.skewX, sprite.skewY, 1, 0, 0 );
-        }
-        //回歸原點
-        context.translate( -(posX), -(posY) );
     }
 
     /**
@@ -504,6 +554,12 @@ class Bitmap extends ModuleBase {
         this.context.drawImage( bitmap.getRenderTarget(), Math.floor(x), Math.floor(y) );
     }
 
+    cacheImgBitmap(){
+        let img = new Image();
+            img.onload = ()=>{ this.imgBitmap = img }
+            img.src = this.canvas.toDataURL();
+    }
+
     /**
      * @function clearCache()
      * @desc 解除並清除圖片資料快取
@@ -511,7 +567,7 @@ class Bitmap extends ModuleBase {
 
     clearCache(){
         this.imgData = null;
-        this.image = null;
+        this.imgBitmap = null;
     }
 
     /**
@@ -582,11 +638,13 @@ class LongTake extends ModuleBase {
         this.stopOfAboveWindow = true;
         this.baseFps = 0;
         this.asyncRefresh = false;
- 
-        this.initBitmap();
-        this.initCamera();
+        this.remove = false;
+        this.bindUpdate = this.update.bind(this);
+
         this.initStage();
         this.initEvent();
+        this.initBitmap();
+        this.initCamera();
         
         window.requestAnimationFrame = window.requestAnimationFrame || 
         window.mozRequestAnimationFrame || 
@@ -595,6 +653,15 @@ class LongTake extends ModuleBase {
         function(callback) { window.setTimeout(callback, 1000 / 60); };
 
         this.update();
+    }
+
+    close(){
+        this.remove = true;
+        this.target = null;
+        this.stage.eachChildrenDeep((child)=>{
+            child.close();
+        });
+        this.stage = null;
     }
 
     //=============================
@@ -610,7 +677,8 @@ class LongTake extends ModuleBase {
     initBitmap(){
         if( this.target instanceof Element && this.target.tagName === "CANVAS" ){
             this.bitmap = this.target.getContext('2d');
-            this.buffer = new Bitmap( this.width, this.height );
+            this.bitmap.globalCompositeOperation = "copy";
+            this.buffer = new RenderBuffer(this);
         }else{
             this.systemError("initBitmap", "Object not a cavnas.", this.target);
         }
@@ -776,8 +844,8 @@ class LongTake extends ModuleBase {
     }
     
     pointerMove(event){
-        this.pointerX = ( event.offsetX - this.camera.offsetX ) * this.target.width / this.targetRect.width;
-        this.pointerY = ( event.offsetY - this.camera.offsetY ) * this.target.height / this.targetRect.height;
+        this.pointerX = ( event.offsetX - this.camera.offsetX * this.targetRect.width / this.target.width ) * this.target.width / this.targetRect.width;
+        this.pointerY = ( event.offsetY - this.camera.offsetY * this.targetRect.height / this.target.height ) * this.target.height / this.targetRect.height;
     }
 
     targetResize(){
@@ -805,35 +873,37 @@ class LongTake extends ModuleBase {
     //
 
     update(){
-        this.baseFps -= 1;
+        if( this.remove == true ){
+            window.cancelAnimationFrame(this.ticker);
+        }
+        this.baseFps += this.framePerSecond;
         if( this.stopOfAboveWindow === false 
             || window.pageYOffset < this.target.offsetTop + this.targetRect.height
-            || window.pageYOffset + document.body.scrollHeight > this.target.offsetTop  ){
+            || window.pageYOffset + document.body.scrollHeight > this.target.offsetTop ){
             this.stageUpdate();
-            if( this.baseFps <= 0 && this.asyncRefresh === false ){
+            if( this.baseFps >= 60 && this.asyncRefresh === false ){
                 this.asyncRefresh = true;
                 this.bitmapUpdate();
-                this.baseFps = 60 / this.framePerSecond;
+                this.baseFps = this.baseFps % 60;
             }
             this.eventAction = {};
         }
-        this.ticker = window.requestAnimationFrame(()=>{
-            this.update();
-        });
+        this.ticker = window.requestAnimationFrame(this.bindUpdate);
     }
 
     stageUpdate(){
-        this.buffer.clear();
         this.stage.mainEvent();
-        this.stage.mainUpdate(this.ticker + 1);
+        this.stage.mainUpdate();
     }
 
     async bitmapUpdate(){
         if( this.camera.sprite ){ this.updateCamera(); }
         this.stage.mainRender();
-        this.buffer.render(this.stage);
-        this.bitmap.clearRect( 0, 0, this.target.width, this.target.height );
-        this.bitmap.drawImage( this.buffer.canvas, this.camera.offsetX, this.camera.offsetY );
+        this.buffer.draw();
+    }
+
+    drawTarget(img){
+        this.bitmap.drawImage( img, this.camera.offsetX, this.camera.offsetY );
         this.asyncRefresh = false;
     }
 
@@ -951,6 +1021,7 @@ class Sprite extends ModuleBase {
         super( moduleName || "Sprite" );
         this.name = moduleName || "No name",
         this.main = null;
+        this.helper = Helper;
         this.initEvent();
         this.initRender();
         this.initStatus();
@@ -1331,6 +1402,7 @@ class Sprite extends ModuleBase {
             remove : false,
             hidden : false,
             readSize : null,
+            childrenDead : false,
         }
     }
 
@@ -1384,8 +1456,8 @@ class Sprite extends ModuleBase {
         if( this.status.readSize == null ){
             let width = this.width + this.skewY * this.height;
             let height = this.height + this.skewX * this.width;
-            let s = Math.abs(Helper.sinByDeg(this.rotation));
-            let c = Math.abs(Helper.cosByDeg(this.rotation));
+            let s = Math.abs( this.helper.sinByDeg(this.rotation) );
+            let c = Math.abs( this.helper.cosByDeg(this.rotation) );
             this.status.readSize = {
                 width : ( width * c + height * s ) * this.scaleWidth,
                 height : ( height * c + width * s ) * this.scaleHeight,
@@ -1426,32 +1498,40 @@ class Sprite extends ModuleBase {
 
     /**
      * @function mainUpdate()
+     * @private
      * @desc 每次執行update時呼叫此函式，處理Z值更動的排序與移除子精靈
      */
 
-    mainUpdate(ticker){
+    mainUpdate(){
         this.status.readSize = null;
-        let remove = false;
         if( this.status.sort ){
             this.status.sort = false;
             this.sortChildren();
         }
-        this.update(ticker);
-        this.eachChildren((children)=>{
-            if( children.status.remove == false ){
-                children.mainUpdate(ticker);
-            }else{
-                remove = true;
-            }
-        });
-        if( remove ){
-            this.children = this.children.filter((c)=>{
-                if( c.status.remove ){ 
-                    c.id = -1; 
-                    c.parent = null; 
+        this.update();
+        this.eachChildren(this.updateForChild);
+        if( this.childrenDead ){
+            this.childrenDead = false;
+            this.children = this.children.filter((child)=>{
+                if( child.status.remove ){ 
+                    child.close();
                 }
                 return !c.status.remove;
             });
+        }
+    }
+
+    /**
+     * @function updateForChild(child)
+     * @private
+     * @desc 呼叫子精靈更新
+     */
+
+    updateForChild(child){
+        if( child.status.remove == false ){
+            child.mainUpdate();
+        }else{
+            this.childrenDead = true;
         }
     }
 
@@ -1459,6 +1539,17 @@ class Sprite extends ModuleBase {
     //
     // remove
     //
+
+    /**
+     * @function close()
+     * @private
+     * @desc 移除自身的綁定資訊(容易出錯，請使用remove讓精靈在迭代過程中被移除)
+     */
+
+    close(){
+        this.id = -1; 
+        this.parent = null; 
+    }
 
     /**
      * @function remove()
@@ -1530,40 +1621,43 @@ class Sprite extends ModuleBase {
      * @desc 渲染濾鏡的函式
      */
 
-    /**
-     * @function mask()
-     * @default null
-     * @desc 建立遮罩的函式
-     */
-
     initRender(){
-        this.mask = null;
         this.filter == null;
     }
 
     /**
-     * @function render(this)
+     * @function render()
      * @desc 渲染bitmap的方法
      */
     
     render(){ /* module set */ }
 
     /**
-     * @function mainRender(force)
+     * @function mainRender()
+     * @private
      * @desc 主要渲染程序，包含渲染與濾鏡
-     * @param {boolean} force 無視快取強制重新渲染(切忌渲染需要高效能的成本付出)
      */
 
-    mainRender(force){
-        this.eachChildren((children)=>{children.mainRender();})
-        if( this.canRender || force ){ 
+    mainRender(){
+        this.eachChildren(this.renderForChild)
+        if( this.canRender ){ 
             this.context.save();
-            this.render(this);
+            this.render();
             this.context.restore();
             this.renderFilter(this.filter);
             this.context.restore();
             this.bitmap.clearCache();
         }
+    }
+
+    /**
+     * @function renderForChild(child)
+     * @private
+     * @desc 呼叫子精靈渲染
+     */
+
+    renderForChild(child){
+        child.mainRender();
     }
 
     /**
@@ -1610,6 +1704,29 @@ class Sprite extends ModuleBase {
             this.resize( this.main.width, this.main.height );
         }else{
             this.systemError("resizeMax", "Function call must in the create or update.");
+        }
+    }
+
+    /**
+     * @function getRenderData()
+     * @desc 當render對象是個offScreenCanvas時會需要的資料
+     */
+
+    getRenderData(){
+        return {
+            bitmap : this.bitmap.getRenderTarget(),
+            posX : this.posX,
+            posY : this.posY,
+            screenX : this.screenX,
+            screenY : this.screenY,
+            skewX : this.skewX,
+            skewY : this.skewY,
+            scaleWidth : this.scaleWidth,
+            scaleHeight : this.scaleHeight,
+            rotation : this.rotation,
+            opacity : this.opacity,
+            blendMode : this.blendMode,
+            transform : this.transform,
         }
     }
 
