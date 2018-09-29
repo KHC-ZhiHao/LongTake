@@ -622,14 +622,24 @@ class Sprite extends ModuleBase {
     render(){ /* module set */ }
 
     /**
+<<<<<<< HEAD
      * @function mainRender()
+=======
+     * @function mainRender(force)
+>>>>>>> 8c09db8b235c315e6359216644507634a5e31bce
      * @private
      * @desc 主要渲染程序，包含渲染與濾鏡
      */
 
+<<<<<<< HEAD
     mainRender(){
         this.eachChildren(this.renderForChild)
         if( this.canRender ){ 
+=======
+    mainRender(force){
+        this.eachChildren(this.renderForChild)
+        if( this.canRender || force ){ 
+>>>>>>> 8c09db8b235c315e6359216644507634a5e31bce
             this.context.save();
             this.render();
             this.context.restore();

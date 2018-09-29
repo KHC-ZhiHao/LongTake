@@ -12,7 +12,12 @@ class Bitmap extends ModuleBase {
         this.transform = true;
         this.cache = false;
         this.imgData = null;
+<<<<<<< HEAD
         this.imgBitmap = null;
+=======
+        this.image = null;
+        this.bindRender = this.render.bind(this);
+>>>>>>> 8c09db8b235c315e6359216644507634a5e31bce
         if( element == null ){ this.resize( width, height ) }
     }
 
@@ -37,6 +42,52 @@ class Bitmap extends ModuleBase {
         }
     }
 
+<<<<<<< HEAD
+=======
+    render(sprite){
+        if( this.transform ){
+            this.context.save();
+            this.drawTransform(sprite);
+        }
+        this.draw( sprite.bitmap, sprite.screenX, sprite.screenY );
+        sprite.eachChildren(this.bindRender);
+        if( this.transform ){
+            this.context.restore();
+        }
+    }
+
+    drawTransform(sprite){
+        //中心
+        let posX = sprite.posX;
+        let posY = sprite.posY;
+        let context = this.context;
+        context.translate( posX, posY );
+        //遮罩
+        if( sprite.mask ){
+            sprite.mask();
+            sprite.context.clip();
+        }
+        if( sprite.opacity !== 255 ){
+            context.globalAlpha = sprite.opacity / 255;
+        }
+        //合成
+        if( sprite.blendMode ){
+            context.globalCompositeOperation = sprite.blendMode;
+        }
+        if( sprite.rotation !== 0 ){
+            context.rotate( sprite.rotation * sprite.main.math.arc );
+        }
+        if( sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1 ){
+            context.scale( sprite.scaleWidth, sprite.scaleHeight );
+        }
+        if( sprite.skewX !== 0 || sprite.skewY !== 0 ){
+            context.transform( 1, sprite.skewX, sprite.skewY, 1, 0, 0 );
+        }
+        //回歸原點
+        context.translate( -(posX), -(posY) );
+    }
+
+>>>>>>> 8c09db8b235c315e6359216644507634a5e31bce
     /**
      * @function resize(width,height)
      * @desc 調整畫布大小
