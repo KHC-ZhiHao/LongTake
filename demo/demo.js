@@ -67,10 +67,10 @@ var loader = new LongTake.Loader();
     loader.add( "bunny", "../img/bunny.png" )
     loader.start();
 
+var app = new LongTake( document.getElementById("app"), 800, 600 );
+
 loader.onload(()=>{
     
-    var app = new LongTake( document.getElementById("app"), 800, 600 );
-
     app.addEvent( "pointerdown", ()=>{
         setTimeout(()=>{
             for( let i = 0 ; i < 100 ; i++ ){
