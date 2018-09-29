@@ -72,7 +72,7 @@ loader.onload(()=>{
     var app = new LongTake( document.getElementById("app"), 800, 600 );
 
     app.addEvent( "pointerdown", ()=>{
-        for( let i = 0 ; i < 1000 ; i++ ){
+        for( let i = 0 ; i < 100 ; i++ ){
             addBunny( app.pointerX, app.pointerY );
         }
     });
