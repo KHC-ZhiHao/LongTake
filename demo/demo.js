@@ -13,7 +13,6 @@ class LTJump extends LongTake.Sprite {
     create(){
         this.maxX = this.main.width;
         this.maxY = this.main.height;
-        this.rotation = ( Math.random() - 0.5 ) * 15;
         this.setAnchor(0,1);
     }
     
@@ -68,6 +67,7 @@ var loader = new LongTake.Loader();
     loader.start();
 
 var app = new LongTake( document.getElementById("app"), 800, 600 );
+    app.autoScreenResize();
 
 loader.onload(()=>{
     
@@ -89,7 +89,6 @@ function addBunny100(){
 
 function addBunny( x, y ){
     let bunny = new LTJump( loader.get("bunny"), x, y );
-    bunny.transform = false;
     app.stage.addChildren(bunny);
     bunnys += 1;
     ballElement.innerText = bunnys;

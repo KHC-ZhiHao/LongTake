@@ -241,7 +241,6 @@ class Sprite extends ModuleBase {
      * @member {number} rotation 旋轉
      * @member {number} opacity 透明度
      * @member {number} blendMode 合成模式
-     * @member {number} transform 是否啟用變形
      */
 
     initContainer(){
@@ -252,7 +251,6 @@ class Sprite extends ModuleBase {
             scaleHeight : 1,
             rotation : 0,
             opacity : 255,
-            blendMode : null, 
         }
     }
 
@@ -301,11 +299,6 @@ class Sprite extends ModuleBase {
     get skewY(){ return this.container.skewY }
     set skewY(val){
         this.container.skewY = val;
-    }
-
-    get transform(){ return this.bitmap.transform }
-    set transform(val){
-        this.bitmap.transform = !!val;
     }
 
     //=============================
@@ -463,8 +456,8 @@ class Sprite extends ModuleBase {
     getOffscreen(){
         if( this.main ){
             let size = this.getRealSize();
-            if( this.screenX <= this.main.camera.offsetX + this.main.bitmap.width 
-                && this.screenY <= this.main.camera.offsetY + this.main.bitmap.height
+            if( this.screenX <= this.main.camera.offsetX + this.main.target.width 
+                && this.screenY <= this.main.camera.offsetY + this.main.target.height
                 && this.screenX + size.width >= this.main.camera.offsetX 
                 && this.screenY + size.height >= this.main.camera.offsetY){
                     return false;
@@ -693,29 +686,6 @@ class Sprite extends ModuleBase {
             this.resize( this.main.width, this.main.height );
         }else{
             this.systemError("resizeMax", "Function call must in the create or update.");
-        }
-    }
-
-    /**
-     * @function getRenderData()
-     * @desc 當render對象是個offScreenCanvas時會需要的資料
-     */
-
-    getRenderData(){
-        return {
-            bitmap : this.bitmap.getRenderTarget(),
-            posX : this.posX,
-            posY : this.posY,
-            screenX : this.screenX,
-            screenY : this.screenY,
-            skewX : this.skewX,
-            skewY : this.skewY,
-            scaleWidth : this.scaleWidth,
-            scaleHeight : this.scaleHeight,
-            rotation : this.rotation,
-            opacity : this.opacity,
-            blendMode : this.blendMode,
-            transform : this.transform,
         }
     }
 

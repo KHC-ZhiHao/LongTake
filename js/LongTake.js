@@ -29,9 +29,9 @@ class LongTake extends ModuleBase {
         this.bindUpdate = this.update.bind(this);
 
         this.initStage();
-        this.initEvent();
-        this.initBitmap();
         this.initCamera();
+        this.initBitmap();
+        this.initEvent();
         
         window.requestAnimationFrame = window.requestAnimationFrame || 
         window.mozRequestAnimationFrame || 
@@ -65,6 +65,7 @@ class LongTake extends ModuleBase {
         if( this.target instanceof Element && this.target.tagName === "CANVAS" ){
             this.bitmap = this.target.getContext('2d');
             this.bitmap.globalCompositeOperation = "copy";
+            this.bitmap.save();
             this.buffer = new RenderBuffer(this);
         }else{
             this.systemError("initBitmap", "Object not a cavnas.", this.target);
@@ -113,7 +114,10 @@ class LongTake extends ModuleBase {
         return false;
     }
 
-    
+    bitmapScale(persen){
+        this.bitmap.restore();
+        this.bitmap.scale( persen, persen );
+    }
 
     //=============================
     //
@@ -239,6 +243,20 @@ class LongTake extends ModuleBase {
 
     targetResize(){
         this.targetRect = this.target.getBoundingClientRect();
+        this.buffer.resize( this.target.width, this.target.height );
+        this.bitmap.globalCompositeOperation = "copy";
+    }
+
+    autoScreenResize(){
+        let width = document.body.clientWidth;
+        let height = document.body.clientHeight;
+        if( width < this.target.width ){
+            this.target.width = width;
+        }
+        if( height < this.target.height ){
+            this.target.height = height;
+        }
+        this.targetResize();
     }
 
     //=============================
@@ -289,7 +307,7 @@ class LongTake extends ModuleBase {
         if( this.camera.sprite ){ this.updateCamera(); }
         this.stage.mainRender();
         this.buffer.draw();
-        this.bitmap.drawImage( this.buffer.canvas, this.camera.offsetX, this.camera.offsetY );
+        this.bitmap.drawImage( this.buffer.canvas, 0, 0 );
     }
 
 }

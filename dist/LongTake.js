@@ -112,32 +112,36 @@ class RenderBuffer extends ModuleBase {
         this.width = main.width;
         this.height = main.height;
         this.canvas = document.createElement('canvas');
-        this.canvas.width = main.width;
-        this.canvas.height = main.height;
         this.context = this.canvas.getContext('2d');
+        this.camera = main.camera;
+        this.resize( main.width, main.height );
+    }
+
+    resize( width, height ){
+        this.canvas.width = width;
+        this.canvas.height = height;
     }
 
     draw(){
         this.context.clearRect( 0, 0, this.width, this.height );
+        this.context.save();
         this.render(this.stage);
+        this.context.restore();
     }
 
     render(sprite){
-        if( sprite.transform ){
-            this.context.save();
-            this.drawTransform(sprite);
-        }
-        this.context.drawImage( sprite.bitmap.getRenderTarget(), Math.floor(sprite.screenX), Math.floor(sprite.screenY) );
-        let len = sprite.children.length;
-        for( let i = 0 ; i < len ; i++ ){
-            this.render(sprite.children[i]);
-        }
-        if( sprite.transform ){ 
-            this.context.restore();
+        if( sprite.canShow ){
+            this.transform(sprite);
+            this.context.drawImage( sprite.bitmap.getRenderTarget(), Math.floor(sprite.screenX + this.camera.offsetX), Math.floor(sprite.screenY + this.camera.offsetY) ); 
+            let len = sprite.children.length;
+            for( let i = 0 ; i < len ; i++ ){
+                this.render(sprite.children[i]);
+            }
+            this.restore(sprite);
         }
     }
 
-    drawTransform(sprite){
+    transform(sprite){
         let posX = sprite.posX;
         let posY = sprite.posY;
         let context = this.context;
@@ -156,6 +160,29 @@ class RenderBuffer extends ModuleBase {
         }
         if( sprite.skewX !== 0 || sprite.skewY !== 0 ){
             context.transform( 1, sprite.skewX, sprite.skewY, 1, 0, 0 );
+        }
+        context.translate( -(posX), -(posY) );
+    }
+
+    restore(sprite){
+        let posX = sprite.posX;
+        let posY = sprite.posY;
+        let context = this.context;
+            context.translate( posX, posY );
+        if( sprite.opacity !== 255 ){
+            context.globalAlpha = 255;
+        }
+        if( sprite.blendMode ){
+            context.globalCompositeOperation = "source-over";
+        }
+        if( sprite.rotation !== 0 ){
+            context.rotate( -(sprite.rotation * sprite.helper.arc) );
+        }
+        if( sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1 ){
+            context.scale( -sprite.scaleWidth, -sprite.scaleHeight );
+        }
+        if( sprite.skewX !== 0 || sprite.skewY !== 0 ){
+            context.transform( 1, -sprite.skewX, -sprite.skewY, 1, 0, 0 );
         }
         context.translate( -(posX), -(posY) );
     }
@@ -605,9 +632,9 @@ class LongTake extends ModuleBase {
         this.bindUpdate = this.update.bind(this);
 
         this.initStage();
-        this.initEvent();
-        this.initBitmap();
         this.initCamera();
+        this.initBitmap();
+        this.initEvent();
         
         window.requestAnimationFrame = window.requestAnimationFrame || 
         window.mozRequestAnimationFrame || 
@@ -641,6 +668,7 @@ class LongTake extends ModuleBase {
         if( this.target instanceof Element && this.target.tagName === "CANVAS" ){
             this.bitmap = this.target.getContext('2d');
             this.bitmap.globalCompositeOperation = "copy";
+            this.bitmap.save();
             this.buffer = new RenderBuffer(this);
         }else{
             this.systemError("initBitmap", "Object not a cavnas.", this.target);
@@ -689,7 +717,10 @@ class LongTake extends ModuleBase {
         return false;
     }
 
-    
+    bitmapScale(persen){
+        this.bitmap.restore();
+        this.bitmap.scale( persen, persen );
+    }
 
     //=============================
     //
@@ -815,6 +846,20 @@ class LongTake extends ModuleBase {
 
     targetResize(){
         this.targetRect = this.target.getBoundingClientRect();
+        this.buffer.resize( this.target.width, this.target.height );
+        this.bitmap.globalCompositeOperation = "copy";
+    }
+
+    autoScreenResize(){
+        let width = document.body.clientWidth;
+        let height = document.body.clientHeight;
+        if( width < this.target.width ){
+            this.target.width = width;
+        }
+        if( height < this.target.height ){
+            this.target.height = height;
+        }
+        this.targetResize();
     }
 
     //=============================
@@ -865,7 +910,7 @@ class LongTake extends ModuleBase {
         if( this.camera.sprite ){ this.updateCamera(); }
         this.stage.mainRender();
         this.buffer.draw();
-        this.bitmap.drawImage( this.buffer.canvas, this.camera.offsetX, this.camera.offsetY );
+        this.bitmap.drawImage( this.buffer.canvas, 0, 0 );
     }
 
 }
@@ -1213,7 +1258,6 @@ class Sprite extends ModuleBase {
      * @member {number} rotation 旋轉
      * @member {number} opacity 透明度
      * @member {number} blendMode 合成模式
-     * @member {number} transform 是否啟用變形
      */
 
     initContainer(){
@@ -1224,7 +1268,6 @@ class Sprite extends ModuleBase {
             scaleHeight : 1,
             rotation : 0,
             opacity : 255,
-            blendMode : null, 
         }
     }
 
@@ -1273,11 +1316,6 @@ class Sprite extends ModuleBase {
     get skewY(){ return this.container.skewY }
     set skewY(val){
         this.container.skewY = val;
-    }
-
-    get transform(){ return this.bitmap.transform }
-    set transform(val){
-        this.bitmap.transform = !!val;
     }
 
     //=============================
@@ -1435,8 +1473,8 @@ class Sprite extends ModuleBase {
     getOffscreen(){
         if( this.main ){
             let size = this.getRealSize();
-            if( this.screenX <= this.main.camera.offsetX + this.main.bitmap.width 
-                && this.screenY <= this.main.camera.offsetY + this.main.bitmap.height
+            if( this.screenX <= this.main.camera.offsetX + this.main.target.width 
+                && this.screenY <= this.main.camera.offsetY + this.main.target.height
                 && this.screenX + size.width >= this.main.camera.offsetX 
                 && this.screenY + size.height >= this.main.camera.offsetY){
                     return false;
@@ -1665,29 +1703,6 @@ class Sprite extends ModuleBase {
             this.resize( this.main.width, this.main.height );
         }else{
             this.systemError("resizeMax", "Function call must in the create or update.");
-        }
-    }
-
-    /**
-     * @function getRenderData()
-     * @desc 當render對象是個offScreenCanvas時會需要的資料
-     */
-
-    getRenderData(){
-        return {
-            bitmap : this.bitmap.getRenderTarget(),
-            posX : this.posX,
-            posY : this.posY,
-            screenX : this.screenX,
-            screenY : this.screenY,
-            skewX : this.skewX,
-            skewY : this.skewY,
-            scaleWidth : this.scaleWidth,
-            scaleHeight : this.scaleHeight,
-            rotation : this.rotation,
-            opacity : this.opacity,
-            blendMode : this.blendMode,
-            transform : this.transform,
         }
     }
 
