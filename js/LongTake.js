@@ -288,7 +288,8 @@ class LongTake extends ModuleBase {
     bitmapUpdate(){
         if( this.camera.sprite ){ this.updateCamera(); }
         this.stage.mainRender();
-        this.bitmap.drawImage( this.buffer.draw(), this.camera.offsetX, this.camera.offsetY );
+        this.buffer.draw();
+        this.bitmap.drawImage( this.buffer.canvas, this.camera.offsetX, this.camera.offsetY );
     }
 
 }

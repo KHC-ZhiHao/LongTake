@@ -120,7 +120,6 @@ class RenderBuffer extends ModuleBase {
     draw(){
         this.context.clearRect( 0, 0, this.width, this.height );
         this.render(this.stage);
-        return this.canvas;
     }
 
     render(sprite){
@@ -865,7 +864,8 @@ class LongTake extends ModuleBase {
     bitmapUpdate(){
         if( this.camera.sprite ){ this.updateCamera(); }
         this.stage.mainRender();
-        //this.bitmap.drawImage( this.buffer.draw(), this.camera.offsetX, this.camera.offsetY );
+        this.buffer.draw();
+        this.bitmap.drawImage( this.buffer.canvas, this.camera.offsetX, this.camera.offsetY );
     }
 
 }

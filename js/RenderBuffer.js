@@ -15,7 +15,6 @@ class RenderBuffer extends ModuleBase {
     draw(){
         this.context.clearRect( 0, 0, this.width, this.height );
         this.render(this.stage);
-        return this.canvas;
     }
 
     render(sprite){
