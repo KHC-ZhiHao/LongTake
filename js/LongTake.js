@@ -25,7 +25,6 @@ class LongTake extends ModuleBase {
         this.framePerSecond = 60;
         this.stopOfAboveWindow = true;
         this.baseFps = 0;
-        this.asyncRefresh = false;
         this.remove = false;
         this.bindUpdate = this.update.bind(this);
 
@@ -271,7 +270,7 @@ class LongTake extends ModuleBase {
             || window.pageYOffset < this.target.offsetTop + this.targetRect.height
             || window.pageYOffset + document.body.scrollHeight > this.target.offsetTop ){
             this.stageUpdate();
-            if( this.baseFps >= 60 && this.asyncRefresh === false ){
+            if( this.baseFps >= 60 ){
                 this.asyncRefresh = true;
                 this.bitmapUpdate();
                 this.baseFps = this.baseFps % 60;
@@ -286,15 +285,10 @@ class LongTake extends ModuleBase {
         this.stage.mainUpdate();
     }
 
-    async bitmapUpdate(){
+    bitmapUpdate(){
         if( this.camera.sprite ){ this.updateCamera(); }
         this.stage.mainRender();
-        this.buffer.draw();
-    }
-
-    drawTarget(img){
-        this.bitmap.drawImage( img, this.camera.offsetX, this.camera.offsetY );
-        this.asyncRefresh = false;
+        this.bitmap.drawImage( this.buffer.draw(), this.camera.offsetX, this.camera.offsetY );
     }
 
 }

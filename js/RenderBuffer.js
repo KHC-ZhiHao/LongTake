@@ -10,44 +10,12 @@ class RenderBuffer extends ModuleBase {
         this.canvas.width = main.width;
         this.canvas.height = main.height;
         this.context = this.canvas.getContext('2d');
-        this.speedRender = null;
-    }
-
-    useSuperRender(){
-        if( this.canvas.toBlob && window.createImageBitmap && window.Worker ){
-            let script = `
-                function getImg(img){
-                    postMessage(img);
-                }
-                onmessage = function(message){
-                    self.createImageBitmap(message.data).then(getImg);
-                }
-            `;
-            let blob = new Blob([script], {type: 'application/javascript'});
-            this.speedRender = new Worker(URL.createObjectURL(blob));
-            this.speedRender.onmessage = (message)=>{
-                this.main.drawTarget(message.data);
-            }
-            this.workerPost = (blob)=>{
-                this.speedRender.postMessage(blob);
-            }
-        }else{
-            this.systemError( "useSuperRender", "UseSuperRender can't use, something function not support." );
-        }
     }
 
     draw(){
         this.context.clearRect( 0, 0, this.width, this.height );
         this.render(this.stage);
-        this.finish();
-    }
-
-    finish(){
-        if( this.speedRender ){
-            this.canvas.toBlob(this.workerPost);
-        }else{
-            this.main.drawTarget(this.canvas);
-        }
+        return this.canvas;
     }
 
     render(sprite){
@@ -66,7 +34,6 @@ class RenderBuffer extends ModuleBase {
     }
 
     drawTransform(sprite){
-        //中心
         let posX = sprite.posX;
         let posY = sprite.posY;
         let context = this.context;
@@ -74,7 +41,6 @@ class RenderBuffer extends ModuleBase {
         if( sprite.opacity !== 255 ){
             context.globalAlpha = sprite.opacity / 255;
         }
-        //合成
         if( sprite.blendMode ){
             context.globalCompositeOperation = sprite.blendMode;
         }
@@ -87,7 +53,6 @@ class RenderBuffer extends ModuleBase {
         if( sprite.skewX !== 0 || sprite.skewY !== 0 ){
             context.transform( 1, sprite.skewX, sprite.skewY, 1, 0, 0 );
         }
-        //回歸原點
         context.translate( -(posX), -(posY) );
     }
 
