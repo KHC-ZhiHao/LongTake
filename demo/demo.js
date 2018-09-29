@@ -78,19 +78,19 @@ loader.onload(()=>{
             }
         }, 100);
     });
-
-    function addBunny( x, y ){
-        let bunny = new LTJump( loader.get("bunny"), x, y );
-        bunny.transform = false;
-        app.stage.addChildren(bunny);
-        bunnys += 1;
-        ballElement.innerText = bunnys;
-    }
     
 });
 
-function addBunny(){
+function addBunny100(){
     for( let i = 0 ; i < 100 ; i++ ){
         addBunny( 0, 0 );
     }
+}
+
+function addBunny( x, y ){
+    let bunny = new LTJump( loader.get("bunny"), x, y );
+    bunny.transform = false;
+    app.stage.addChildren(bunny);
+    bunnys += 1;
+    ballElement.innerText = bunnys;
 }
