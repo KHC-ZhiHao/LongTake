@@ -241,6 +241,8 @@ class Sprite extends ModuleBase {
      * @member {number} rotation 旋轉
      * @member {number} opacity 透明度
      * @member {number} blendMode 合成模式
+     * @member {number} screenScaleWidth 該精靈在最後顯示的總倍率寬
+     * @member {number} screenScaleHeight 該精靈在最後顯示的總倍率高
      */
 
     initContainer(){
@@ -273,6 +275,10 @@ class Sprite extends ModuleBase {
     set scaleHeight(val){
         this.container.scaleHeight = val;
     }
+
+    get screenScaleWidth(){ return this.parent === null ? this.scaleWidth : this.scaleWidth * this.parent.scaleWidth }
+    get screenScaleHeight(){ return this.parent === null ? this.scaleHeight : this.scaleHeight * this.parent.screenScaleHeight }
+
 
     get rotation(){ return this.container.rotation }
     set rotation(val){
@@ -383,13 +389,13 @@ class Sprite extends ModuleBase {
             cache : false,
             remove : false,
             hidden : false,
-            readSize : null,
+            realSize : null,
             childrenDead : false,
         }
     }
 
     get canRender(){ return !this.status.cache; }
-    get canShow(){ return !this.status.hidden && !this.getOffscreen() }
+    get canShow(){ return !this.status.hidden }
 
     /**
      * @function cache()
@@ -435,35 +441,24 @@ class Sprite extends ModuleBase {
      */
 
     getRealSize(){
-        if( this.status.readSize == null ){
+        if( this.status.realSize == null ){
             let width = this.width + this.skewY * this.height;
             let height = this.height + this.skewX * this.width;
             let s = Math.abs( this.helper.sinByDeg(this.rotation) );
             let c = Math.abs( this.helper.cosByDeg(this.rotation) );
-            this.status.readSize = {
-                width : ( width * c + height * s ) * this.scaleWidth,
-                height : ( height * c + width * s ) * this.scaleHeight,
+            this.status.realSize = {
+                width : ( width * c + height * s ) * this.screenScaleWidth,
+                height : ( height * c + width * s ) * this.screenScaleWidth,
             }
         }
-        return this.status.readSize;
+        return this.status.realSize;
     }
 
-    /**
-     * @function getOffscreen()
-     * @desc 獲取該精靈是否在視窗外
-     */
-
-    getOffscreen(){
-        if( this.main ){
-            let size = this.getRealSize();
-            if( this.screenX <= this.main.camera.offsetX + this.main.target.width 
-                && this.screenY <= this.main.camera.offsetY + this.main.target.height
-                && this.screenX + size.width >= this.main.camera.offsetX 
-                && this.screenY + size.height >= this.main.camera.offsetY){
-                    return false;
-            }
+    getRealPosition(){
+        return {
+            x : this.screenX - this.screenX * this.parent.scaleWidth,
+            y : this.screenY - this.screenY * this.parent.scaleHeight,
         }
-        return true;
     }
 
     //=============================
@@ -701,8 +696,9 @@ class Sprite extends ModuleBase {
 
     inRect(x,y){
         let rect = this.getRealSize();
-        return ( x >= this.screenX && x <= this.screenX + rect.width ) 
-            && ( y >= this.screenY && y <= this.screenY + rect.height );
+        let position = this.getRealPosition();
+        return ( x >= position.x && x <= position.x + rect.width ) 
+            && ( y >= position.y && y <= position.y + rect.height );
     }
 
 }

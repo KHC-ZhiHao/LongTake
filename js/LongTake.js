@@ -63,9 +63,9 @@ class LongTake extends ModuleBase {
 
     initBitmap(){
         if( this.target instanceof Element && this.target.tagName === "CANVAS" ){
+            this.target.style.touchAction = "pan-y";
             this.bitmap = this.target.getContext('2d');
             this.bitmap.globalCompositeOperation = "copy";
-            this.bitmap.save();
             this.buffer = new RenderBuffer(this);
         }else{
             this.systemError("initBitmap", "Object not a cavnas.", this.target);
@@ -112,11 +112,6 @@ class LongTake extends ModuleBase {
         if( width >= 1264 && width < 1904 ){ return ['sm','xs','md','lg'].indexOf(view) !== -1 }
         if( width >= 1904 ){ return ['sm','xs','md','lg','xl'].indexOf(view) !== -1 }
         return false;
-    }
-
-    bitmapScale(persen){
-        this.bitmap.restore();
-        this.bitmap.scale( persen, persen );
     }
 
     //=============================
@@ -210,6 +205,7 @@ class LongTake extends ModuleBase {
 
     initEvent(){
         this.event = {};
+        this.globalEvent = {};
         this.eventAction = {};
         this.pointerX = 0;
         this.pointerY = 0;
@@ -224,7 +220,7 @@ class LongTake extends ModuleBase {
      * @param {function} callback 觸發事件
      */
 
-    addEvent( eventName, callback ){
+    addEvent( eventName, callback, global ){
         if( this.event[eventName] == null ){
             this.event[eventName] = (event)=>{
                 if( this.eventAction[eventName] == null ){
@@ -247,15 +243,14 @@ class LongTake extends ModuleBase {
         this.bitmap.globalCompositeOperation = "copy";
     }
 
-    autoScreenResize(){
-        let width = document.body.clientWidth;
-        let height = document.body.clientHeight;
+    responsiveResize(scale = 1){
+        let width = this.target.parentElement.clientWidth * scale;
+        let person = (width / this.target.width) * scale;
         if( width < this.target.width ){
+            this.target.height *= person;
             this.target.width = width;
         }
-        if( height < this.target.height ){
-            this.target.height = height;
-        }
+        this.stage.scale(person);
         this.targetResize();
     }
 

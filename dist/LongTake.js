@@ -124,9 +124,7 @@ class RenderBuffer extends ModuleBase {
 
     draw(){
         this.context.clearRect( 0, 0, this.width, this.height );
-        this.context.save();
         this.render(this.stage);
-        this.context.restore();
     }
 
     render(sprite){
@@ -179,12 +177,12 @@ class RenderBuffer extends ModuleBase {
             context.rotate( -(sprite.rotation * sprite.helper.arc) );
         }
         if( sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1 ){
-            context.scale( -sprite.scaleWidth, -sprite.scaleHeight );
+            context.scale(  1 / sprite.scaleWidth, 1 / sprite.scaleHeight );
         }
         if( sprite.skewX !== 0 || sprite.skewY !== 0 ){
             context.transform( 1, -sprite.skewX, -sprite.skewY, 1, 0, 0 );
         }
-        context.translate( -(posX), -(posY) );
+        context.translate( -posX, -posY );
     }
 
 }
@@ -666,9 +664,9 @@ class LongTake extends ModuleBase {
 
     initBitmap(){
         if( this.target instanceof Element && this.target.tagName === "CANVAS" ){
+            this.target.style.touchAction = "pan-y";
             this.bitmap = this.target.getContext('2d');
             this.bitmap.globalCompositeOperation = "copy";
-            this.bitmap.save();
             this.buffer = new RenderBuffer(this);
         }else{
             this.systemError("initBitmap", "Object not a cavnas.", this.target);
@@ -715,11 +713,6 @@ class LongTake extends ModuleBase {
         if( width >= 1264 && width < 1904 ){ return ['sm','xs','md','lg'].indexOf(view) !== -1 }
         if( width >= 1904 ){ return ['sm','xs','md','lg','xl'].indexOf(view) !== -1 }
         return false;
-    }
-
-    bitmapScale(persen){
-        this.bitmap.restore();
-        this.bitmap.scale( persen, persen );
     }
 
     //=============================
@@ -813,6 +806,7 @@ class LongTake extends ModuleBase {
 
     initEvent(){
         this.event = {};
+        this.globalEvent = {};
         this.eventAction = {};
         this.pointerX = 0;
         this.pointerY = 0;
@@ -827,7 +821,7 @@ class LongTake extends ModuleBase {
      * @param {function} callback 觸發事件
      */
 
-    addEvent( eventName, callback ){
+    addEvent( eventName, callback, global ){
         if( this.event[eventName] == null ){
             this.event[eventName] = (event)=>{
                 if( this.eventAction[eventName] == null ){
@@ -850,15 +844,14 @@ class LongTake extends ModuleBase {
         this.bitmap.globalCompositeOperation = "copy";
     }
 
-    autoScreenResize(){
-        let width = document.body.clientWidth;
-        let height = document.body.clientHeight;
+    responsiveResize(scale = 1){
+        let width = this.target.parentElement.clientWidth * scale;
+        let person = (width / this.target.width) * scale;
         if( width < this.target.width ){
+            this.target.height *= person;
             this.target.width = width;
         }
-        if( height < this.target.height ){
-            this.target.height = height;
-        }
+        this.stage.scale(person);
         this.targetResize();
     }
 
@@ -1258,6 +1251,8 @@ class Sprite extends ModuleBase {
      * @member {number} rotation 旋轉
      * @member {number} opacity 透明度
      * @member {number} blendMode 合成模式
+     * @member {number} screenScaleWidth 該精靈在最後顯示的總倍率寬
+     * @member {number} screenScaleHeight 該精靈在最後顯示的總倍率高
      */
 
     initContainer(){
@@ -1290,6 +1285,10 @@ class Sprite extends ModuleBase {
     set scaleHeight(val){
         this.container.scaleHeight = val;
     }
+
+    get screenScaleWidth(){ return this.parent === null ? this.scaleWidth : this.scaleWidth * this.parent.scaleWidth }
+    get screenScaleHeight(){ return this.parent === null ? this.scaleHeight : this.scaleHeight * this.parent.screenScaleHeight }
+
 
     get rotation(){ return this.container.rotation }
     set rotation(val){
@@ -1400,13 +1399,13 @@ class Sprite extends ModuleBase {
             cache : false,
             remove : false,
             hidden : false,
-            readSize : null,
+            realSize : null,
             childrenDead : false,
         }
     }
 
     get canRender(){ return !this.status.cache; }
-    get canShow(){ return !this.status.hidden && !this.getOffscreen() }
+    get canShow(){ return !this.status.hidden }
 
     /**
      * @function cache()
@@ -1452,35 +1451,24 @@ class Sprite extends ModuleBase {
      */
 
     getRealSize(){
-        if( this.status.readSize == null ){
+        if( this.status.realSize == null ){
             let width = this.width + this.skewY * this.height;
             let height = this.height + this.skewX * this.width;
             let s = Math.abs( this.helper.sinByDeg(this.rotation) );
             let c = Math.abs( this.helper.cosByDeg(this.rotation) );
-            this.status.readSize = {
-                width : ( width * c + height * s ) * this.scaleWidth,
-                height : ( height * c + width * s ) * this.scaleHeight,
+            this.status.realSize = {
+                width : ( width * c + height * s ) * this.screenScaleWidth,
+                height : ( height * c + width * s ) * this.screenScaleWidth,
             }
         }
-        return this.status.readSize;
+        return this.status.realSize;
     }
 
-    /**
-     * @function getOffscreen()
-     * @desc 獲取該精靈是否在視窗外
-     */
-
-    getOffscreen(){
-        if( this.main ){
-            let size = this.getRealSize();
-            if( this.screenX <= this.main.camera.offsetX + this.main.target.width 
-                && this.screenY <= this.main.camera.offsetY + this.main.target.height
-                && this.screenX + size.width >= this.main.camera.offsetX 
-                && this.screenY + size.height >= this.main.camera.offsetY){
-                    return false;
-            }
+    getRealPosition(){
+        return {
+            x : this.screenX - this.screenX * this.parent.scaleWidth,
+            y : this.screenY - this.screenY * this.parent.scaleHeight,
         }
-        return true;
     }
 
     //=============================
@@ -1718,8 +1706,9 @@ class Sprite extends ModuleBase {
 
     inRect(x,y){
         let rect = this.getRealSize();
-        return ( x >= this.screenX && x <= this.screenX + rect.width ) 
-            && ( y >= this.screenY && y <= this.screenY + rect.height );
+        let position = this.getRealPosition();
+        return ( x >= position.x && x <= position.x + rect.width ) 
+            && ( y >= position.y && y <= position.y + rect.height );
     }
 
 }

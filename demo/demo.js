@@ -67,7 +67,7 @@ var loader = new LongTake.Loader();
     loader.start();
 
 var app = new LongTake( document.getElementById("app"), 800, 600 );
-    app.autoScreenResize();
+    app.responsiveResize();
 
 loader.onload(()=>{
     

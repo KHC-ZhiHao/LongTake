@@ -19,9 +19,7 @@ class RenderBuffer extends ModuleBase {
 
     draw(){
         this.context.clearRect( 0, 0, this.width, this.height );
-        this.context.save();
         this.render(this.stage);
-        this.context.restore();
     }
 
     render(sprite){
@@ -74,12 +72,12 @@ class RenderBuffer extends ModuleBase {
             context.rotate( -(sprite.rotation * sprite.helper.arc) );
         }
         if( sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1 ){
-            context.scale( -sprite.scaleWidth, -sprite.scaleHeight );
+            context.scale(  1 / sprite.scaleWidth, 1 / sprite.scaleHeight );
         }
         if( sprite.skewX !== 0 || sprite.skewY !== 0 ){
             context.transform( 1, -sprite.skewX, -sprite.skewY, 1, 0, 0 );
         }
-        context.translate( -(posX), -(posY) );
+        context.translate( -posX, -posY );
     }
 
 }
