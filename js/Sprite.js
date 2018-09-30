@@ -276,8 +276,8 @@ class Sprite extends ModuleBase {
         this.container.scaleHeight = val;
     }
 
-    get screenScaleWidth(){ return this.parent === null ? this.scaleWidth : this.scaleWidth * this.parent.scaleWidth }
-    get screenScaleHeight(){ return this.parent === null ? this.scaleHeight : this.scaleHeight * this.parent.screenScaleHeight }
+    get screenScaleWidth(){ return this.parent == null ? this.scaleWidth : this.scaleWidth * this.parent.screenScaleWidth }
+    get screenScaleHeight(){ return this.parent == null ? this.scaleHeight : this.scaleHeight * this.parent.screenScaleHeight }
 
 
     get rotation(){ return this.container.rotation }
@@ -448,7 +448,7 @@ class Sprite extends ModuleBase {
             let c = Math.abs( this.helper.cosByDeg(this.rotation) );
             this.status.realSize = {
                 width : ( width * c + height * s ) * this.screenScaleWidth,
-                height : ( height * c + width * s ) * this.screenScaleWidth,
+                height : ( height * c + width * s ) * this.screenScaleHeight,
             }
         }
         return this.status.realSize;
@@ -456,8 +456,8 @@ class Sprite extends ModuleBase {
 
     getRealPosition(){
         return {
-            x : this.screenX * this.parent == null ? 1 : this.parent.scaleWidth,
-            y : this.screenY * this.parent == null ? 1 : this.parent.scaleHeight,
+            x : this.screenX * ( this.parent == null ? 1 : this.parent.screenScaleWidth ),
+            y : this.screenY * ( this.parent == null ? 1 : this.parent.screenScaleHeight ),
         }
     }
 
@@ -480,7 +480,7 @@ class Sprite extends ModuleBase {
      */
 
     mainUpdate(){
-        this.status.readSize = null;
+        this.status.realSize = null;
         if( this.status.sort ){
             this.status.sort = false;
             this.sortChildren();
