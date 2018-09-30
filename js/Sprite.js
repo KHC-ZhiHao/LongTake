@@ -456,8 +456,8 @@ class Sprite extends ModuleBase {
 
     getRealPosition(){
         return {
-            x : this.screenX - this.screenX * this.parent.scaleWidth,
-            y : this.screenY - this.screenY * this.parent.scaleHeight,
+            x : this.screenX * this.parent == null ? 1 : this.parent.scaleWidth,
+            y : this.screenY * this.parent == null ? 1 : this.parent.scaleHeight,
         }
     }
 
