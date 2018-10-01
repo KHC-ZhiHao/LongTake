@@ -25,7 +25,6 @@ class ModuleBase {
     constructor( name ){
         this.moduleBase = {
             name : name || "No module base name.",
-            worker : {},
         }
     }
 
@@ -112,7 +111,7 @@ class RenderBuffer extends ModuleBase {
         this.width = main.width;
         this.height = main.height;
         this.canvas = document.createElement('canvas');
-        this.context = this.canvas.getContext('2d');
+        this.context = this.canvas.getContext('2d', { alpha : false });
         this.camera = main.camera;
         this.resize( main.width, main.height );
     }
@@ -666,7 +665,6 @@ class LongTake extends ModuleBase {
         if( this.target instanceof Element && this.target.tagName === "CANVAS" ){
             this.target.style.touchAction = "pan-y";
             this.bitmap = this.target.getContext('2d');
-            this.bitmap.globalCompositeOperation = "copy";
             this.buffer = new RenderBuffer(this);
         }else{
             this.systemError("initBitmap", "Object not a cavnas.", this.target);
@@ -821,7 +819,7 @@ class LongTake extends ModuleBase {
      * @param {function} callback 觸發事件
      */
 
-    addEvent( eventName, callback, global ){
+    addEvent( eventName, callback ){
         if( this.event[eventName] == null ){
             this.event[eventName] = (event)=>{
                 if( this.eventAction[eventName] == null ){
@@ -841,7 +839,6 @@ class LongTake extends ModuleBase {
     targetResize(){
         this.targetRect = this.target.getBoundingClientRect();
         this.buffer.resize( this.target.width, this.target.height );
-        this.bitmap.globalCompositeOperation = "copy";
     }
 
     responsiveResize(scale = 1){
@@ -867,7 +864,11 @@ class LongTake extends ModuleBase {
     initStage(){
         this.stage = new Sprite("Stage");
         this.stage.install(this);
-        this.stage.resize(this.width, this.height);
+        this.stage.resize(0,0);
+    }
+
+    addChildren(sprite){
+        this.stage.addChildren(sprite);
     }
 
     //=============================
@@ -903,6 +904,7 @@ class LongTake extends ModuleBase {
         if( this.camera.sprite ){ this.updateCamera(); }
         this.stage.mainRender();
         this.buffer.draw();
+        this.bitmap.clearRect( 0, 0, this.target.width, this.target.height );
         this.bitmap.drawImage( this.buffer.canvas, 0, 0 );
     }
 

@@ -8,7 +8,6 @@ class ModuleBase {
     constructor( name ){
         this.moduleBase = {
             name : name || "No module base name.",
-            worker : {},
         }
     }
 
