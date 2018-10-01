@@ -111,7 +111,7 @@ class RenderBuffer extends ModuleBase {
         this.width = main.width;
         this.height = main.height;
         this.canvas = document.createElement('canvas');
-        this.context = this.canvas.getContext('2d', { alpha : false });
+        this.context = this.canvas.getContext('2d');
         this.camera = main.camera;
         this.resize( main.width, main.height );
     }
