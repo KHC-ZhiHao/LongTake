@@ -454,6 +454,11 @@ class Sprite extends ModuleBase {
         return this.status.realSize;
     }
 
+    /**
+     * @function getRealPosition()
+     * @desc 獲取精靈在畫布的準確位置
+     */
+
     getRealPosition(){
         return {
             x : this.screenX * ( this.parent == null ? 1 : this.parent.screenScaleWidth ),
@@ -487,8 +492,8 @@ class Sprite extends ModuleBase {
         }
         this.update();
         this.eachChildren(this.updateForChild);
-        if( this.childrenDead ){
-            this.childrenDead = false;
+        if( this.status.childrenDead ){
+            this.status.childrenDead = false;
             this.children = this.children.filter((child)=>{
                 if( child.status.remove ){ 
                     child.close();
@@ -508,7 +513,7 @@ class Sprite extends ModuleBase {
         if( child.status.remove == false ){
             child.mainUpdate();
         }else{
-            this.childrenDead = true;
+            this.status.childrenDead = true;
         }
     }
 
@@ -649,26 +654,6 @@ class Sprite extends ModuleBase {
             this.bitmap.putImageData(imgData);
             this.eachChildren((child) => {child.renderFilter(filter);});
         }
-    }
-
-    /**
-     * @function drawImage(imageName,x,y)
-     * @desc 繪製加載完成的圖片
-     */
-
-    drawImage(imageName,x = 0, y = 0){
-        let image = this.main.getImageByName(imageName);
-        this.context.drawImage( image, x, y );
-    }
-
-    /**
-     * @function resizeFromImage()
-     * @desc 調整至加載圖片的大小
-     */
-
-    resizeFromImage(imageName){
-        let image = this.main.getImageByName(imageName);
-        this.resize( image.width, image.height );
     }
 
     /**

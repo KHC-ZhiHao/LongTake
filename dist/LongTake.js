@@ -55,40 +55,6 @@ class ModuleBase {
     }
 
     /**
-     * @function reverseEach(array,callback)
-     * @desc 反向執行迴圈
-     */
-
-    reverseEach( array, callback ){
-        if( Array.isArray(array) ){
-            var len = array.length;
-            for( let i = len ; i >= 0 ; i-- ){
-                var br = callback( array[i], i );
-                if( br === "_break" ){ break; }
-                if( br === "_continue" ){ continue; }
-            }
-    	}else{
-            this.systemError("each", "Not a array.", array);
-        }
-    }
-
-    /**
-     * @function runWhile(callback,max)
-     * @desc 執行有限迴圈
-     */
-
-    runWhile(callback, max = 10000){
-        let now = 0;
-        while(true){
-            let br = callback(now);
-            if( br === "_break" ){ break; }
-            if( br === "_continue" ){ continue; }
-            if( now > max ){ break; }
-            now++;
-        }
-    }
-
-    /**
     * @function systemError(functionName,maessage,object)
     * @desc 於console呼叫錯誤，中斷程序並顯示錯誤的物件
     */
@@ -108,21 +74,18 @@ class RenderBuffer extends ModuleBase {
         super("RenderBuffer");
         this.main = main;
         this.stage = main.stage;
-        this.width = main.width;
-        this.height = main.height;
-        this.canvas = document.createElement('canvas');
-        this.context = this.canvas.getContext('2d');
+        this.bitmap = new Bitmap( main.width, main.height );
+        this.context = this.bitmap.context;
         this.camera = main.camera;
         this.resize( main.width, main.height );
     }
 
     resize( width, height ){
-        this.canvas.width = width;
-        this.canvas.height = height;
+        this.bitmap.resize( width, height );
     }
 
     draw(){
-        this.context.clearRect( 0, 0, this.width, this.height );
+        this.context.clearRect( 0, 0, this.main.width, this.main.height );
         this.render(this.stage);
     }
 
@@ -167,10 +130,10 @@ class RenderBuffer extends ModuleBase {
         let context = this.context;
             context.translate( posX, posY );
         if( sprite.opacity !== 255 ){
-            context.globalAlpha = 1;
+            context.globalAlpha = sprite.opacity / 255;
         }
         if( sprite.blendMode ){
-            context.globalCompositeOperation = "source-over";
+            context.globalCompositeOperation = sprite.blendMode;
         }
         if( sprite.rotation !== 0 ){
             context.rotate( -(sprite.rotation * sprite.helper.arc) );
@@ -186,23 +149,29 @@ class RenderBuffer extends ModuleBase {
 
 }
 
-class HelperModuel {
+class HelperModule {
 
     constructor(){
         this.arc = Math.PI / 180;
+        this.trigonometric = {};
+        for( let i = -360 ; i < 360 ; i++ ){
+            this.trigonometric[i] = {};
+            this.trigonometric[i].sin = Math.sin(i * this.arc);
+            this.trigonometric[i].cos = Math.cos(i * this.arc);
+        }
     }
     
     sinByDeg(deg){
-        return Math.sin( (deg % 360) * this.arc );
+        return this.trigonometric[Math.round(deg)].sin;
     }
     
     cosByDeg(deg){
-        return Math.cos( (deg % 360) * this.arc );
+        return this.trigonometric[Math.round(deg)].cos;
     }
 
 }
 
-let Helper = new HelperModuel;
+let Helper = new HelperModule;
 /**
  * @class Loader
  * @desc 一個簡易的載入載具
@@ -808,6 +777,7 @@ class LongTake extends ModuleBase {
         this.eventAction = {};
         this.pointerX = 0;
         this.pointerY = 0;
+        this.addEvent( "click", this.pointerMove )
         this.addEvent( "resize", this.targetResize )
         this.addEvent( "pointermove", this.pointerMove );
         this.targetResize();
@@ -865,6 +835,9 @@ class LongTake extends ModuleBase {
         this.stage = new Sprite("Stage");
         this.stage.install(this);
         this.stage.resize(0,0);
+        this.stage.render = function(){
+            this.cache();
+        }
     }
 
     addChildren(sprite){
@@ -886,7 +859,6 @@ class LongTake extends ModuleBase {
             || window.pageYOffset + document.body.scrollHeight > this.target.offsetTop ){
             this.stageUpdate();
             if( this.baseFps >= 60 ){
-                this.asyncRefresh = true;
                 this.bitmapUpdate();
                 this.baseFps = this.baseFps % 60;
             }
@@ -905,10 +877,15 @@ class LongTake extends ModuleBase {
         this.stage.mainRender();
         this.buffer.draw();
         this.bitmap.clearRect( 0, 0, this.target.width, this.target.height );
-        this.bitmap.drawImage( this.buffer.canvas, 0, 0 );
+        this.bitmap.drawImage( this.buffer.bitmap.canvas, 0, 0 );
     }
 
 }
+
+/**
+ * @class Animate(sprite,begin,duration, easing, alternate, action)
+ * @desc 
+ */
 
 class Animate extends ModuleBase {
 
@@ -1466,6 +1443,11 @@ class Sprite extends ModuleBase {
         return this.status.realSize;
     }
 
+    /**
+     * @function getRealPosition()
+     * @desc 獲取精靈在畫布的準確位置
+     */
+
     getRealPosition(){
         return {
             x : this.screenX * ( this.parent == null ? 1 : this.parent.screenScaleWidth ),
@@ -1499,8 +1481,8 @@ class Sprite extends ModuleBase {
         }
         this.update();
         this.eachChildren(this.updateForChild);
-        if( this.childrenDead ){
-            this.childrenDead = false;
+        if( this.status.childrenDead ){
+            this.status.childrenDead = false;
             this.children = this.children.filter((child)=>{
                 if( child.status.remove ){ 
                     child.close();
@@ -1520,7 +1502,7 @@ class Sprite extends ModuleBase {
         if( child.status.remove == false ){
             child.mainUpdate();
         }else{
-            this.childrenDead = true;
+            this.status.childrenDead = true;
         }
     }
 
@@ -1664,26 +1646,6 @@ class Sprite extends ModuleBase {
     }
 
     /**
-     * @function drawImage(imageName,x,y)
-     * @desc 繪製加載完成的圖片
-     */
-
-    drawImage(imageName,x = 0, y = 0){
-        let image = this.main.getImageByName(imageName);
-        this.context.drawImage( image, x, y );
-    }
-
-    /**
-     * @function resizeFromImage()
-     * @desc 調整至加載圖片的大小
-     */
-
-    resizeFromImage(imageName){
-        let image = this.main.getImageByName(imageName);
-        this.resize( image.width, image.height );
-    }
-
-    /**
      * @function resizeMax()
      * @desc 調整大小至LongTake大小
      */
@@ -1720,6 +1682,7 @@ class Sprite extends ModuleBase {
             __re.Sprite = Sprite;
 __re.Bitmap = Bitmap;
 __re.Loader = Loader;
+__re.Helper = Helper;
 __re.Animate = Animate;
 
             return __re;

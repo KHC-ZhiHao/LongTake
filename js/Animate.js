@@ -1,4 +1,9 @@
 
+/**
+ * @class Animate(sprite,begin,duration, easing, alternate, action)
+ * @desc 
+ */
+
 class Animate extends ModuleBase {
 
     /**

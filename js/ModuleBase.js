@@ -38,40 +38,6 @@ class ModuleBase {
     }
 
     /**
-     * @function reverseEach(array,callback)
-     * @desc 反向執行迴圈
-     */
-
-    reverseEach( array, callback ){
-        if( Array.isArray(array) ){
-            var len = array.length;
-            for( let i = len ; i >= 0 ; i-- ){
-                var br = callback( array[i], i );
-                if( br === "_break" ){ break; }
-                if( br === "_continue" ){ continue; }
-            }
-    	}else{
-            this.systemError("each", "Not a array.", array);
-        }
-    }
-
-    /**
-     * @function runWhile(callback,max)
-     * @desc 執行有限迴圈
-     */
-
-    runWhile(callback, max = 10000){
-        let now = 0;
-        while(true){
-            let br = callback(now);
-            if( br === "_break" ){ break; }
-            if( br === "_continue" ){ continue; }
-            if( now > max ){ break; }
-            now++;
-        }
-    }
-
-    /**
     * @function systemError(functionName,maessage,object)
     * @desc 於console呼叫錯誤，中斷程序並顯示錯誤的物件
     */

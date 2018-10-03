@@ -208,6 +208,7 @@ class LongTake extends ModuleBase {
         this.eventAction = {};
         this.pointerX = 0;
         this.pointerY = 0;
+        this.addEvent( "click", this.pointerMove )
         this.addEvent( "resize", this.targetResize )
         this.addEvent( "pointermove", this.pointerMove );
         this.targetResize();
@@ -265,6 +266,9 @@ class LongTake extends ModuleBase {
         this.stage = new Sprite("Stage");
         this.stage.install(this);
         this.stage.resize(0,0);
+        this.stage.render = function(){
+            this.cache();
+        }
     }
 
     addChildren(sprite){
@@ -286,7 +290,6 @@ class LongTake extends ModuleBase {
             || window.pageYOffset + document.body.scrollHeight > this.target.offsetTop ){
             this.stageUpdate();
             if( this.baseFps >= 60 ){
-                this.asyncRefresh = true;
                 this.bitmapUpdate();
                 this.baseFps = this.baseFps % 60;
             }
@@ -305,7 +308,7 @@ class LongTake extends ModuleBase {
         this.stage.mainRender();
         this.buffer.draw();
         this.bitmap.clearRect( 0, 0, this.target.width, this.target.height );
-        this.bitmap.drawImage( this.buffer.canvas, 0, 0 );
+        this.bitmap.drawImage( this.buffer.bitmap.canvas, 0, 0 );
     }
 
 }

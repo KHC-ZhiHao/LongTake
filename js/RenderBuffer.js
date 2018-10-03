@@ -4,21 +4,18 @@ class RenderBuffer extends ModuleBase {
         super("RenderBuffer");
         this.main = main;
         this.stage = main.stage;
-        this.width = main.width;
-        this.height = main.height;
-        this.canvas = document.createElement('canvas');
-        this.context = this.canvas.getContext('2d');
+        this.bitmap = new Bitmap( main.width, main.height );
+        this.context = this.bitmap.context;
         this.camera = main.camera;
         this.resize( main.width, main.height );
     }
 
     resize( width, height ){
-        this.canvas.width = width;
-        this.canvas.height = height;
+        this.bitmap.resize( width, height );
     }
 
     draw(){
-        this.context.clearRect( 0, 0, this.width, this.height );
+        this.context.clearRect( 0, 0, this.main.width, this.main.height );
         this.render(this.stage);
     }
 
@@ -63,10 +60,10 @@ class RenderBuffer extends ModuleBase {
         let context = this.context;
             context.translate( posX, posY );
         if( sprite.opacity !== 255 ){
-            context.globalAlpha = 1;
+            context.globalAlpha = sprite.opacity / 255;
         }
         if( sprite.blendMode ){
-            context.globalCompositeOperation = "source-over";
+            context.globalCompositeOperation = sprite.blendMode;
         }
         if( sprite.rotation !== 0 ){
             context.rotate( -(sprite.rotation * sprite.helper.arc) );
