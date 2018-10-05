@@ -395,7 +395,7 @@ class Sprite extends ModuleBase {
     }
 
     get canRender(){ return !this.status.cache; }
-    get canShow(){ return !this.status.hidden }
+    get canShow(){ return !this.status.hidden && !this.getOutScreen() }
 
     /**
      * @function cache()
@@ -643,6 +643,20 @@ class Sprite extends ModuleBase {
     }
 
     /**
+     * @function fromImage(img)
+     * @desc 快速建立一個繪製圖片完成的精靈
+     */
+
+    fromImage(img){
+        this.resize(img);
+        this.render = function(){
+            this.context.drawImage( img, 0, 0 );
+            this.cache();
+        }
+        return this;
+    }
+
+    /**
      * @function renderFilter(filter)
      * @desc 操作堆疊渲染的函式
      */
@@ -684,6 +698,25 @@ class Sprite extends ModuleBase {
         let position = this.getRealPosition();
         return ( x >= position.x && x <= position.x + rect.width ) 
             && ( y >= position.y && y <= position.y + rect.height );
+    }
+
+    /**
+     * @function getOutScreen()
+     * @desc 獲取該精靈是否在視窗外
+     */
+
+    getOutScreen(){
+        if( this.main ){
+            let size = this.getRealSize();
+            let position = this.getRealPosition();
+            if( position.x <= this.main.camera.offsetX + this.main.buffer.bitmap.width
+                && position.y <= this.main.camera.offsetY + this.main.buffer.bitmap.height
+                && position.x + size.width >= this.main.camera.offsetX
+                && position.y + size.height >= this.main.camera.offsetY ){
+                    return false;
+            }
+        }
+        return true;
     }
 
 }
