@@ -104,7 +104,7 @@ class BunnyContainer extends LongTake.Container {
     }
 
     init(){
-        for( let i = 0 ; i < 3000 ; i++ ){
+        for( let i = 0 ; i < 2000 ; i++ ){
             this.addChildren( new LTJump( this.bunnyImage, this.px, this.py ) );
         }
     }
@@ -119,7 +119,7 @@ function getBunnyContainer( bunnyImage, px, py ){
             var global = self;
             onmessage = (message)=>{
                 if( container == null ){
-                    self.importScripts( message.data.url + '/dist/index.js' );
+                    self.importScripts( message.data.url + '/LongTake/dist/index.js' );
                     ${LTJump.toString()}
                     ${BunnyContainer.toString()}
                     container = new BunnyContainer( message.data.img, ${px}, ${py} );
