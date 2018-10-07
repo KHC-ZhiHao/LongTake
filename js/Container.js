@@ -2,31 +2,27 @@ class Container extends ModuleBase {
 
     constructor( width, height ){
         super("Container");
-        this.store = {};
         this.width = width;
         this.height = height;
-        this.camera = {
-            offsetX : 0,
-            offsetY : 0,
-        }
+        this.camera = { offsetX : 0, offsetY : 0, }
         this.initStage();
         this.buffer = new RenderBuffer(this);
         this.bitmap = new Bitmap( width, height );
         this.bitmap.cache = true;
+        this.rendering = false;
     }
 
-    setStore( name, data ){
-        this.stage[name] = data;
-    }
-
-    post( data, callback ){
-        this.data = data;
-        this.update();
-        this.getImageBitmap(callback);
+    post(data){
+        if( this.rendering === false ){
+            this.rendering = true;
+            this.data = data;
+            this.update();
+            this.rendering = false;
+        }
     }
 
     getImageBitmap(callback){
-        this.bitmap.getImageBitmap(callback);
+        callback(this.bitmap.getRenderTarget());
     }
 
     addChildren(sprite){

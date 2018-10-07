@@ -33,7 +33,11 @@ class Bitmap extends ModuleBase {
             return this.canvas;
         }else {
             this.cacheImageBitmap();
-            return this.canvas;
+            if( this.offscreenCanvasSupport  ){
+                return this.imgBitmap;
+            }else{
+                return this.canvas;
+            }
         }
     }
 
@@ -65,22 +69,16 @@ class Bitmap extends ModuleBase {
         this.context.drawImage( bitmap.getRenderTarget(), Math.floor(x), Math.floor(y) );
     }
 
-    cacheImageBitmap(callback = function(){}){
+    cacheImageBitmap(){
         if( this.offscreenCanvasSupport ){
             this.imgBitmap = this.canvas.transferToImageBitmap();
-            callback(this.imgBitmap);
         }else{
             let img = new Image();
-                img.onload = ()=>{ 
-                    this.imgBitmap = img
-                    callback(this.imgBitmap);
-                }
-                img.src = this.canvas.toDataURL();
+            img.onload = ()=>{ 
+                this.imgBitmap = img
+            }
+            img.src = this.canvas.toDataURL();
         }
-    }
-
-    getImageBitmap(callback){
-        this.cacheImageBitmap(callback);
     }
 
     /**

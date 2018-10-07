@@ -1,4 +1,5 @@
-
+let bunnys = 0;
+let ballElement = document.getElementById("many");
 let stats = new Stats();
     stats.showPanel( 0 );
 document.body.appendChild( stats.dom );
@@ -26,6 +27,7 @@ class LTJump extends LongTake.Sprite {
     create(){
         this.maxX = this.main.width;
         this.maxY = this.main.height;
+        this.rotation = ( Math.random() - 0.5 ) * 15;
         this.setAnchor(0,1);
     }
     
@@ -61,38 +63,6 @@ class LTJump extends LongTake.Sprite {
  
 }
 
-class Scene extends LongTake.Sprite {
-
-    constructor(bunnyImage){
-        super("Scene");
-        this.bunnyImage = bunnyImage;
-        this.img = null;
-    }
-    
-    create(){
-        this.container = getBunnyContainer( this.bunnyImage, this.main.pointerX, this.main.pointerY );
-    }
-
-    update(){
-        this.container.post( null, ( bitmap )=>{
-            if( this.img ){
-                this.img = bitmap;
-            }else{
-                this.img = bitmap;
-                this.resize(this.img);
-            }
-        })
-    }
-
-    render(){
-        if( this.img ){
-            this.bitmap.clear();
-            this.context.drawImage( this.img, 0, 0 );
-        }
-    }
-
-}
-
 class BunnyContainer extends LongTake.Container {
 
     constructor( bunnyImage, px, py ){
@@ -111,6 +81,36 @@ class BunnyContainer extends LongTake.Container {
 
 }
 
+class Scene extends LongTake.Sprite {
+
+    constructor(bunnyImage){
+        super("Scene");
+        bunnys += 2000;
+        
+        this.bunnyImage = bunnyImage;
+        this.bindDrawer = this.renderByBitmap.bind(this);
+        this.resize(800,600);
+    }
+    
+    create(){
+        this.container = getBunnyContainer( this.bunnyImage, this.main.pointerX, this.main.pointerY );
+    }
+
+    update(){
+        this.container.post(null);
+    }
+
+    render(){
+        this.container.getImageBitmap(this.bindDrawer);
+    }
+
+    renderByBitmap(imagebitmap){
+        this.bitmap.clear();
+        this.context.drawImage( imagebitmap, 0, 0 );
+    }
+
+}
+
 function getBunnyContainer( bunnyImage, px, py ){
 
     if( OffscreenCanvas ){
@@ -123,10 +123,12 @@ function getBunnyContainer( bunnyImage, px, py ){
                     ${LTJump.toString()}
                     ${BunnyContainer.toString()}
                     container = new BunnyContainer( message.data.img, ${px}, ${py} );
-                }else{
-                    container.post( null, (bitmap)=>{
+                }else if( message.data === true ){
+                    container.getImageBitmap((bitmap)=>{
                         postMessage(bitmap);
-                    })
+                    });
+                }else{
+                    container.post();
                 }
             }
         `
@@ -137,11 +139,14 @@ function getBunnyContainer( bunnyImage, px, py ){
             url : document.location.protocol + '//' + document.location.host,
         });
         return {
-            post : function( data, callback ){
-                worker.onmessage = function(message){
-                    callback(message.data);
-                }
+            post : function(){
                 worker.postMessage(null);
+            },
+            getImageBitmap : function(callback){
+                worker.postMessage(true);
+                worker.onmessage = function(e){
+                    callback(e.data);
+                };
             }
         }
     }else{
