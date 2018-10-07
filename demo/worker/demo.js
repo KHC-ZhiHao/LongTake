@@ -86,7 +86,7 @@ class Scene extends LongTake.Sprite {
     constructor(bunnyImage){
         super("Scene");
         bunnys += 2000;
-        
+        ballElement.innerText = bunnys;
         this.bunnyImage = bunnyImage;
         this.bindDrawer = this.renderByBitmap.bind(this);
         this.resize(800,600);
