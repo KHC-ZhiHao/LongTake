@@ -81,7 +81,9 @@ class Sprite extends ModuleBase {
 
     install(main){
         this.main = main;
-        this.main.register(this);
+        if( this.main.register ){
+            this.main.register(this);
+        }
         this.create();
     }
 
@@ -395,7 +397,7 @@ class Sprite extends ModuleBase {
     }
 
     get canRender(){ return !this.status.cache; }
-    get canShow(){ return !this.status.hidden && !this.getOutScreen() }
+    get canShow(){ return !this.status.hidden }
 
     /**
      * @function cache()
@@ -485,6 +487,7 @@ class Sprite extends ModuleBase {
      */
 
     mainUpdate(){
+        if( this.main == null ){ this.install(this.parent.main); }
         this.status.realSize = null;
         if( this.status.sort ){
             this.status.sort = false;

@@ -38,8 +38,15 @@ class Loader extends ModuleBase {
 
     start(loading){
         for( let name in this.files ){
-            this.data[name] = new Image();
-            this.data[name].onload = ()=>{
+            let image = new Image();
+            image.onload = ()=>{
+                if( createImageBitmap ){
+                    createImageBitmap(image).then((bitmap)=>{
+                        this.data[name] = bitmap;
+                    });
+                }else{
+                    this.data[name] = image;
+                }
                 this.completed += 1;
                 if( typeof loading === "function" ){
                     loading( this.completed, this.fileLength );
@@ -49,7 +56,7 @@ class Loader extends ModuleBase {
                     delete this.types;
                 }
             }
-            this.data[name].src = this.files[name];
+            image.src = this.files[name];
         }
     }
 

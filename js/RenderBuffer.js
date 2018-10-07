@@ -15,7 +15,7 @@ class RenderBuffer extends ModuleBase {
     }
 
     draw(){
-        this.context.clearRect( 0, 0, this.main.width, this.main.height );
+        this.bitmap.clear();
         this.render(this.stage);
     }
 

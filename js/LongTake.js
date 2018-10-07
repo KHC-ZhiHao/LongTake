@@ -21,24 +21,21 @@ class LongTake extends ModuleBase {
         this.height = height;
         this.ticker = 0;
         this.target = target;
-        this.targetRect = this.target.getBoundingClientRect();
+        this.remove = false;
+        this.baseFps = 0;
         this.framePerSecond = 60;
         this.stopOfAboveWindow = true;
-        this.baseFps = 0;
-        this.remove = false;
         this.bindUpdate = this.update.bind(this);
-
+        this.targetRect = this.target.getBoundingClientRect();
         this.initStage();
         this.initCamera();
         this.initBitmap();
         this.initEvent();
-        
         window.requestAnimationFrame = window.requestAnimationFrame || 
         window.mozRequestAnimationFrame || 
         window.webkitRequestAnimationFrame || 
         window.msRequestAnimationFrame ||
         function(callback) { window.setTimeout(callback, 1000 / 60); };
-
         this.update();
     }
 

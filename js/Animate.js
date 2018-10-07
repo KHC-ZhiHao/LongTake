@@ -1,7 +1,8 @@
 
 /**
  * @class Animate(sprite,begin,duration, easing, alternate, action)
- * @desc 
+ * @desc 一個動畫的載具
+ * @see {easing} https://easings.net/zh-tw
  */
 
 class Animate extends ModuleBase {
@@ -30,7 +31,7 @@ class Animate extends ModuleBase {
         this.over = false;
         this.reverse = false;
         this.actionEasing = this.sprite.main.getEasing(this.easing);
-        this.pace = 1000 / this.sprite.main.framePerSecond;
+        this.pace = 1000 / ( this.sprite.main.framePerSecond || 60 );
     }
 
     /**

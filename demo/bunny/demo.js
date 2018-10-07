@@ -63,7 +63,7 @@ LongTake.prototype.update = function(){
 }
     
 var loader = new LongTake.Loader();
-    loader.add( "bunny", "../img/bunny.png" )
+    loader.add( "bunny", "../../img/bunny.png" )
     loader.start();
 
 var app = new LongTake( document.getElementById("app"), 800, 600 );

@@ -7,9 +7,9 @@ class Bitmap extends ModuleBase {
 
     constructor( width = 100, height = 100, element ){
         super("Bitmap");
-        this.canvas = element || document.createElement('canvas');
+        this.offscreenCanvasSupport = !!OffscreenCanvas;
+        this.canvas = element || this.offscreenCanvasSupport ? new OffscreenCanvas(width, height) : document.createElement('canvas');
         this.context = this.canvas.getContext('2d');
-        this.transform = true;
         this.cache = false;
         this.imgData = null;
         this.imgBitmap = null;
@@ -27,12 +27,12 @@ class Bitmap extends ModuleBase {
     set height(val){ this.canvas.height = val; }
 
     getRenderTarget(){
-        if( this.imgBitmap ){
+        if( this.imgBitmap && this.cache === true ){
             return this.imgBitmap;
-        }else if( this.cache == false ){
+        }else if( this.cache === false ){
             return this.canvas;
         }else {
-            this.cacheImgBitmap();
+            this.cacheImageBitmap();
             return this.canvas;
         }
     }
@@ -65,10 +65,22 @@ class Bitmap extends ModuleBase {
         this.context.drawImage( bitmap.getRenderTarget(), Math.floor(x), Math.floor(y) );
     }
 
-    cacheImgBitmap(){
-        let img = new Image();
-            img.onload = ()=>{ this.imgBitmap = img }
-            img.src = this.canvas.toDataURL();
+    cacheImageBitmap(callback = function(){}){
+        if( this.offscreenCanvasSupport ){
+            this.imgBitmap = this.canvas.transferToImageBitmap();
+            callback(this.imgBitmap);
+        }else{
+            let img = new Image();
+                img.onload = ()=>{ 
+                    this.imgBitmap = img
+                    callback(this.imgBitmap);
+                }
+                img.src = this.canvas.toDataURL();
+        }
+    }
+
+    getImageBitmap(callback){
+        this.cacheImageBitmap(callback);
     }
 
     /**
