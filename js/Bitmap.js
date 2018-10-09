@@ -5,11 +5,11 @@
 
 class Bitmap extends ModuleBase {
 
-    constructor( width = 100, height = 100, element ){
+    constructor( width = 100, height = 100, element, context = '2d' ){
         super("Bitmap");
         this.offscreenCanvasSupport = !!OffscreenCanvas;
         this.canvas = element || this.offscreenCanvasSupport ? new OffscreenCanvas(width, height) : document.createElement('canvas');
-        this.context = this.canvas.getContext('2d');
+        this.context = this.canvas.getContext(context);
         this.cache = false;
         this.imgData = null;
         this.imgBitmap = null;
@@ -33,11 +33,7 @@ class Bitmap extends ModuleBase {
             return this.canvas;
         }else {
             this.cacheImageBitmap();
-            if( this.offscreenCanvasSupport  ){
-                return this.imgBitmap;
-            }else{
-                return this.canvas;
-            }
+            return this.offscreenCanvasSupport ? this.imgBitmap : this.canvas;
         }
     }
 
@@ -60,23 +56,13 @@ class Bitmap extends ModuleBase {
         this.context.clearRect( 0, 0, this.width, this.height );
     }
 
-    /**
-     * @function draw(bitmap,x,y)
-     * @desc 繪製一個bitmap在畫布上
-     */
-
-    draw( bitmap, x, y ){
-        this.context.drawImage( bitmap.getRenderTarget(), Math.floor(x), Math.floor(y) );
-    }
-
     cacheImageBitmap(){
         if( this.offscreenCanvasSupport ){
             this.imgBitmap = this.canvas.transferToImageBitmap();
+            this.imgBitmap.close();
         }else{
             let img = new Image();
-            img.onload = ()=>{ 
-                this.imgBitmap = img
-            }
+            img.onload = ()=>{ this.imgBitmap = img }
             img.src = this.canvas.toDataURL();
         }
     }

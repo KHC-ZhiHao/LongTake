@@ -42,9 +42,7 @@ class LongTake extends ModuleBase {
     close(){
         this.remove = true;
         this.target = null;
-        this.stage.eachChildrenDeep((child)=>{
-            child.close();
-        });
+        this.stage.eachChildrenDeep((child)=>{ child.close(); });
         this.stage = null;
     }
 
@@ -108,25 +106,6 @@ class LongTake extends ModuleBase {
         if( width >= 1264 && width < 1904 ){ return ['sm','xs','md','lg'].indexOf(view) !== -1 }
         if( width >= 1904 ){ return ['sm','xs','md','lg','xl'].indexOf(view) !== -1 }
         return false;
-    }
-
-    //=============================
-    //
-    // easing
-    //
-
-    /**
-     * @function getEasing(name)
-     * @desc 取得緩動函數的function
-     * @see {easing} https://easings.net/zh-tw
-     */
-
-    getEasing(name){
-        if( Easing[name] && name !== "constructor" ){
-            return Easing[name];
-        }else{
-            this.systemError( "getEasing", "Name not found.", name );
-        }
     }
 
     //=============================

@@ -76,7 +76,7 @@ class RenderBuffer extends ModuleBase {
         this.stage = main.stage;
         this.bitmap = new Bitmap( main.width, main.height );
         this.context = this.bitmap.context;
-        this.camera = main.camera;
+        this.camera = main.camera || {};
         this.resize( main.width, main.height );
     }
 
@@ -91,8 +91,10 @@ class RenderBuffer extends ModuleBase {
 
     render(sprite){
         if( sprite.canShow ){
+            let offsetX = sprite.screenX + ( this.camera.offsetX || 0 );
+            let offsetY = sprite.screenY + ( this.camera.offsetY || 0 );
             this.transform(sprite);
-            this.context.drawImage( sprite.bitmap.getRenderTarget(), Math.floor(sprite.screenX + this.camera.offsetX), Math.floor(sprite.screenY + this.camera.offsetY) ); 
+            this.context.drawImage( sprite.bitmap.getRenderTarget(), Math.floor(offsetX), Math.floor(offsetY) ); 
             let len = sprite.children.length;
             for( let i = 0 ; i < len ; i++ ){
                 this.render(sprite.children[i]);
@@ -277,16 +279,35 @@ class Loader extends ModuleBase {
 
 }
 
+/**
+ * @class Easing()
+ * @static
+ * @desc 取得緩動函數的靜態物件
+ * @see {支援表} https://easings.net/zh-tw
+ */
+
 class Easing {
 
-    constructor(){}
+    /**
+     * @function get(name)
+     * @static
+     * @desc 獲取相對應的緩動函數
+     */
+
+    static get(name){
+        if( Easing[name] && name !== "constructor" && name !== "get" ){
+            return Easing[name];
+        }else{
+            return Easing.linear;
+        }
+    }
 
     static linear( time, over ){
         return time / over;
     }
 
     static easeInQuad( time, over ){
-        return 1 * ( time /= over ) * time + 0;
+        return 1 * ( time /= over ) * time;
     }
 
     static easeOutQuad( time, over ) {
@@ -334,7 +355,7 @@ class Easing {
 
     static easeInOutQuint( time, over ){
         if ( ( time /= over / 2 ) < 1) return 1 / 2 * time * time * time * time * time;
-        return 1/2 * ( ( time -= 2 ) * time * time * time * time + 2 ) + 0;
+        return 1/2 * ( ( time -= 2 ) * time * time * time * time + 2 );
     }
 
     static easeInSine( time, over ){
@@ -354,12 +375,12 @@ class Easing {
     }
 
     static easeOutExpo( time, over ){
-        return ( time == over ) ? 0 + 1 : 1 * ( -Math.pow ( 2, -10 * time / over) + 1);
+        return ( time == over ) ? 1 : 1 * ( -Math.pow ( 2, -10 * time / over) + 1);
     }
 
     static easeInOutExpo( time, over ){
         if ( time == 0 ) return 0;
-        if ( time == over ) return 0 + 1;
+        if ( time == over ) return 1;
         if ( ( time /= over / 2 ) < 1 ) return 1/2 * Math.pow( 2, 10 * ( time - 1 ) );
         return 1 / 2 * ( - Math.pow( 2, -10 * --time) + 2 );
     }
@@ -382,18 +403,18 @@ class Easing {
         var p = 0;
         var a = 1;
         if ( time == 0 ) return 0;  
-        if ( ( time /= over ) == 1 ) return 0 + 1;
+        if ( ( time /= over ) == 1 ) return 1;
         if ( !p ) p = over * .3 ;
         if ( a < 1 ) { a = 1; var s = p / 4 ; }
         else var s = p / ( 2 * Math.PI ) * Math.asin( 1 / a );
-        return -( a * Math.pow( 2, 10 * ( time -= 1 ) ) * Math.sin( ( time * over - s ) * ( 2 * Math.PI ) / p )) + 0;
+        return -( a * Math.pow( 2, 10 * ( time -= 1 ) ) * Math.sin( ( time * over - s ) * ( 2 * Math.PI ) / p ));
     }
 
     static easeOutElastic( time, over ){
         var s = 1.70158;
         var p = 0;
         var a = 1;
-        if ( time == 0 ) return 0;  if ( ( time /= over ) == 1 ) return 0 + 1;  if (!p) p = over*.3;
+        if ( time == 0 ) return 0;  if ( ( time /= over ) == 1 ) return 1;  if (!p) p = over*.3;
         if ( a < 1 ) { a = 1; var s = p / 4; }
         else var s = p / ( 2 * Math.PI ) * Math.asin( 1 / a );
         return a * Math.pow( 2, -10 * time ) * Math.sin( ( time * over - s ) * ( 2 * Math.PI ) / p ) + 1;
@@ -404,7 +425,7 @@ class Easing {
         var p = 0;
         var a = 1;
         if( time == 0 ) return 0;  
-        if( ( time /= over / 2 ) == 2 ) return 0 + 1;  
+        if( ( time /= over / 2 ) == 2 ) return 1;  
         if( !p ) p = over * ( 0.3 * 1.5 );
         if ( a < 1 ) { a = 1; var s = p / 4; }        
         if (time < 1){
@@ -437,9 +458,9 @@ class Easing {
         if ( ( time /= over ) < ( 1 / 2.75 )) {
             return 1 * ( 7.5625 * time * time );
         } else if ( time < ( 2 / 2.75 ) ) {
-            return 1 * ( 7.5625 * ( time -= ( 1.5 / 2.75 ) ) * time + 0.75 ) + 0;
+            return 1 * ( 7.5625 * ( time -= ( 1.5 / 2.75 ) ) * time + 0.75 );
         } else if ( time < ( 2.5 / 2.75 ) ) {
-            return 1 * ( 7.5625 * ( time -= ( 2.25 / 2.75) ) * time + 0.9375 ) + 0;
+            return 1 * ( 7.5625 * ( time -= ( 2.25 / 2.75) ) * time + 0.9375 );
         } else {
             return 1 * ( 7.5625 * ( time -= ( 2.625 / 2.75 ) ) * time + 0.984375);
         }
@@ -458,11 +479,11 @@ class Easing {
 
 class Bitmap extends ModuleBase {
 
-    constructor( width = 100, height = 100, element ){
+    constructor( width = 100, height = 100, element, context = '2d' ){
         super("Bitmap");
         this.offscreenCanvasSupport = !!OffscreenCanvas;
         this.canvas = element || this.offscreenCanvasSupport ? new OffscreenCanvas(width, height) : document.createElement('canvas');
-        this.context = this.canvas.getContext('2d');
+        this.context = this.canvas.getContext(context);
         this.cache = false;
         this.imgData = null;
         this.imgBitmap = null;
@@ -486,11 +507,7 @@ class Bitmap extends ModuleBase {
             return this.canvas;
         }else {
             this.cacheImageBitmap();
-            if( this.offscreenCanvasSupport  ){
-                return this.imgBitmap;
-            }else{
-                return this.canvas;
-            }
+            return this.offscreenCanvasSupport ? this.imgBitmap : this.canvas;
         }
     }
 
@@ -513,23 +530,13 @@ class Bitmap extends ModuleBase {
         this.context.clearRect( 0, 0, this.width, this.height );
     }
 
-    /**
-     * @function draw(bitmap,x,y)
-     * @desc 繪製一個bitmap在畫布上
-     */
-
-    draw( bitmap, x, y ){
-        this.context.drawImage( bitmap.getRenderTarget(), Math.floor(x), Math.floor(y) );
-    }
-
     cacheImageBitmap(){
         if( this.offscreenCanvasSupport ){
             this.imgBitmap = this.canvas.transferToImageBitmap();
+            this.imgBitmap.close();
         }else{
             let img = new Image();
-            img.onload = ()=>{ 
-                this.imgBitmap = img
-            }
+            img.onload = ()=>{ this.imgBitmap = img }
             img.src = this.canvas.toDataURL();
         }
     }
@@ -628,9 +635,7 @@ class LongTake extends ModuleBase {
     close(){
         this.remove = true;
         this.target = null;
-        this.stage.eachChildrenDeep((child)=>{
-            child.close();
-        });
+        this.stage.eachChildrenDeep((child)=>{ child.close(); });
         this.stage = null;
     }
 
@@ -694,25 +699,6 @@ class LongTake extends ModuleBase {
         if( width >= 1264 && width < 1904 ){ return ['sm','xs','md','lg'].indexOf(view) !== -1 }
         if( width >= 1904 ){ return ['sm','xs','md','lg','xl'].indexOf(view) !== -1 }
         return false;
-    }
-
-    //=============================
-    //
-    // easing
-    //
-
-    /**
-     * @function getEasing(name)
-     * @desc 取得緩動函數的function
-     * @see {easing} https://easings.net/zh-tw
-     */
-
-    getEasing(name){
-        if( Easing[name] && name !== "constructor" ){
-            return Easing[name];
-        }else{
-            this.systemError( "getEasing", "Name not found.", name );
-        }
     }
 
     //=============================
@@ -897,7 +883,7 @@ class LongTake extends ModuleBase {
 }
 
 /**
- * @class Animate(sprite,begin,duration, easing, alternate, action)
+ * @class Animate(option)
  * @desc 一個動畫的載具
  * @see {easing} https://easings.net/zh-tw
  */
@@ -905,7 +891,8 @@ class LongTake extends ModuleBase {
 class Animate extends ModuleBase {
 
     /**
-     * @member {Sprite} sprite 目標精靈
+     * @argument {opject} options 動畫狀態
+     * @member {number} push 每次前進的偵數
      * @member {number} begin 起始時間
      * @member {number} duration 持續時間
      * @member {string} easing 緩動函數
@@ -914,36 +901,20 @@ class Animate extends ModuleBase {
      * @member {function} action 執行動作
      */
 
-    constructor( sprite, begin, duration, easing, alternate, action ){
+    constructor( options ){
         super("Animate");
-        this.sprite = sprite;
-        this.checkSprite();
         this.validate({
-            time : [begin, 0],
-            duration : [duration, 0],
-            easing : [easing, "linear"],
-            alternate : [alternate, false],
-            action : [action, function(){}],
+            push : [ options.push, 60 ],
+            time : [ options.begin, 0],
+            duration : [ options.duration, 0],
+            easing : [ options.easing, "linear"],
+            alternate : [ options.alternate, false],
+            reverse : [ options.reverse, false],
+            action : [ options.action, function(){}],
         });
         this.over = false;
-        this.reverse = false;
-        this.actionEasing = this.sprite.main.getEasing(this.easing);
-        this.pace = 1000 / ( this.sprite.main.framePerSecond || 60 );
-    }
-
-    /**
-     * @function checkSprite()
-     * @desc 確認是否為可執行的精靈
-     */
-
-    checkSprite(){
-        if( Sprite.isSprite(this.sprite) ){
-            if( this.sprite.main == null ){
-                this.systemError( "checkSprite", "Sprite not install. Call Animate in the create please.", this.sprite );
-            }
-        }else{
-            this.systemError( "checkSprite", "Sprite not a Sprite module", this.sprite );
-        }
+        this.actionEasing = Easing.get(this.easing);
+        this.pace = 1000 / this.push;
     }
 
     /**
@@ -1400,7 +1371,7 @@ class Sprite extends ModuleBase {
         }
     }
 
-    get canRender(){ return !this.status.cache; }
+    get canRender(){ return !this.status.cache }
     get canShow(){ return !this.status.hidden }
 
     /**
@@ -1707,26 +1678,13 @@ class Sprite extends ModuleBase {
             && ( y >= position.y && y <= position.y + rect.height );
     }
 
-    /**
-     * @function getOutScreen()
-     * @desc 獲取該精靈是否在視窗外
-     */
-
-    getOutScreen(){
-        if( this.main ){
-            let size = this.getRealSize();
-            let position = this.getRealPosition();
-            if( position.x <= this.main.camera.offsetX + this.main.buffer.bitmap.width
-                && position.y <= this.main.camera.offsetY + this.main.buffer.bitmap.height
-                && position.x + size.width >= this.main.camera.offsetX
-                && position.y + size.height >= this.main.camera.offsetY ){
-                    return false;
-            }
-        }
-        return true;
-    }
-
 }
+
+
+/**
+ * @class Container(width,height)
+ * @desc 一個LongTake的靜態變體
+ */
 
 class Container extends ModuleBase {
 
@@ -1734,55 +1692,56 @@ class Container extends ModuleBase {
         super("Container");
         this.width = width;
         this.height = height;
-        this.camera = { offsetX : 0, offsetY : 0, }
-        this.initStage();
+        this.stage = new Sprite("Stage");
+        this.stage.install(this);
+        this.stage.resize(0,0);
+        this.stage.render = function(){ this.cache(); }
         this.buffer = new RenderBuffer(this);
         this.bitmap = new Bitmap( width, height );
-        this.bitmap.cache = true;
         this.rendering = false;
     }
+
+    /**
+     * @function post(data)
+     * @desc 發送一個data給Container並觸發重渲染
+     */
 
     post(data){
         if( this.rendering === false ){
             this.rendering = true;
             this.data = data;
-            this.update();
+            this.stage.mainUpdate();
+            this.stage.mainRender();
             this.rendering = false;
         }
     }
 
+    /**
+     * @function getImageBitmap(callback)
+     * @desc 獲取該Container的ImageBitmap
+     * @callback (ImageBitmap)
+     */
+
     getImageBitmap(callback){
-        callback(this.bitmap.getRenderTarget());
-    }
-
-    addChildren(sprite){
-        this.stage.addChildren(sprite);
-    }
-
-    initStage(){
-        this.stage = new Sprite("Stage");
-        this.stage.install(this);
-        this.stage.resize(0,0);
-        this.stage.render = function(){
-            this.cache();
-        }
-    }
-
-    update(){
-        this.bitmap.clearCache();
-        this.stage.mainUpdate();
-        this.stage.mainRender();
         this.buffer.draw();
         this.bitmap.clear();
         this.bitmap.context.drawImage( this.buffer.bitmap.canvas, 0, 0 );
+        if( this.bitmap.offscreenCanvasSupport ){
+            let bitmap = this.bitmap.canvas.transferToImageBitmap();
+            callback( bitmap );
+            bitmap.close();
+        }else{
+            callback( this.bitmap.canvas );
+        }
     }
 
-    getEasing(name){
-        if( Easing[name] && name !== "constructor" ){
-            return Easing[name];
-        }else{
-            this.systemError( "getEasing", "Name not found.", name );
-        }
+    /**
+     * @function addChildren(sprite)
+     * @desc 加入一個子精靈
+     */
+
+    addChildren(sprite){
+        this.stage.addChildren(sprite);
     }
 
 }

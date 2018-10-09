@@ -1,13 +1,32 @@
+/**
+ * @class Easing()
+ * @static
+ * @desc 取得緩動函數的靜態物件
+ * @see {支援表} https://easings.net/zh-tw
+ */
+
 class Easing {
 
-    constructor(){}
+    /**
+     * @function get(name)
+     * @static
+     * @desc 獲取相對應的緩動函數
+     */
+
+    static get(name){
+        if( Easing[name] && name !== "constructor" && name !== "get" ){
+            return Easing[name];
+        }else{
+            return Easing.linear;
+        }
+    }
 
     static linear( time, over ){
         return time / over;
     }
 
     static easeInQuad( time, over ){
-        return 1 * ( time /= over ) * time + 0;
+        return 1 * ( time /= over ) * time;
     }
 
     static easeOutQuad( time, over ) {
@@ -55,7 +74,7 @@ class Easing {
 
     static easeInOutQuint( time, over ){
         if ( ( time /= over / 2 ) < 1) return 1 / 2 * time * time * time * time * time;
-        return 1/2 * ( ( time -= 2 ) * time * time * time * time + 2 ) + 0;
+        return 1/2 * ( ( time -= 2 ) * time * time * time * time + 2 );
     }
 
     static easeInSine( time, over ){
@@ -75,12 +94,12 @@ class Easing {
     }
 
     static easeOutExpo( time, over ){
-        return ( time == over ) ? 0 + 1 : 1 * ( -Math.pow ( 2, -10 * time / over) + 1);
+        return ( time == over ) ? 1 : 1 * ( -Math.pow ( 2, -10 * time / over) + 1);
     }
 
     static easeInOutExpo( time, over ){
         if ( time == 0 ) return 0;
-        if ( time == over ) return 0 + 1;
+        if ( time == over ) return 1;
         if ( ( time /= over / 2 ) < 1 ) return 1/2 * Math.pow( 2, 10 * ( time - 1 ) );
         return 1 / 2 * ( - Math.pow( 2, -10 * --time) + 2 );
     }
@@ -103,18 +122,18 @@ class Easing {
         var p = 0;
         var a = 1;
         if ( time == 0 ) return 0;  
-        if ( ( time /= over ) == 1 ) return 0 + 1;
+        if ( ( time /= over ) == 1 ) return 1;
         if ( !p ) p = over * .3 ;
         if ( a < 1 ) { a = 1; var s = p / 4 ; }
         else var s = p / ( 2 * Math.PI ) * Math.asin( 1 / a );
-        return -( a * Math.pow( 2, 10 * ( time -= 1 ) ) * Math.sin( ( time * over - s ) * ( 2 * Math.PI ) / p )) + 0;
+        return -( a * Math.pow( 2, 10 * ( time -= 1 ) ) * Math.sin( ( time * over - s ) * ( 2 * Math.PI ) / p ));
     }
 
     static easeOutElastic( time, over ){
         var s = 1.70158;
         var p = 0;
         var a = 1;
-        if ( time == 0 ) return 0;  if ( ( time /= over ) == 1 ) return 0 + 1;  if (!p) p = over*.3;
+        if ( time == 0 ) return 0;  if ( ( time /= over ) == 1 ) return 1;  if (!p) p = over*.3;
         if ( a < 1 ) { a = 1; var s = p / 4; }
         else var s = p / ( 2 * Math.PI ) * Math.asin( 1 / a );
         return a * Math.pow( 2, -10 * time ) * Math.sin( ( time * over - s ) * ( 2 * Math.PI ) / p ) + 1;
@@ -125,7 +144,7 @@ class Easing {
         var p = 0;
         var a = 1;
         if( time == 0 ) return 0;  
-        if( ( time /= over / 2 ) == 2 ) return 0 + 1;  
+        if( ( time /= over / 2 ) == 2 ) return 1;  
         if( !p ) p = over * ( 0.3 * 1.5 );
         if ( a < 1 ) { a = 1; var s = p / 4; }        
         if (time < 1){
@@ -158,9 +177,9 @@ class Easing {
         if ( ( time /= over ) < ( 1 / 2.75 )) {
             return 1 * ( 7.5625 * time * time );
         } else if ( time < ( 2 / 2.75 ) ) {
-            return 1 * ( 7.5625 * ( time -= ( 1.5 / 2.75 ) ) * time + 0.75 ) + 0;
+            return 1 * ( 7.5625 * ( time -= ( 1.5 / 2.75 ) ) * time + 0.75 );
         } else if ( time < ( 2.5 / 2.75 ) ) {
-            return 1 * ( 7.5625 * ( time -= ( 2.25 / 2.75) ) * time + 0.9375 ) + 0;
+            return 1 * ( 7.5625 * ( time -= ( 2.25 / 2.75) ) * time + 0.9375 );
         } else {
             return 1 * ( 7.5625 * ( time -= ( 2.625 / 2.75 ) ) * time + 0.984375);
         }

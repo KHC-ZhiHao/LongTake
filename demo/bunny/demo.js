@@ -17,6 +17,7 @@ class LTJump extends LongTake.Sprite {
     }
     
     update(){
+        this.rotation += 1;
         this.x += this.speedX;
         this.y += this.speedY;
         this.speedY += 0.5 //gravity
@@ -72,7 +73,7 @@ loader.onload(()=>{
     
     app.addEvent( "pointerdown", ()=>{
         setTimeout(()=>{
-            for( let i = 0 ; i < 100 ; i++ ){
+            for( let i = 0 ; i < 2000 ; i++ ){
                 addBunny( app.pointerX, app.pointerY );
             }
         }, 100);
@@ -80,8 +81,8 @@ loader.onload(()=>{
     
 });
 
-function addBunny100(){
-    for( let i = 0 ; i < 100 ; i++ ){
+function addBunny2000(){
+    for( let i = 0 ; i < 2000 ; i++ ){
         addBunny( 0, 0 );
     }
 }

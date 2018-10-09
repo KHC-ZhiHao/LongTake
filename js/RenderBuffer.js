@@ -6,7 +6,7 @@ class RenderBuffer extends ModuleBase {
         this.stage = main.stage;
         this.bitmap = new Bitmap( main.width, main.height );
         this.context = this.bitmap.context;
-        this.camera = main.camera;
+        this.camera = main.camera || {};
         this.resize( main.width, main.height );
     }
 
@@ -21,8 +21,10 @@ class RenderBuffer extends ModuleBase {
 
     render(sprite){
         if( sprite.canShow ){
+            let offsetX = sprite.screenX + ( this.camera.offsetX || 0 );
+            let offsetY = sprite.screenY + ( this.camera.offsetY || 0 );
             this.transform(sprite);
-            this.context.drawImage( sprite.bitmap.getRenderTarget(), Math.floor(sprite.screenX + this.camera.offsetX), Math.floor(sprite.screenY + this.camera.offsetY) ); 
+            this.context.drawImage( sprite.bitmap.getRenderTarget(), Math.floor(offsetX), Math.floor(offsetY) ); 
             let len = sprite.children.length;
             for( let i = 0 ; i < len ; i++ ){
                 this.render(sprite.children[i]);

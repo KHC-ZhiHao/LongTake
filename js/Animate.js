@@ -1,6 +1,6 @@
 
 /**
- * @class Animate(sprite,begin,duration, easing, alternate, action)
+ * @class Animate(option)
  * @desc 一個動畫的載具
  * @see {easing} https://easings.net/zh-tw
  */
@@ -8,7 +8,8 @@
 class Animate extends ModuleBase {
 
     /**
-     * @member {Sprite} sprite 目標精靈
+     * @argument {opject} options 動畫狀態
+     * @member {number} push 每次前進的偵數
      * @member {number} begin 起始時間
      * @member {number} duration 持續時間
      * @member {string} easing 緩動函數
@@ -17,36 +18,20 @@ class Animate extends ModuleBase {
      * @member {function} action 執行動作
      */
 
-    constructor( sprite, begin, duration, easing, alternate, action ){
+    constructor( options ){
         super("Animate");
-        this.sprite = sprite;
-        this.checkSprite();
         this.validate({
-            time : [begin, 0],
-            duration : [duration, 0],
-            easing : [easing, "linear"],
-            alternate : [alternate, false],
-            action : [action, function(){}],
+            push : [ options.push, 60 ],
+            time : [ options.begin, 0],
+            duration : [ options.duration, 0],
+            easing : [ options.easing, "linear"],
+            alternate : [ options.alternate, false],
+            reverse : [ options.reverse, false],
+            action : [ options.action, function(){}],
         });
         this.over = false;
-        this.reverse = false;
-        this.actionEasing = this.sprite.main.getEasing(this.easing);
-        this.pace = 1000 / ( this.sprite.main.framePerSecond || 60 );
-    }
-
-    /**
-     * @function checkSprite()
-     * @desc 確認是否為可執行的精靈
-     */
-
-    checkSprite(){
-        if( Sprite.isSprite(this.sprite) ){
-            if( this.sprite.main == null ){
-                this.systemError( "checkSprite", "Sprite not install. Call Animate in the create please.", this.sprite );
-            }
-        }else{
-            this.systemError( "checkSprite", "Sprite not a Sprite module", this.sprite );
-        }
+        this.actionEasing = Easing.get(this.easing);
+        this.pace = 1000 / this.push;
     }
 
     /**

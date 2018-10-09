@@ -27,11 +27,11 @@ class LTJump extends LongTake.Sprite {
     create(){
         this.maxX = this.main.width;
         this.maxY = this.main.height;
-        this.rotation = ( Math.random() - 0.5 ) * 15;
         this.setAnchor(0,1);
     }
     
     update(){
+        this.rotation += 1;
         this.x += this.speedX;
         this.y += this.speedY;
         this.speedY += 0.5 //gravity
@@ -105,8 +105,11 @@ class Scene extends LongTake.Sprite {
     }
 
     renderByBitmap(imagebitmap){
-        this.bitmap.clear();
-        this.context.drawImage( imagebitmap, 0, 0 );
+        if( imagebitmap ){
+            this.bitmap.clear();
+            this.context.drawImage( imagebitmap, 0, 0 );
+            imagebitmap.close();
+        }
     }
 
 }
@@ -124,16 +127,23 @@ function getBunnyContainer( bunnyImage, px, py ){
                     ${BunnyContainer.toString()}
                     container = new BunnyContainer( message.data.img, ${px}, ${py} );
                 }else if( message.data === true ){
-                    container.getImageBitmap((bitmap)=>{
-                        postMessage(bitmap);
-                    });
+                    if( container.rendering === false ){
+                        container.getImageBitmap((bitmap)=>{
+                            postMessage(bitmap, [bitmap]);
+                        });
+                    }else{
+                        postMessage(null);
+                    }
                 }else{
                     container.post();
                 }
             }
         `
         let blob = new Blob([workerString], {type: 'application/javascript'});
-        let worker = new Worker(URL.createObjectURL(blob));
+        let url = URL.createObjectURL(blob);
+        let worker = new Worker(url);
+        URL.revokeObjectURL(url);
+        blob = null;
         worker.postMessage({
             img : bunnyImage,
             url : document.location.protocol + '//' + document.location.host,
@@ -166,4 +176,3 @@ loader.onload(()=>{
         app.addChildren(new Scene(loader.get('bunny')));
     });
 });
-

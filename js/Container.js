@@ -1,58 +1,65 @@
+
+/**
+ * @class Container(width,height)
+ * @desc 一個LongTake的靜態變體
+ */
+
 class Container extends ModuleBase {
 
     constructor( width, height ){
         super("Container");
         this.width = width;
         this.height = height;
-        this.camera = { offsetX : 0, offsetY : 0, }
-        this.initStage();
+        this.stage = new Sprite("Stage");
+        this.stage.install(this);
+        this.stage.resize(0,0);
+        this.stage.render = function(){ this.cache(); }
         this.buffer = new RenderBuffer(this);
         this.bitmap = new Bitmap( width, height );
-        this.bitmap.cache = true;
         this.rendering = false;
     }
+
+    /**
+     * @function post(data)
+     * @desc 發送一個data給Container並觸發重渲染
+     */
 
     post(data){
         if( this.rendering === false ){
             this.rendering = true;
             this.data = data;
-            this.update();
+            this.stage.mainUpdate();
+            this.stage.mainRender();
             this.rendering = false;
         }
     }
 
+    /**
+     * @function getImageBitmap(callback)
+     * @desc 獲取該Container的ImageBitmap
+     * @callback (ImageBitmap)
+     */
+
     getImageBitmap(callback){
-        callback(this.bitmap.getRenderTarget());
-    }
-
-    addChildren(sprite){
-        this.stage.addChildren(sprite);
-    }
-
-    initStage(){
-        this.stage = new Sprite("Stage");
-        this.stage.install(this);
-        this.stage.resize(0,0);
-        this.stage.render = function(){
-            this.cache();
-        }
-    }
-
-    update(){
-        this.bitmap.clearCache();
-        this.stage.mainUpdate();
-        this.stage.mainRender();
         this.buffer.draw();
         this.bitmap.clear();
         this.bitmap.context.drawImage( this.buffer.bitmap.canvas, 0, 0 );
+        if( this.bitmap.offscreenCanvasSupport ){
+            let bitmap = this.bitmap.canvas.transferToImageBitmap();
+            callback( bitmap );
+            bitmap.close();
+        }else{
+            callback( this.bitmap.canvas );
+        }
     }
 
-    getEasing(name){
-        if( Easing[name] && name !== "constructor" ){
-            return Easing[name];
-        }else{
-            this.systemError( "getEasing", "Name not found.", name );
-        }
+    /**
+     * @function addChildren(sprite)
+     * @desc 加入一個子精靈
+     */
+
+    addChildren(sprite){
+        this.stage.addChildren(sprite);
     }
 
 }
