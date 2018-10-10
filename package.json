@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/KHC-ZhiHao/LongTake/issues"
   },
-  "homepage": "https://github.com/KHC-ZhiHao/LongTake#readme"
+  "homepage": "https://github.com/KHC-ZhiHao/LongTake#readme",
+  "files": [
+	  "./dist/index.js"
+	]
 }

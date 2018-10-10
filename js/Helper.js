@@ -18,6 +18,17 @@ class HelperModule {
         return this.trigonometric[Math.round(deg)].cos;
     }
 
+    getVector( deg, distance ){
+    	return { 
+            x : distance * this.cosByDeg(deg),
+            y : distance * this.sinByDeg(deg)
+        };
+    }
+
+    randInt( min, max ){
+        return Math.floor( Math.random() * ( max-min + 1 ) + min );
+    }
+
 }
 
 let Helper = new HelperModule;

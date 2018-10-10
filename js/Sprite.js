@@ -11,6 +11,7 @@ class Sprite extends ModuleBase {
         this.name = moduleName || "No name",
         this.main = null;
         this.helper = Helper;
+        this.bindUpdateForChild = this.updateForChild.bind(this);
         this.initEvent();
         this.initRender();
         this.initStatus();
@@ -494,14 +495,14 @@ class Sprite extends ModuleBase {
             this.sortChildren();
         }
         this.update();
-        this.eachChildren(this.updateForChild);
+        this.eachChildren(this.bindUpdateForChild);
         if( this.status.childrenDead ){
             this.status.childrenDead = false;
             this.children = this.children.filter((child)=>{
                 if( child.status.remove ){ 
                     child.close();
                 }
-                return !c.status.remove;
+                return !child.status.remove;
             });
         }
     }
@@ -670,19 +671,6 @@ class Sprite extends ModuleBase {
             filter(imgData);
             this.bitmap.putImageData(imgData);
             this.eachChildren((child) => {child.renderFilter(filter);});
-        }
-    }
-
-    /**
-     * @function resizeMax()
-     * @desc 調整大小至LongTake大小
-     */
-
-    resizeMax(){
-        if( this.main ){
-            this.resize( this.main.width, this.main.height );
-        }else{
-            this.systemError("resizeMax", "Function call must in the create or update.");
         }
     }
 

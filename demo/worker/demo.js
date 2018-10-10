@@ -116,7 +116,7 @@ class Scene extends LongTake.Sprite {
 
 function getBunnyContainer( bunnyImage, px, py ){
 
-    if( OffscreenCanvas ){
+    if( window.OffscreenCanvas ){
         let workerString = ` 
             var container = null;
             var global = self;

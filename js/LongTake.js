@@ -20,7 +20,7 @@ class LongTake extends ModuleBase {
         this.width = width;
         this.height = height;
         this.ticker = 0;
-        this.target = target;
+        this.target = typeof target === "string" ? document.getElementById(target) : target;
         this.remove = false;
         this.baseFps = 0;
         this.framePerSecond = 60;

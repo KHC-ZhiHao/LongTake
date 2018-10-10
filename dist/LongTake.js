@@ -107,18 +107,21 @@ class RenderBuffer extends ModuleBase {
         let posX = sprite.posX;
         let posY = sprite.posY;
         let context = this.context;
-            context.translate( posX, posY );
+        if( sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1 ){
+            context.save();
+        }
+        context.translate( posX, posY );
         if( sprite.opacity !== 255 ){
             context.globalAlpha = sprite.opacity / 255;
         }
         if( sprite.blendMode ){
             context.globalCompositeOperation = sprite.blendMode;
         }
-        if( sprite.rotation !== 0 ){
-            context.rotate( sprite.rotation * sprite.helper.arc );
-        }
         if( sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1 ){
             context.scale( sprite.scaleWidth, sprite.scaleHeight );
+        }
+        if( sprite.rotation !== 0 ){
+            context.rotate( sprite.rotation * sprite.helper.arc );
         }
         if( sprite.skewX !== 0 || sprite.skewY !== 0 ){
             context.transform( 1, sprite.skewX, sprite.skewY, 1, 0, 0 );
@@ -130,18 +133,19 @@ class RenderBuffer extends ModuleBase {
         let posX = sprite.posX;
         let posY = sprite.posY;
         let context = this.context;
-            context.translate( posX, posY );
+        if( sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1 ){
+            context.restore();
+            return;
+        }
+        context.translate( posX, posY );
         if( sprite.opacity !== 255 ){
-            context.globalAlpha = sprite.opacity / 255;
+            context.globalAlpha = sprite.parent ? sprite.parent.opacity / 255 : 1;
         }
         if( sprite.blendMode ){
             context.globalCompositeOperation = sprite.blendMode;
         }
         if( sprite.rotation !== 0 ){
             context.rotate( -(sprite.rotation * sprite.helper.arc) );
-        }
-        if( sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1 ){
-            context.scale(  1 / sprite.scaleWidth, 1 / sprite.scaleHeight );
         }
         if( sprite.skewX !== 0 || sprite.skewY !== 0 ){
             context.transform( 1, -sprite.skewX, -sprite.skewY, 1, 0, 0 );
@@ -169,6 +173,17 @@ class HelperModule {
     
     cosByDeg(deg){
         return this.trigonometric[Math.round(deg)].cos;
+    }
+
+    getVector( deg, distance ){
+    	return { 
+            x : distance * this.cosByDeg(deg),
+            y : distance * this.sinByDeg(deg)
+        };
+    }
+
+    randInt( min, max ){
+        return Math.floor( Math.random() * ( max-min + 1 ) + min );
     }
 
 }
@@ -613,7 +628,7 @@ class LongTake extends ModuleBase {
         this.width = width;
         this.height = height;
         this.ticker = 0;
-        this.target = target;
+        this.target = typeof target === "string" ? document.getElementById(target) : target;
         this.remove = false;
         this.baseFps = 0;
         this.framePerSecond = 60;
@@ -986,6 +1001,7 @@ class Sprite extends ModuleBase {
         this.name = moduleName || "No name",
         this.main = null;
         this.helper = Helper;
+        this.bindUpdateForChild = this.updateForChild.bind(this);
         this.initEvent();
         this.initRender();
         this.initStatus();
@@ -1469,14 +1485,14 @@ class Sprite extends ModuleBase {
             this.sortChildren();
         }
         this.update();
-        this.eachChildren(this.updateForChild);
+        this.eachChildren(this.bindUpdateForChild);
         if( this.status.childrenDead ){
             this.status.childrenDead = false;
             this.children = this.children.filter((child)=>{
                 if( child.status.remove ){ 
                     child.close();
                 }
-                return !c.status.remove;
+                return !child.status.remove;
             });
         }
     }
@@ -1645,19 +1661,6 @@ class Sprite extends ModuleBase {
             filter(imgData);
             this.bitmap.putImageData(imgData);
             this.eachChildren((child) => {child.renderFilter(filter);});
-        }
-    }
-
-    /**
-     * @function resizeMax()
-     * @desc 調整大小至LongTake大小
-     */
-
-    resizeMax(){
-        if( this.main ){
-            this.resize( this.main.width, this.main.height );
-        }else{
-            this.systemError("resizeMax", "Function call must in the create or update.");
         }
     }
 
