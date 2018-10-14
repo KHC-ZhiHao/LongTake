@@ -127,13 +127,9 @@ function getBunnyContainer( bunnyImage, px, py ){
                     ${BunnyContainer.toString()}
                     container = new BunnyContainer( message.data.img, ${px}, ${py} );
                 }else if( message.data === true ){
-                    if( container.rendering === false ){
-                        container.getImageBitmap((bitmap)=>{
-                            postMessage(bitmap, [bitmap]);
-                        });
-                    }else{
-                        postMessage(null);
-                    }
+                    container.getImageBitmap((bitmap)=>{
+                        postMessage(bitmap, [bitmap]);
+                    });
                 }else{
                     container.post();
                 }
@@ -172,7 +168,7 @@ var loader = new LongTake.Loader();
     loader.start();
 
 loader.onload(()=>{
-    app.stage.on('c', 'click', ()=>{
+    app.container.stage.on('c', 'click', ()=>{
         app.addChildren(new Scene(loader.get('bunny')));
     });
 });

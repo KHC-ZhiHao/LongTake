@@ -7,7 +7,7 @@ loader.add( 'leaf2', './img/leaf2.png' );
 loader.add( 'main', './img/main.jpg' );
 loader.add( 'cap', './img/cap.png' )
 loader.add( 'ray', './img/lightray.png' );
-loader.add( 'grassland', './img/grassland.png' );
+loader.add( 'shadow', './img/shadow.png' )
 loader.add( 'branch1', './img/branch1.png' );
 loader.add( 'branch2', './img/branch2.png' );
 loader.start();
@@ -19,8 +19,8 @@ let branch2 = new LongTake.Sprite("branch2");
     branch2.z = 5;
 let cap = new LongTake.Sprite("cap");
     cap.z = 9;
-let grassland = new LongTake.Sprite("grassland");
-    grassland.z = 10;
+let shadow = new LongTake.Sprite("shadow");
+    shadow.z = 10;
 
 //================================
 //
@@ -32,7 +32,13 @@ let camera = new LongTake.Sprite("camera");
 camera.create = function(){
     this.x = this.main.width / 2;
     this.z = 11;
+    this.resize(10,10);
     this.setAnchor(0.5);
+}
+
+camera.update = function(){
+    this.x = this.main.pointerX;
+    this.y = this.main.pointerY;
 }
 
 camera.render = function(){
@@ -40,9 +46,12 @@ camera.render = function(){
     this.context.fillRect( 0,0,this.width, this.height);
 }
 
-app.responsiveResize();
-//app.addChildren(camera);
-//app.follow(camera);
+app.addChildren(camera);
+app.setCamera( app.width / 2, app.height / 2 );
+app.forElementResize( app.target.parentElement, 1 );
+app.onWindowResize = function(){
+    app.forElementResize( app.target.parentElement, 1 );
+};
 
 //================================
 //
@@ -61,7 +70,7 @@ class Leaf extends LongTake.Sprite{
         this.z = this.helper.randInt( 1, 8 );
         this.trun = 0;
         this.trunSpeed = Math.random() * 0.01 + 0.01;
-        this.size = Math.random() * (this.z / 20) + 0.3;
+        this.size = Math.random() * (this.z / 50) + 0.3;
         this.scale(this.size);
         this.path = new Ppath2D();
         this.path.moveTo( this.helper.randInt( -300, 600), -200 );
@@ -133,7 +142,7 @@ class Ray extends LongTake.Sprite{
 
 loader.onload(()=>{
     app.addChildren( main.fromImage(loader.get('main')) );
-    app.addChildren( grassland.fromImage(loader.get('grassland')) );
+    app.addChildren( shadow.fromImage(loader.get('shadow')) );
     app.addChildren( branch1.fromImage(loader.get('branch1')) );
     app.addChildren( branch2.fromImage(loader.get('branch2')) );
     app.addChildren( cap.fromImage(loader.get('cap')) );

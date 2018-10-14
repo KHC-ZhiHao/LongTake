@@ -59,7 +59,6 @@ class Bitmap extends ModuleBase {
     cacheImageBitmap(){
         if( this.offscreenCanvasSupport ){
             this.imgBitmap = this.canvas.transferToImageBitmap();
-            //this.imgBitmap.close();
         }else{
             let img = new Image();
             img.onload = ()=>{ this.imgBitmap = img }

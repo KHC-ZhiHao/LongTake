@@ -89,7 +89,7 @@ function addBunny2000(){
 
 function addBunny( x, y ){
     let bunny = new LTJump( loader.get("bunny"), x, y );
-    app.stage.addChildren(bunny);
+    app.addChildren(bunny);
     bunnys += 1;
     ballElement.innerText = bunnys;
 }

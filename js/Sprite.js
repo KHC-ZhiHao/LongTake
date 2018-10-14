@@ -82,9 +82,7 @@ class Sprite extends ModuleBase {
 
     install(main){
         this.main = main;
-        if( this.main.register ){
-            this.main.register(this);
-        }
+        this.main.register(this);
         this.create();
     }
 
@@ -112,7 +110,10 @@ class Sprite extends ModuleBase {
      */
 
     get width(){ return this.bitmap.width }
+    set width(val){ this.bitmap.width = val }
+
     get height(){ return this.bitmap.height }
+    set height(val){ this.bitmap.height = val }
 
     /**
      * @function resize(width,height)
@@ -200,10 +201,10 @@ class Sprite extends ModuleBase {
 
     on( name, event, callback ){
         if( this.event[name] == null ){
-            if( this.main ){ this.main.addEvent(event); }
+            if( this.main.core ){ this.main.core.addEvent(event); }
             this.event[name] = {
-                event : event,
-                callback : callback,
+                event,
+                callback,
             }
         }else{
             this.systemError( 'on', `Event name(${name}) conflict.` )
@@ -219,15 +220,15 @@ class Sprite extends ModuleBase {
         this.event[name] = null;
     }
 
-    mainEvent(){
+    mainEvent(eventAction){
         if( this.main == null ){ this.install(this.parent.main); }
-        this.each( this.main.eventAction, ( event, key )=>{
+        this.each( eventAction, ( event, key )=>{
             this.each( this.event, (data)=>{
                 if( data.event === key ){ data.callback(event); }
             });
         });
         this.eachChildren((children)=>{
-            children.mainEvent();
+            children.mainEvent(eventAction);
         });
     }
 
@@ -281,7 +282,6 @@ class Sprite extends ModuleBase {
 
     get screenScaleWidth(){ return this.parent == null ? this.scaleWidth : this.scaleWidth * this.parent.screenScaleWidth }
     get screenScaleHeight(){ return this.parent == null ? this.scaleHeight : this.scaleHeight * this.parent.screenScaleHeight }
-
 
     get rotation(){ return this.container.rotation }
     set rotation(val){
@@ -439,7 +439,7 @@ class Sprite extends ModuleBase {
     }
 
     /**
-     * @function getMaxSize()
+     * @function getRealSize()
      * @desc 獲取該精靈預期最大的大小
      */
 

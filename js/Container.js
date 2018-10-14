@@ -6,17 +6,40 @@
 
 class Container extends ModuleBase {
 
-    constructor( width, height ){
+    constructor( width, height, core ){
         super("Container");
-        this.width = width;
-        this.height = height;
+        this.data = null;
+        this.core = core || null;
+        this.bitmap = new Bitmap( width, height );
+        this.context = this.bitmap.context;
+        this.pointerX = 0;
+        this.pointerY = 0;
+        this.initStage();
+    }
+
+    get width(){ return this.bitmap.canvas.width }
+    get height(){ return this.bitmap.canvas.height }
+
+    initStage(){
         this.stage = new Sprite("Stage");
         this.stage.install(this);
         this.stage.resize(0,0);
         this.stage.render = function(){ this.cache(); }
-        this.buffer = new RenderBuffer(this);
-        this.bitmap = new Bitmap( width, height );
-        this.rendering = false;
+    }
+
+    /**
+     * @function register(sprite)
+     * @desc 當sprite優先註冊過事件，在 install container 的時候回補註冊至LongTake
+     */
+
+    register(sprite){
+        if( this.core ){
+            this.each( sprite.event, ( value )=>{
+                if( this.core.event[value.event] == null ){
+                    this.core.addEvent(value.event);
+                }
+            });
+        }
     }
 
     /**
@@ -25,13 +48,18 @@ class Container extends ModuleBase {
      */
 
     post(data){
-        if( this.rendering === false ){
-            this.rendering = true;
-            this.data = data;
-            this.stage.mainUpdate();
-            this.stage.mainRender();
-            this.rendering = false;
-        }
+        this.data = data;
+        this.stageUpdate();
+        this.stageRender();
+    }
+
+    stageUpdate(){
+        this.stage.mainUpdate();
+    }
+
+    stageRender(){
+        this.stage.mainRender();
+        this.draw();
     }
 
     /**
@@ -41,9 +69,6 @@ class Container extends ModuleBase {
      */
 
     getImageBitmap(callback){
-        this.buffer.draw();
-        this.bitmap.clear();
-        this.bitmap.context.drawImage( this.buffer.bitmap.canvas, 0, 0 );
         if( this.bitmap.offscreenCanvasSupport ){
             let bitmap = this.bitmap.canvas.transferToImageBitmap();
             callback( bitmap );
@@ -60,6 +85,78 @@ class Container extends ModuleBase {
 
     addChildren(sprite){
         this.stage.addChildren(sprite);
+    }
+
+    draw(){
+        this.bitmap.clear();
+        this.render(this.stage);
+    }
+
+    render( sprite ){
+        if( sprite.canShow ){
+            let screenX = Math.round(sprite.screenX);
+            let screenY = Math.round(sprite.screenY);
+            let realPosition = sprite.getRealPosition();
+            this.transform(sprite);
+            if( realPosition.x < this.width && realPosition.y < this.height ){
+                this.context.drawImage( sprite.bitmap.getRenderTarget(), screenX, screenY );
+            }
+            let len = sprite.children.length;
+            for( let i = 0 ; i < len ; i++ ){
+                this.render(sprite.children[i]);
+            }
+            this.restore(sprite);
+        }
+    }
+
+    transform(sprite){
+        let posX = sprite.posX;
+        let posY = sprite.posY;
+        let context = this.context;
+        if( sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1 ){
+            context.save();
+        }
+        context.translate( posX, posY );
+        if( sprite.opacity !== 255 ){
+            context.globalAlpha = sprite.opacity / 255;
+        }
+        if( sprite.blendMode ){
+            context.globalCompositeOperation = sprite.blendMode;
+        }
+        if( sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1 ){
+            context.scale( sprite.scaleWidth, sprite.scaleHeight );
+        }
+        if( sprite.rotation !== 0 ){
+            context.rotate( sprite.rotation * sprite.helper.arc );
+        }
+        if( sprite.skewX !== 0 || sprite.skewY !== 0 ){
+            context.transform( 1, sprite.skewX, sprite.skewY, 1, 0, 0 );
+        }
+        context.translate( -(posX), -(posY) );
+    }
+
+    restore(sprite){
+        let posX = sprite.posX;
+        let posY = sprite.posY;
+        let context = this.context;
+        if( sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1 ){
+            context.restore();
+            return;
+        }
+        context.translate( posX, posY );
+        if( sprite.opacity !== 255 ){
+            context.globalAlpha = sprite.parent ? sprite.parent.opacity / 255 : 1;
+        }
+        if( sprite.blendMode ){
+            context.globalCompositeOperation = sprite.blendMode;
+        }
+        if( sprite.rotation !== 0 ){
+            context.rotate( -(sprite.rotation * sprite.helper.arc) );
+        }
+        if( sprite.skewX !== 0 || sprite.skewY !== 0 ){
+            context.transform( 1, -sprite.skewX, -sprite.skewY, 1, 0, 0 );
+        }
+        context.translate( -posX, -posY );
     }
 
 }

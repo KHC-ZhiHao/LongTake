@@ -101,4 +101,21 @@ class Loader extends ModuleBase {
         this.systemError("get", "Data not found.", name);
     }
 
+    /**
+     * @function close(name)
+     * @desc 清除快取釋放記憶體
+     */
+
+    close( name ){
+        if( name && this.data[name] ){
+            this.data[name].src = "";
+            this.data[name] = null
+        }else{
+            this.each( this.data, ( data )=>{
+                data.src = "";
+                data = null;
+            });
+        }
+    }
+
 }
