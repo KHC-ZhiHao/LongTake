@@ -1,4 +1,4 @@
-let bunnys = 0;
+let bears = 0;
 let ballElement = document.getElementById("many");
 let stats = new Stats();
     stats.showPanel( 0 );
@@ -31,7 +31,6 @@ class LTJump extends LongTake.Sprite {
     }
     
     update(){
-        this.rotation += 1;
         this.x += this.speedX;
         this.y += this.speedY;
         this.speedY += 0.5 //gravity
@@ -63,19 +62,19 @@ class LTJump extends LongTake.Sprite {
  
 }
 
-class BunnyContainer extends LongTake.Container {
+class BearContainer extends LongTake.Container {
 
-    constructor( bunnyImage, px, py ){
+    constructor( image, px, py ){
         super(800,600);
         this.px = px;
         this.py = py;
-        this.bunnyImage = bunnyImage;
+        this.image = image;
         this.init();
     }
 
     init(){
         for( let i = 0 ; i < 2000 ; i++ ){
-            this.addChildren( new LTJump( this.bunnyImage, this.px, this.py ) );
+            this.addChildren( new LTJump( this.image, this.px, this.py ) );
         }
     }
 
@@ -83,17 +82,17 @@ class BunnyContainer extends LongTake.Container {
 
 class Scene extends LongTake.Sprite {
 
-    constructor(bunnyImage){
+    constructor(image){
         super("Scene");
-        bunnys += 2000;
-        ballElement.innerText = bunnys;
-        this.bunnyImage = bunnyImage;
+        bears += 2000;
+        ballElement.innerText = bears;
+        this.image = image;
         this.bindDrawer = this.renderByBitmap.bind(this);
         this.resize(800,600);
     }
     
     create(){
-        this.container = getBunnyContainer( this.bunnyImage, this.main.pointerX, this.main.pointerY );
+        this.container = getBearContainer( this.image, this.main.pointerX, this.main.pointerY );
     }
 
     update(){
@@ -114,7 +113,7 @@ class Scene extends LongTake.Sprite {
 
 }
 
-function getBunnyContainer( bunnyImage, px, py ){
+function getBearContainer( image, px, py ){
 
     if( window.OffscreenCanvas ){
         let workerString = ` 
@@ -124,8 +123,8 @@ function getBunnyContainer( bunnyImage, px, py ){
                 if( container == null ){
                     self.importScripts( message.data.url + '/LongTake/dist/index.js' );
                     ${LTJump.toString()}
-                    ${BunnyContainer.toString()}
-                    container = new BunnyContainer( message.data.img, ${px}, ${py} );
+                    ${BearContainer.toString()}
+                    container = new BearContainer( message.data.img, ${px}, ${py} );
                 }else if( message.data === true ){
                     container.getImageBitmap((bitmap)=>{
                         postMessage(bitmap, [bitmap]);
@@ -141,7 +140,7 @@ function getBunnyContainer( bunnyImage, px, py ){
         URL.revokeObjectURL(url);
         blob = null;
         worker.postMessage({
-            img : bunnyImage,
+            img : image,
             url : document.location.protocol + '//' + document.location.host,
         });
         return {
@@ -156,7 +155,7 @@ function getBunnyContainer( bunnyImage, px, py ){
             }
         }
     }else{
-        return new BunnyContainer( bunnyImage, px, py );
+        return new BearContainer( image, px, py );
     }
 
 }
@@ -164,11 +163,11 @@ function getBunnyContainer( bunnyImage, px, py ){
 var app = new LongTake( document.getElementById("app"), 800, 600 );
 var scene = new LongTake.Sprite();
 var loader = new LongTake.Loader();
-    loader.add('bunny', '../../img/bunny.png');
+    loader.add('bear', '../../img/KaohBear.png');
     loader.start();
 
 loader.onload(()=>{
     app.container.stage.on('c', 'click', ()=>{
-        app.addChildren(new Scene(loader.get('bunny')));
+        app.addChildren(new Scene(loader.get('bear')));
     });
 });

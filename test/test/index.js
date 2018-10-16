@@ -17,7 +17,6 @@ class LTJump extends LongTake.Sprite {
     }
     
     update(){
-        this.rotation += 1;
         this.x += this.speedX;
         this.y += this.speedY;
         this.speedY += 0.5 //gravity
@@ -49,7 +48,7 @@ class LTJump extends LongTake.Sprite {
  
 }
 
-let bunnys = 0;
+let bears = 0;
 let ballElement = document.getElementById("many");
 let stats = new Stats();
     stats.showPanel( 0 );
@@ -64,32 +63,30 @@ LongTake.prototype.update = function(){
 }
     
 var loader = new LongTake.Loader();
-    loader.add( "bunny", "../../img/bunny.png" )
+    loader.add( "bear", "../../img/KaohBear.png" )
     loader.start();
 
-var app = new LongTake( document.getElementById("app"), 800, 600 );
+var app = new LongTake( "app", 800, 600 );
 
 loader.onload(()=>{
-    
     app.addEvent( "pointerdown", ()=>{
         setTimeout(()=>{
             for( let i = 0 ; i < 2000 ; i++ ){
-                addBunny( app.pointerX, app.pointerY );
+                addBear( app.pointerX, app.pointerY );
             }
         }, 100);
     });
-    
 });
 
-function addBunny2000(){
+function addBear2000(){
     for( let i = 0 ; i < 2000 ; i++ ){
-        addBunny( 0, 0 );
+        addBear( 0, 0 );
     }
 }
 
-function addBunny( x, y ){
-    let bunny = new LTJump( loader.get("bunny"), x, y );
-    app.addChildren(bunny);
-    bunnys += 1;
-    ballElement.innerText = bunnys;
+function addBear( x, y ){
+    let bear = new LTJump( loader.get("bear"), x, y );
+    app.addChildren(bear);
+    bears += 1;
+    ballElement.innerText = bears;
 }

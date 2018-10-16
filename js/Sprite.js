@@ -8,7 +8,7 @@ class Sprite extends ModuleBase {
 
     constructor(moduleName){
         super( moduleName || "Sprite" );
-        this.name = moduleName || "No name",
+        this.name = moduleName || "No name";
         this.main = null;
         this.helper = Helper;
         this.bindUpdateForChild = this.updateForChild.bind(this);
