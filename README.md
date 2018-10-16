@@ -1,12 +1,14 @@
 # LongTake
 
-## 協助你快速繪製複雜banner的入門級canvas2d函式庫
+### 協助你快速繪製複雜banner的入門級canvas2d函式庫
 
-[APIDocument]()
+_本庫實驗正為實驗階段_
+
+[API Document]()
 
 ### DEMO
 
-[Tree](https://khc-zhihao.github.io/LongTake/demo/tree/index.html)
+[LightAndTree](https://khc-zhihao.github.io/LongTake/demo/LightAndTree/index.html)
 
 [TwinVortex](https://khc-zhihao.github.io/LongTake/demo/TwinVortex/index.html)
 
@@ -119,7 +121,7 @@ let sprite = new LongTake.Sprite();
 
 ```js
 let app = new LongTake( 'app', 800, 600 );
-    app.look( 400, 300 );
+    app.setCamera( 400, 300 );
 ```
 
 ### RWD優化策略

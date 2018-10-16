@@ -99,7 +99,7 @@ class LongTake extends ModuleBase {
     }
 
     /**
-     * @function look(x,y)
+     * @function setCamera(x,y)
      * @desc 移動攝影機至x,y
      */
 
