@@ -1,10 +1,20 @@
 
 /**
  * @class Container(width,height)
- * @desc 一個LongTake的靜態變體
+ * @desc 一個靜態的精靈容器，負責呈現精靈與位圖的計算結果
  */
 
 class Container extends ModuleBase {
+
+    /**
+     * @member {LongTake} core 是否指向LongTakeCore
+     * @member {Sprite} stage 主精靈
+     * @member {Bitmap} bitmap 主位圖
+     * @member {number} width 位圖寬(與位圖同步)
+     * @member {number} height 位圖高(與位圖同步)
+     * @member {number} pointerX 當此Container指向LongTakeCore時，該值會隨著鼠標或觸碰位置改變
+     * @member {number} pointerY 當此Container指向LongTakeCore時，該值會隨著鼠標或觸碰位置改變
+     */
 
     constructor( width, height, core ){
         super("Container");

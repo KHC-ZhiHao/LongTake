@@ -1,14 +1,14 @@
 
 /**
- * @class Sprite(moduleName)
+ * @class Sprite(name)
  * @desc 建立一個動畫精靈，為LongTake的驅動核心
  */
 
 class Sprite extends ModuleBase {
 
-    constructor(moduleName){
-        super( moduleName || "Sprite" );
-        this.name = moduleName || "No name";
+    constructor(name){
+        super( name || "Sprite" );
+        this.name = name || "No name";
         this.main = null;
         this.helper = Helper;
         this.bindUpdateForChild = this.updateForChild.bind(this);
@@ -77,6 +77,7 @@ class Sprite extends ModuleBase {
 
     /**
      * @function install(main)
+     * @private
      * @desc 被加入LongTake時執行，並載入LongTake
      */
 
@@ -105,8 +106,8 @@ class Sprite extends ModuleBase {
     }
 
     /**
-     * @member {number} width 精靈寬(和位圖同步)
-     * @member {number} height 精靈高(和位圖同步)
+     * @member {number} width 精靈寬(和Bitmap同步)
+     * @member {number} height 精靈高(和Bitmap同步同步)
      */
 
     get width(){ return this.bitmap.width }
@@ -169,7 +170,7 @@ class Sprite extends ModuleBase {
 
     /**
      * @function sortChildren()
-     * @desc 重新排列子精靈
+     * @desc 重新排列子精靈，當子精靈有Z值改變時會自動觸發
      */
 
     sortChildren(){
@@ -262,7 +263,7 @@ class Sprite extends ModuleBase {
 
     /**
      * @function scale(width,height)
-     * @desc 放大倍率
+     * @desc 設定放大倍率
      */
 
     scale( width, height ){
@@ -440,15 +441,15 @@ class Sprite extends ModuleBase {
 
     /**
      * @function getRealSize()
-     * @desc 獲取該精靈預期最大的大小
+     * @desc 獲取該精靈實際呈現的大小
      */
 
     getRealSize(){
         if( this.status.realSize == null ){
             let width = this.width + this.skewY * this.height;
             let height = this.height + this.skewX * this.width;
-            let s = Math.abs( this.helper.sinByDeg(this.rotation) );
-            let c = Math.abs( this.helper.cosByDeg(this.rotation) );
+            let s = Math.abs( this.helper.sinByRad(this.rotation) );
+            let c = Math.abs( this.helper.cosByRad(this.rotation) );
             this.status.realSize = {
                 width : ( width * c + height * s ) * this.screenScaleWidth,
                 height : ( height * c + width * s ) * this.screenScaleHeight,
@@ -539,7 +540,7 @@ class Sprite extends ModuleBase {
 
     /**
      * @function remove()
-     * @desc 移除自己
+     * @desc 移除自己於父精靈下
      */
 
     remove(){
@@ -648,7 +649,7 @@ class Sprite extends ModuleBase {
 
     /**
      * @function fromImage(img)
-     * @desc 快速建立一個繪製圖片完成的精靈
+     * @desc 將精靈設置成img檔案的解析度，並將render宣告成渲染該圖片並快取
      */
 
     fromImage(img){
@@ -662,6 +663,7 @@ class Sprite extends ModuleBase {
 
     /**
      * @function renderFilter(filter)
+     * @private
      * @desc 操作堆疊渲染的函式
      */
 
@@ -681,7 +683,7 @@ class Sprite extends ModuleBase {
 
     /**
      * @function inRect(x,y)
-     * @desc 測試座標是否在精靈的矩形範圍內
+     * @desc 座標是否在精靈的矩形範圍內
      */
 
     inRect(x,y){

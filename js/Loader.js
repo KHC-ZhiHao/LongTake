@@ -1,6 +1,6 @@
 /**
  * @class Loader
- * @desc 一個簡易的載入載具
+ * @desc 針對圖片預載入的載具
  */
 
 class Loader extends ModuleBase {
@@ -104,6 +104,7 @@ class Loader extends ModuleBase {
     /**
      * @function close(name)
      * @desc 清除快取釋放記憶體
+     * @param {string} name 當此值沒有輸入，將清空全部
      */
 
     close( name ){

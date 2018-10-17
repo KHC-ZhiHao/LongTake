@@ -1,9 +1,18 @@
 /**
  * @class Bitmap
- * @desc 為掌管位元圖的物件
+ * @desc 為掌管位圖的物件
  */
 
 class Bitmap extends ModuleBase {
+
+    /**
+     * @member {boolean} offscreenCanvasSupport 是否支援離屏渲染
+     * @member {element} canvas 內部指向的離屏canvas
+     * @member {object} context cavnas 2d context
+     * @member {boolean} cache 是否為快取狀態
+     * @member {object} imgData 由context.getImageData取得的int8Array位圖元素
+     * @member {object} imgBitmap 由快取產生的圖片buffer
+     */
 
     constructor( width = 100, height = 100, element, context = '2d' ){
         super("Bitmap");
@@ -25,6 +34,12 @@ class Bitmap extends ModuleBase {
 
     get height(){ return this.canvas.height }
     set height(val){ this.canvas.height = val; }
+
+    /**
+     * @function getRenderTarget()
+     * @private
+     * @desc 獲取渲染目標
+     */
 
     getRenderTarget(){
         if( this.imgBitmap && this.cache === true ){
@@ -55,6 +70,12 @@ class Bitmap extends ModuleBase {
     clear(){
         this.context.clearRect( 0, 0, this.width, this.height );
     }
+
+    /**
+     * @function cacheImageBitmap()
+     * @private
+     * @desc 當此位圖快取時，將render target轉換成img or imagebitmap加速渲染
+     */
 
     cacheImageBitmap(){
         if( this.offscreenCanvasSupport ){
@@ -94,6 +115,7 @@ class Bitmap extends ModuleBase {
 
     /**
      * @function getImageData()
+     * @private
      * @desc 獲取快取圖片資料
      */
 
@@ -106,6 +128,7 @@ class Bitmap extends ModuleBase {
 
     /**
      * @function putImageData()
+     * @private
      * @desc 清空圖片並貼上圖片資料
      */
 

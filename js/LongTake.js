@@ -1,6 +1,6 @@
 /**
  * @class LongTake(canvasDom,width,height)
- * @desc 核心驅動
+ * @desc 核心
  */
 
 class LongTake extends ModuleBase {
@@ -9,9 +9,12 @@ class LongTake extends ModuleBase {
      * @member {number} width 繪製圖的寬
      * @member {number} height 繪製圖的高
      * @member {number} ticker 目前運行的偵數
-     * @member {object} target 目前運行的canvas
      * @member {number} framePerSecond 最大FPS數
      * @member {number} baseFps 目前實際運行的fps
+     * @member {number} viewScale 整體視圖倍率
+     * @member {object} target 目前運行的canvas
+     * @member {object} targetRect 目前運行的canvas實際大小
+     * @member {Container} container 主要運行的container，由本核心驅動內部精靈的update和event
      */
 
     constructor( target, width, height ){
@@ -71,6 +74,10 @@ class LongTake extends ModuleBase {
     // camera
     //
 
+    /**
+     * @member {object} camera 鏡頭物件
+     */
+
     initCamera(){
         this.camera = new class {
 
@@ -100,7 +107,7 @@ class LongTake extends ModuleBase {
 
     /**
      * @function setCamera(x,y)
-     * @desc 移動攝影機至x,y
+     * @desc 移動鏡頭至x,y
      */
 
     setCamera( x, y ){
@@ -139,11 +146,22 @@ class LongTake extends ModuleBase {
             this.target.addEventListener( eventName, this.event[eventName] );
         }
     }
+
+    /**
+     * @function resetPointerCoordinate(event)
+     * @private
+     * @desc 重新設定矯正過後的觸及位置
+     */
     
     resetPointerCoordinate(event){
         this.container.pointerX = ( event.offsetX / this.viewScale + this.camera.offsetX ) * ( this.target.width / this.targetRect.width );
         this.container.pointerY = ( event.offsetY / this.viewScale + this.camera.offsetY ) * ( this.target.height / this.targetRect.height ) ;
     }
+
+    /**
+     * @function targetResize(width,height)
+     * @desc 調整視圖canvas的大小
+     */
 
     targetResize( width, height ){
         this.target.width = width;
@@ -156,7 +174,18 @@ class LongTake extends ModuleBase {
         this.onWindowResize();
     }
 
+    /**
+     * @function onWindowResize()
+     * @desc 當畫面旋轉或縮放時觸發該function(自定義)
+     */
+
     onWindowResize(){}
+
+    /**
+     * @function forElementResize(element,scale)
+     * @desc 縮放視圖倍率至指定element大小(cover縮放模式)
+     * @param scale 縮放倍率(預設為1)
+     */
 
     forElementResize( element, scale = 1 ){
         this.targetResize( element.clientWidth, element.clientHeight );
@@ -169,6 +198,11 @@ class LongTake extends ModuleBase {
         this.context.save();
         this.context.scale( this.viewScale, this.viewScale );
     }
+
+    /**
+     * @function addChildren(sprite)
+     * @desc 加入一個精靈至container底下
+     */
 
     addChildren(sprite){
         this.container.addChildren(sprite);

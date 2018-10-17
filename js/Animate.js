@@ -1,6 +1,6 @@
 
 /**
- * @class Animate(option)
+ * @class Animate(options)
  * @desc 一個動畫的載具
  * @see {easing} https://easings.net/zh-tw
  */
@@ -8,14 +8,14 @@
 class Animate extends ModuleBase {
 
     /**
-     * @argument {opject} options 動畫狀態
-     * @member {number} push 每次前進的偵數
-     * @member {number} begin 起始時間
-     * @member {number} duration 持續時間
-     * @member {string} easing 緩動函數
-     * @member {boolean} reverse 反轉前進
-     * @member {boolean} alternate 巡迴播放
-     * @member {function} action 執行動作
+     * @argument options 動畫選項
+     * @param {number} push 每次前進的偵數
+     * @param {number} begin 起始時間
+     * @param {number} duration 持續時間
+     * @param {string} easing 緩動函數
+     * @param {boolean} reverse 反轉前進
+     * @param {boolean} alternate 巡迴播放
+     * @param {function} action 執行動作
      */
 
     constructor( options ){

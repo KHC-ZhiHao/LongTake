@@ -1,3 +1,8 @@
+/**
+ * @class HelperModule
+ * @desc 具擴展性的多元物件
+ */
+
 class HelperModule {
 
     constructor(){
@@ -10,20 +15,52 @@ class HelperModule {
         }
     }
     
-    sinByDeg(deg){
-        return this.trigonometric[Math.round(deg)].sin;
-    }
+    /**
+     * @function sinByRad(deg)
+     * @desc 獲取角度轉換弧度後的sin值
+     * @returns {number}
+     */
     
-    cosByDeg(deg){
-        return this.trigonometric[Math.round(deg)].cos;
+    sinByRad(deg){
+        if( this.trigonometric[Math.round(deg)] ){
+            return this.trigonometric[Math.round(deg)].sin
+        }else{
+            return Math.sin(deg * this.arc);
+        }
     }
+
+    /**
+     * @function cosByRad(deg)
+     * @desc 獲取角度轉換弧度後的cos值
+     * @returns {number}
+     */
+    
+    cosByRad(deg){
+        if( this.trigonometric[Math.round(deg)] ){
+            return this.trigonometric[Math.round(deg)].cos
+        }else{
+            return Math.cos(deg * this.arc);
+        }
+    }
+
+    /**
+     * @function getVector(deg,distance)
+     * @desc 獲取向量
+     * @returns {x,y}
+     */
 
     getVector( deg, distance ){
     	return { 
-            x : distance * this.cosByDeg(deg),
-            y : distance * this.sinByDeg(deg)
+            x : distance * this.cosByRad(deg),
+            y : distance * this.sinByRad(deg)
         };
     }
+
+    /**
+     * @function randInt(min,max)
+     * @desc 求整數範圍內的隨機值
+     * @returns {number}
+     */
 
     randInt( min, max ){
         return Math.floor( Math.random() * ( max-min + 1 ) + min );
@@ -33,6 +70,7 @@ class HelperModule {
      * @function getVisibility(view)
      * @desc 檢測目前螢幕裝置大小
      * @param {string} view xs, sm, md, le, xl
+     * @returns {boolean}
      */
 
     getVisibility(view){

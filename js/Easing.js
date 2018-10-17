@@ -1,5 +1,5 @@
 /**
- * @class Easing()
+ * @class Easing
  * @static
  * @desc 取得緩動函數的靜態物件
  * @see {支援表} https://easings.net/zh-tw
@@ -9,7 +9,6 @@ class Easing {
 
     /**
      * @function get(name)
-     * @static
      * @desc 獲取相對應的緩動函數
      */
 
