@@ -15,7 +15,7 @@
     }
 
 })(this || (typeof window !== 'undefined' ? window : global), function () {
-
+    
     /**
     * @class ModuleBase
     * @desc 所有的模塊父類
@@ -499,6 +499,8 @@
             this.cache = false;
             this.imgData = null;
             this.imgBitmap = null;
+            this._width = this.canvas.width;
+            this._height = this.canvas.height;
             if (element == null) { this.resize(width, height) }
         }
 
@@ -506,11 +508,17 @@
             return object instanceof this;
         }
 
-        get width() { return this.canvas.width }
-        set width(val) { this.canvas.width = val; }
+        get width() { return this._width }
+        set width(val) {
+            this._width = val;
+            this.canvas.width = val;
+        }
 
-        get height() { return this.canvas.height }
-        set height(val) { this.canvas.height = val; }
+        get height() { return this._height }
+        set height(val) {
+            this._height = val;
+            this.canvas.height = val;
+        }
 
         /**
          * @function getRenderTarget()
@@ -615,7 +623,6 @@
         }
 
     }
-
 
     /**
      * @class Container(width,height)
@@ -738,19 +745,20 @@
         }
 
         transform(sprite) {
-            let posX = sprite.posX;
-            let posY = sprite.posY;
             let context = this.context;
-            if (sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1) {
-                context.save();
-            }
-            context.translate(posX, posY);
             if (sprite.opacity !== 255) {
                 context.globalAlpha = sprite.opacity / 255;
             }
             if (sprite.blendMode) {
                 context.globalCompositeOperation = sprite.blendMode;
             }
+            if (sprite.isTransform() === false) { return; }
+            let posX = sprite.posX;
+            let posY = sprite.posY;
+            if (sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1) {
+                context.save();
+            }
+            context.translate(posX, posY);
             if (sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1) {
                 context.scale(sprite.scaleWidth, sprite.scaleHeight);
             }
@@ -764,20 +772,21 @@
         }
 
         restore(sprite) {
-            let posX = sprite.posX;
-            let posY = sprite.posY;
             let context = this.context;
-            if (sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1) {
-                context.restore();
-                return;
-            }
-            context.translate(posX, posY);
             if (sprite.opacity !== 255) {
                 context.globalAlpha = sprite.parent ? sprite.parent.opacity / 255 : 1;
             }
             if (sprite.blendMode) {
                 context.globalCompositeOperation = sprite.blendMode;
             }
+            if (sprite.isTransform() === false) { return; }
+            let posX = sprite.posX;
+            let posY = sprite.posY;
+            if (sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1) {
+                context.restore();
+                return;
+            }
+            context.translate(posX, posY);
             if (sprite.rotation !== 0) {
                 context.rotate(-(sprite.rotation * sprite.helper.arc));
             }
@@ -1024,13 +1033,9 @@
         }
 
         bitmapUpdate() {
-            let offsetX = this.camera.offsetX;
-            let offsetY = this.camera.offsetY;
-            let tWidth = this.width;
-            let tHeight = this.height;
             this.container.stageRender();
             this.context.clearRect(0, 0, this.width, this.height);
-            this.context.drawImage(this.container.bitmap.canvas, offsetX, offsetY, tWidth, tHeight, 0, 0, tWidth, tHeight);
+            this.context.drawImage(this.container.bitmap.canvas, - this.camera.offsetX, -this.camera.offsetY);
         }
 
     }
@@ -1145,7 +1150,7 @@
             this.initBitmap();
             this.initFamily();
             this.initPosition();
-            this.initContainer();
+            this.initTransform();
         }
 
         /**
@@ -1362,7 +1367,7 @@
 
         //=============================
         //
-        // container
+        // transform
         //
 
         /**
@@ -1377,8 +1382,8 @@
          * @member {number} screenScaleHeight 該精靈在最後顯示的總倍率高
          */
 
-        initContainer() {
-            this.container = {
+        initTransform() {
+            this.transform = {
                 skewX: 0,
                 skewY: 0,
                 scaleWidth: 1,
@@ -1386,6 +1391,16 @@
                 rotation: 0,
                 opacity: 255,
             }
+        }
+
+        /**
+         * @function isTransform()
+         * @desc 是否有變形
+         */
+
+        isTransform() {
+            let t = this.transform;
+            return !(t.skewX === 0 && t.skewY === 0 && t.scaleWidth === 1 && t.scaleHeight === 1 && t.rotation === 0);
         }
 
         /**
@@ -1398,44 +1413,44 @@
             this.scaleHeight = height || width;
         }
 
-        get scaleWidth() { return this.container.scaleWidth }
+        get scaleWidth() { return this.transform.scaleWidth }
         set scaleWidth(val) {
-            this.container.scaleWidth = val;
+            this.transform.scaleWidth = val;
         }
 
-        get scaleHeight() { return this.container.scaleHeight }
+        get scaleHeight() { return this.transform.scaleHeight }
         set scaleHeight(val) {
-            this.container.scaleHeight = val;
+            this.transform.scaleHeight = val;
         }
 
         get screenScaleWidth() { return this.parent == null ? this.scaleWidth : this.scaleWidth * this.parent.screenScaleWidth }
         get screenScaleHeight() { return this.parent == null ? this.scaleHeight : this.scaleHeight * this.parent.screenScaleHeight }
 
-        get rotation() { return this.container.rotation }
+        get rotation() { return this.transform.rotation }
         set rotation(val) {
-            this.container.rotation = val % 360;
+            this.transform.rotation = val % 360;
         }
 
-        get blendMode() { return this.container.blendMode };
+        get blendMode() { return this.transform.blendMode };
         set blendMode(val) {
-            this.container.blendMode = val;
+            this.transform.blendMode = val;
         }
 
-        get opacity() { return this.container.opacity };
+        get opacity() { return this.transform.opacity };
         set opacity(val) {
             if (val <= 0) { val = 0; }
             if (val >= 255) { val = 255; }
-            this.container.opacity = val;
+            this.transform.opacity = val;
         }
 
-        get skewX() { return this.container.skewX }
+        get skewX() { return this.transform.skewX }
         set skewX(val) {
-            this.container.skewX = val;
+            this.transform.skewX = val;
         }
 
-        get skewY() { return this.container.skewY }
+        get skewY() { return this.transform.skewY }
         set skewY(val) {
-            this.container.skewY = val;
+            this.transform.skewY = val;
         }
 
         //=============================
@@ -1456,6 +1471,8 @@
                 x: 0,
                 y: 0,
                 z: 0,
+                screenX: 0,
+                screenY: 0,
                 anchorX: 0,
                 anchorY: 0,
             }
@@ -1493,8 +1510,19 @@
             }
         }
 
-        get screenX() { return (this.parent ? this.parent.screenX + this.parent.width * this.parent.anchorX : 0) + this.x - this.width * this.anchorX }
-        get screenY() { return (this.parent ? this.parent.screenY + this.parent.height * this.parent.anchorY : 0) + this.y - this.height * this.anchorY }
+        get screenX() {
+            if (this.position.screenX == null) {
+                this.position.screenX = (this.parent ? this.parent.screenX + this.parent.width * this.parent.anchorX : 0) + this.x - this.width * this.anchorX;
+            }
+            return this.position.screenX;
+        }
+
+        get screenY() {
+            if (this.position.screenY == null) {
+                this.position.screenY = (this.parent ? this.parent.screenY + this.parent.height * this.parent.anchorY : 0) + this.y - this.height * this.anchorY;
+            }
+            return this.position.screenY
+        }
 
         get posX() { return this.screenX + this.width * this.anchorX }
         get posY() { return this.screenY + this.height * this.anchorY }
@@ -1617,6 +1645,8 @@
 
         mainUpdate() {
             if (this.main == null) { this.install(this.parent.main); }
+            this.position.screenX = null;
+            this.position.screenY = null;
             this.status.realSize = null;
             if (this.status.sort) {
                 this.status.sort = false;

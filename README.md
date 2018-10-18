@@ -20,6 +20,7 @@
 * [鏡頭定位](#鏡頭定位)
 * [RWD優化策略](#RWD優化策略)
 * [OffscreenCanvas support](#OffscreenCanvas)
+* [Close](#Close)
 
 ### 輕便、簡單建立、快速擴展
 
@@ -147,3 +148,17 @@ Container是一個靜態的容器，在支援OffscreenCanvas2D的瀏覽器下，
 可以從這麼[範例](https://github.com/KHC-ZhiHao/LongTake/blob/master/test/worker/index.js)中得知我是如何實踐Worker中繪製canvas的。
 
 >目前OffscreenCanvas的支援程度並不高，所以使用這方法基本上只是徒增自己麻煩...
+
+### Close
+
+這是我在開發Vue過程時遇到的問題，在SPA開發過程有時候requestAnimationFrame的綁定並沒有隨著頁面跳轉移除不斷運行的LongTakeCore，close將協助擺脫這個輪迴。
+
+```js
+//vue.js
+created(){
+    this.app = new LongTake( 'app', 800, 600 );
+},
+destroyed(){
+    this.app.close();
+}
+```

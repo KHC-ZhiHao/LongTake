@@ -120,19 +120,20 @@ class Container extends ModuleBase {
     }
 
     transform(sprite){
-        let posX = sprite.posX;
-        let posY = sprite.posY;
         let context = this.context;
-        if( sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1 ){
-            context.save();
-        }
-        context.translate( posX, posY );
         if( sprite.opacity !== 255 ){
             context.globalAlpha = sprite.opacity / 255;
         }
         if( sprite.blendMode ){
             context.globalCompositeOperation = sprite.blendMode;
         }
+        if( sprite.isTransform() === false ){ return; }
+        let posX = sprite.posX;
+        let posY = sprite.posY;
+        if( sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1 ){
+            context.save();
+        }
+        context.translate( posX, posY );
         if( sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1 ){
             context.scale( sprite.scaleWidth, sprite.scaleHeight );
         }
@@ -146,20 +147,21 @@ class Container extends ModuleBase {
     }
 
     restore(sprite){
-        let posX = sprite.posX;
-        let posY = sprite.posY;
         let context = this.context;
-        if( sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1 ){
-            context.restore();
-            return;
-        }
-        context.translate( posX, posY );
         if( sprite.opacity !== 255 ){
             context.globalAlpha = sprite.parent ? sprite.parent.opacity / 255 : 1;
         }
         if( sprite.blendMode ){
             context.globalCompositeOperation = sprite.blendMode;
         }
+        if( sprite.isTransform() === false ){ return; }
+        let posX = sprite.posX;
+        let posY = sprite.posY;
+        if( sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1 ){
+            context.restore();
+            return;
+        }
+        context.translate( posX, posY );
         if( sprite.rotation !== 0 ){
             context.rotate( -(sprite.rotation * sprite.helper.arc) );
         }

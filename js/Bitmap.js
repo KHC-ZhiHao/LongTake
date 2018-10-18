@@ -22,6 +22,8 @@ class Bitmap extends ModuleBase {
         this.cache = false;
         this.imgData = null;
         this.imgBitmap = null;
+        this._width = this.canvas.width;
+        this._height = this.canvas.height;
         if( element == null ){ this.resize( width, height ) }
     }
 
@@ -29,11 +31,17 @@ class Bitmap extends ModuleBase {
         return object instanceof this;
     }
 
-    get width(){ return this.canvas.width }
-    set width(val){ this.canvas.width = val; }
+    get width(){ return this._width }
+    set width(val){
+        this._width = val;
+        this.canvas.width = val;
+    }
 
-    get height(){ return this.canvas.height }
-    set height(val){ this.canvas.height = val; }
+    get height(){ return this._height }
+    set height(val){ 
+        this._height = val;
+        this.canvas.height = val;
+    }
 
     /**
      * @function getRenderTarget()

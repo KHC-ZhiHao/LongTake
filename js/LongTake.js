@@ -233,13 +233,9 @@ class LongTake extends ModuleBase {
     }
 
     bitmapUpdate(){
-        let offsetX = this.camera.offsetX;
-        let offsetY = this.camera.offsetY;
-        let tWidth = this.width;
-        let tHeight = this.height;
         this.container.stageRender();
         this.context.clearRect( 0, 0, this.width, this.height );
-        this.context.drawImage( this.container.bitmap.canvas, offsetX, offsetY, tWidth, tHeight, 0, 0, tWidth, tHeight );
+        this.context.drawImage( this.container.bitmap.canvas,- this.camera.offsetX, -this.camera.offsetY );
     }
 
 }

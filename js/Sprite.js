@@ -18,7 +18,7 @@ class Sprite extends ModuleBase {
         this.initBitmap();
         this.initFamily();
         this.initPosition();
-        this.initContainer();
+        this.initTransform();
     }
 
     /**
@@ -235,7 +235,7 @@ class Sprite extends ModuleBase {
 
     //=============================
     //
-    // container
+    // transform
     //
 
     /**
@@ -250,8 +250,8 @@ class Sprite extends ModuleBase {
      * @member {number} screenScaleHeight 該精靈在最後顯示的總倍率高
      */
 
-    initContainer(){
-        this.container = {
+    initTransform(){
+        this.transform = {
             skewX : 0,
             skewY : 0,
             scaleWidth : 1,
@@ -259,6 +259,16 @@ class Sprite extends ModuleBase {
             rotation : 0,
             opacity : 255,
         }
+    }
+
+    /**
+     * @function isTransform()
+     * @desc 是否有變形
+     */
+
+    isTransform(){
+        let t = this.transform;
+        return !(t.skewX === 0 && t.skewY === 0 && t.scaleWidth === 1 && t.scaleHeight === 1 && t.rotation === 0);
     }
 
     /**
@@ -271,44 +281,44 @@ class Sprite extends ModuleBase {
         this.scaleHeight = height || width;
     }
 
-    get scaleWidth(){ return this.container.scaleWidth }
+    get scaleWidth(){ return this.transform.scaleWidth }
     set scaleWidth(val){
-        this.container.scaleWidth = val;
+        this.transform.scaleWidth = val;
     }
 
-    get scaleHeight(){ return this.container.scaleHeight }
+    get scaleHeight(){ return this.transform.scaleHeight }
     set scaleHeight(val){
-        this.container.scaleHeight = val;
+        this.transform.scaleHeight = val;
     }
 
     get screenScaleWidth(){ return this.parent == null ? this.scaleWidth : this.scaleWidth * this.parent.screenScaleWidth }
     get screenScaleHeight(){ return this.parent == null ? this.scaleHeight : this.scaleHeight * this.parent.screenScaleHeight }
 
-    get rotation(){ return this.container.rotation }
+    get rotation(){ return this.transform.rotation }
     set rotation(val){
-        this.container.rotation = val % 360;
+        this.transform.rotation = val % 360;
     }
 
-    get blendMode(){ return this.container.blendMode };
+    get blendMode(){ return this.transform.blendMode };
     set blendMode(val){
-        this.container.blendMode = val;
+        this.transform.blendMode = val;
     }
 
-    get opacity(){ return this.container.opacity };
+    get opacity(){ return this.transform.opacity };
     set opacity(val){
         if( val <= 0 ){ val = 0; }
         if( val >= 255 ){ val = 255; }
-        this.container.opacity = val;
+        this.transform.opacity = val;
     }
 
-    get skewX(){ return this.container.skewX }
+    get skewX(){ return this.transform.skewX }
     set skewX(val){
-        this.container.skewX = val;
+        this.transform.skewX = val;
     }
 
-    get skewY(){ return this.container.skewY }
+    get skewY(){ return this.transform.skewY }
     set skewY(val){
-        this.container.skewY = val;
+        this.transform.skewY = val;
     }
 
     //=============================
@@ -329,6 +339,8 @@ class Sprite extends ModuleBase {
             x : 0,
             y : 0,
             z : 0,
+            screenX : 0,
+            screenY : 0,
             anchorX : 0,
             anchorY : 0,
         }
@@ -366,8 +378,19 @@ class Sprite extends ModuleBase {
         }
     }
 
-    get screenX(){ return (this.parent ? this.parent.screenX + this.parent.width * this.parent.anchorX : 0) + this.x - this.width * this.anchorX }
-    get screenY(){ return (this.parent ? this.parent.screenY + this.parent.height * this.parent.anchorY : 0) + this.y - this.height * this.anchorY }
+    get screenX(){
+        if( this.position.screenX == null ){
+            this.position.screenX = (this.parent ? this.parent.screenX + this.parent.width * this.parent.anchorX : 0) + this.x - this.width * this.anchorX;
+        }
+        return this.position.screenX;
+    }
+
+    get screenY(){ 
+        if( this.position.screenY == null ){
+            this.position.screenY = (this.parent ? this.parent.screenY + this.parent.height * this.parent.anchorY : 0) + this.y - this.height * this.anchorY;
+        }
+        return this.position.screenY
+    }
 
     get posX(){ return this.screenX + this.width * this.anchorX }
     get posY(){ return this.screenY + this.height * this.anchorY }
@@ -490,6 +513,8 @@ class Sprite extends ModuleBase {
 
     mainUpdate(){
         if( this.main == null ){ this.install(this.parent.main); }
+        this.position.screenX = null;
+        this.position.screenY = null;
         this.status.realSize = null;
         if( this.status.sort ){
             this.status.sort = false;
