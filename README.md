@@ -1,5 +1,7 @@
 # LongTake
 
+[![NPM Version][npm-image]][npm-url]
+
 ### 協助你快速繪製複雜banner的入門級canvas2d函式庫
 
 [API Document](https://github.com/KHC-ZhiHao/LongTake/wiki/Document)
@@ -9,6 +11,20 @@
 [LightAndTree](https://khc-zhihao.github.io/LongTake/demo/LightAndTree/index.html)
 
 [TwinVortex](https://khc-zhihao.github.io/LongTake/demo/TwinVortex/index.html)
+
+### 安裝 (Install)
+
+webpack
+
+```bash
+$ npm i longtake
+```
+
+html
+
+```html
+<script src="https://rawcdn.githack.com/KHC-ZhiHao/LongTake/master/dist/index.js"></script>
+```
 
 ### LongTake是協助你快速建立符合設計師動畫需求的函式庫，他將保持以下特點：
 
@@ -162,3 +178,6 @@ destroyed(){
     this.app.close();
 }
 ```
+
+[npm-image]: https://img.shields.io/npm/v/longtake.svg
+[npm-url]: https://npmjs.org/package/longtake
