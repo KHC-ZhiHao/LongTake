@@ -18,9 +18,9 @@
 * [動畫與緩動函數](#動畫與緩動函數)
 * [事件監聽](#事件監聽)
 * [鏡頭定位](#鏡頭定位)
-* [RWD優化策略](#RWD優化策略)
-* [OffscreenCanvas support](#OffscreenCanvas)
-* [Close](#Close)
+* [RWD優化策略](#rwe優化策略)
+* [OffscreenCanvas support](#offscreenCanvas)
+* [Close](#close)
 
 ### 輕便、簡單建立、快速擴展
 
