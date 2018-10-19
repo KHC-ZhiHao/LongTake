@@ -4,7 +4,7 @@
 
 ### 協助你快速繪製複雜banner的入門級canvas2d函式庫
 
-[API Document](https://github.com/KHC-ZhiHao/LongTake/wiki/Document)
+[API Document](https://github.com/KHC-ZhiHao/LongTake/document.html)
 
 ### DEMO
 
