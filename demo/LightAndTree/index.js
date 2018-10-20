@@ -146,9 +146,9 @@ loader.onload(()=>{
     app.addChildren( branch1.fromImage(loader.get('branch1')) );
     app.addChildren( branch2.fromImage(loader.get('branch2')) );
     app.addChildren( cap.fromImage(loader.get('cap')) );
-    //app.addChildren( new Ray(200) );
+    app.addChildren( new Ray(200) );
     app.addChildren( new Ray(500) );
-    //app.addChildren( new Ray(700) );
+    app.addChildren( new Ray(700) );
     for( let i = 0; i < 20 ; i++ ){
         app.addChildren( new Leaf() );
     }
