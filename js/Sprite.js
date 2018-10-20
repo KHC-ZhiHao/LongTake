@@ -258,6 +258,7 @@ class Sprite extends ModuleBase {
             scaleHeight : 1,
             rotation : 0,
             opacity : 255,
+            blendMode : 'source-over',
         }
     }
 

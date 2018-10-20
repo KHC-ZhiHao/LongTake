@@ -22,6 +22,7 @@ class Container extends ModuleBase {
         this.core = core || null;
         this.bitmap = new Bitmap( width, height );
         this.context = this.bitmap.context;
+        this.stackOpacity = [];
         this.pointerX = 0;
         this.pointerY = 0;
         this.initStage();
@@ -120,19 +121,20 @@ class Container extends ModuleBase {
     }
 
     transform(sprite){
-        let context = this.context;
-        if( sprite.opacity !== 255 ){
-            context.globalAlpha = sprite.opacity / 255;
+        var context = this.context;
+        if( sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1 ){
+            context.save();
         }
-        if( sprite.blendMode ){
+        if( sprite.opacity !== 255 ){
+            this.stackOpacity.push(sprite.opacity);
+            context.globalAlpha = this.stackOpacity.reduce(( a, b )=>{ return a + b }) / (255 * this.stackOpacity.length);
+        }
+        if( sprite.blendMode !== 'source-over' ){
             context.globalCompositeOperation = sprite.blendMode;
         }
         if( sprite.isTransform() === false ){ return; }
         let posX = sprite.posX;
         let posY = sprite.posY;
-        if( sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1 ){
-            context.save();
-        }
         context.translate( posX, posY );
         if( sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1 ){
             context.scale( sprite.scaleWidth, sprite.scaleHeight );
@@ -147,20 +149,25 @@ class Container extends ModuleBase {
     }
 
     restore(sprite){
-        let context = this.context;
-        if( sprite.opacity !== 255 ){
-            context.globalAlpha = sprite.parent ? sprite.parent.opacity / 255 : 1;
-        }
-        if( sprite.blendMode ){
-            context.globalCompositeOperation = sprite.blendMode;
-        }
-        if( sprite.isTransform() === false ){ return; }
-        let posX = sprite.posX;
-        let posY = sprite.posY;
+        var context = this.context;
         if( sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1 ){
             context.restore();
             return;
         }
+        if( sprite.opacity !== 255 ){
+            this.stackOpacity.pop();
+            if( this.stackOpacity.length === 0 ){
+                context.globalAlpha = 1;
+            }else{
+                context.globalAlpha = this.stackOpacity.reduce(( a, b )=>{ return a + b }) / (255 * this.stackOpacity.length);
+            }
+        }
+        if( sprite.blendMode !== 'source-over' ){
+            context.globalCompositeOperation = 'source-over';
+        }
+        if( sprite.isTransform() === false ){ return; }
+        let posX = sprite.posX;
+        let posY = sprite.posY;
         context.translate( posX, posY );
         if( sprite.rotation !== 0 ){
             context.rotate( -(sprite.rotation * sprite.helper.arc) );
