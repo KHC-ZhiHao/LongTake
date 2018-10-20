@@ -27,26 +27,6 @@ let shadow = new LongTake.Sprite("shadow");
 // camera
 //
 
-let camera = new LongTake.Sprite("camera");
-
-camera.create = function(){
-    this.x = this.main.width / 2;
-    this.z = 11;
-    this.resize(10,10);
-    this.setAnchor(0.5);
-}
-
-camera.update = function(){
-    this.x = this.main.pointerX;
-    this.y = this.main.pointerY;
-}
-
-camera.render = function(){
-    this.context.fillStyle = "red";
-    this.context.fillRect( 0,0,this.width, this.height);
-}
-
-app.addChildren(camera);
 app.setCamera( app.width / 2, app.height / 2 );
 app.forElementResize( app.target.parentElement, 1 );
 app.onWindowResize = function(){
