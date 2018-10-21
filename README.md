@@ -12,6 +12,8 @@
 
 [TwinVortex](https://khc-zhihao.github.io/LongTake/demo/TwinVortex/index.html)
 
+[Farm](https://khc-zhihao.github.io/LongTake/demo/Farm/index.html)
+
 ### 安裝 (Install)
 
 webpack
@@ -29,7 +31,7 @@ html
 ### LongTake是協助你快速建立符合設計師動畫需求的函式庫，他將保持以下特點：
 
 * [輕便、簡單建立、快速擴展](#輕便簡單建立快速擴展)
-* [精靈驅動](#精靈驅動)
+* [精靈與精靈樹](#精靈與精靈樹)
 * [預載入機制](#預載入機制)
 * [動畫與緩動函數](#動畫與緩動函數)
 * [事件監聽](#事件監聽)
@@ -51,7 +53,7 @@ LongTake雖然不到30kb，但該有的都有，當你想為你的網站添加�
 let app = new LongTake( 'app', 1920, 1080 );
 ```
 
-### 精靈驅動
+### 精靈與精靈樹
 
 Sprite為該系統的基本單位，每個Sprite都封裝了Bitmap、Layer、Filter與運作週期等模式，基本上就是...我們不要管這麼多了，建立Sprite就對了!
 
@@ -73,6 +75,42 @@ let rect = new LongTake.Sprite();
 
 let app = new LongTake( 'app', 800, 600 );
     app.addChildren(rect);
+```
+
+每個Sprite都有自己的子代，你可以用繼承的方式建立樹，樹會繼承變形、透明度、濾鏡等。
+
+>混和模式globalCompositeOperation單一性的特性只能做單層的繼承。
+
+```js
+class Rect extends LongTake.Sprite {
+
+    constructor(){
+        super("Rect");
+    }
+
+    create(){
+        this.resize(30,30);
+        this.setAnchor(0.5);
+    }
+
+    update(){
+        this.rotation += 1;
+    }
+
+    render(){
+        this.fillRect( 0, 0, this.width, this.height );
+        this.cache();
+    }
+
+}
+
+let rectWrapper = new LongTake.Sprite("wrapper");
+    rectWrapper.addChildren(new Rect());
+    rectWrapper.addChildren(new Rect());
+
+let app = new LongTake( 'app', 800, 600 );
+    app.addChildren(rectWrapper);
+
 ```
 
 ### 預載入機制
