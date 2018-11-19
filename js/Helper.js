@@ -7,6 +7,7 @@ class HelperModule {
 
     constructor(){
         this.arc = Math.PI / 180;
+        this.rarc = 180 / Math.PI;
         this.trigonometric = {};
         for( let i = -360 ; i < 360 ; i++ ){
             this.trigonometric[i] = {};
@@ -64,6 +65,18 @@ class HelperModule {
 
     randInt( min, max ){
         return Math.floor( Math.random() * ( max-min + 1 ) + min );
+    }
+
+    /**
+     * @function getAngle(x,y,ax,ay)
+     * @desc 求兩點角度
+     * @returns {number}
+     */
+
+    getAngle( x, y, ax, ay ){
+        if( x == ax && y == ay ){ return 0; }
+        var angle = Math.atan2(( ay - y ), ( ax - x )) * this.rarc;
+        return angle > 0 ? angle : 360 + angle;
     }
 
     /**

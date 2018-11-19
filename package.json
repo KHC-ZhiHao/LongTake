@@ -1,6 +1,6 @@
 {
   "name": "longtake",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Very simple canvas library.",
   "main": "./dist/index.js",
   "scripts": {
@@ -19,8 +19,5 @@
   "bugs": {
     "url": "https://github.com/KHC-ZhiHao/LongTake/issues"
   },
-  "homepage": "https://github.com/KHC-ZhiHao/LongTake#readme",
-  "files": [
-	  "./dist/index.js"
-	]
+  "homepage": "https://github.com/KHC-ZhiHao/LongTake#readme"
 }
