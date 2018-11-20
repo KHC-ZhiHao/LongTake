@@ -16,7 +16,8 @@ class Bitmap extends ModuleBase {
 
     constructor( width = 100, height = 100, element, context = '2d' ){
         super("Bitmap");
-        this.offscreenCanvasSupport = !!self.OffscreenCanvas;
+        // this.offscreenCanvasSupport = !!self.OffscreenCanvas;
+        this.offscreenCanvasSupport = false;
         this.canvas = element || this.offscreenCanvasSupport ? new OffscreenCanvas(width, height) : document.createElement('canvas');
         this.context = this.canvas.getContext(context);
         this.cache = false;

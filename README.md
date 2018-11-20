@@ -1,5 +1,7 @@
 # LongTake
 
+<font color="red">離屏渲染因為某些重大BUG暫時關閉</font>
+
 [![NPM Version][npm-image]][npm-url]
 
 ### 協助你快速繪製複雜banner的入門級canvas2d函式庫
@@ -119,7 +121,7 @@ Loader將協助您在呈現動畫之前先將圖片載入完成，讓主題圖�
 
 ```js
 let loader = new LongTake.Loader();
-    loader.add('./img/HighBear.png');
+    loader.add('bear', './img/HighBear.png');
 
     //start為執行載入，你可以在這建立讀取畫面的呈現
     loader.start(( onload, finish )=>{
