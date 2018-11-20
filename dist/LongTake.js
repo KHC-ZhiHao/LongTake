@@ -502,8 +502,7 @@ class Bitmap extends ModuleBase {
 
     constructor( width = 100, height = 100, element, context = '2d' ){
         super("Bitmap");
-        // this.offscreenCanvasSupport = !!self.OffscreenCanvas;
-        this.offscreenCanvasSupport = false;
+        this.offscreenCanvasSupport = !!self.OffscreenCanvas;
         this.canvas = element || this.offscreenCanvasSupport ? new OffscreenCanvas(width, height) : document.createElement('canvas');
         this.context = this.canvas.getContext(context);
         this.cache = false;
@@ -575,6 +574,7 @@ class Bitmap extends ModuleBase {
     cacheImageBitmap(){
         if( this.offscreenCanvasSupport ){
             this.imgBitmap = this.canvas.transferToImageBitmap();
+            this.imgBitmap.close();
         }else{
             let img = new Image();
             img.onload = ()=>{ this.imgBitmap = img }
