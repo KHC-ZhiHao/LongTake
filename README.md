@@ -1,7 +1,5 @@
 # LongTake
 
-<font color="red">離屏渲染因為某些重大BUG暫時關閉</font>
-
 [![NPM Version][npm-image]][npm-url]
 
 ### 協助你快速繪製複雜banner的入門級canvas2d函式庫
@@ -198,6 +196,8 @@ let app = new LongTake( 'app', 1920, 1080 );
 ```
 
 ### OffscreenCanvas
+
+__因為在apple產品上有支援度上的錯誤，這個功能暫時關閉__
 
 Container是一個靜態的容器，在支援OffscreenCanvas2D的瀏覽器下，所有的bitmap會指向OffscreenCanvas2D而不是DOM，這讓建立Worker環境有了曙光。
 
