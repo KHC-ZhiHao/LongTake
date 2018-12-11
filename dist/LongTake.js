@@ -211,8 +211,8 @@ class Loader extends ModuleBase {
         for( let name in this.files ){
             let image = new Image();
             image.onload = ()=>{
-                if( createImageBitmap ){
-                    createImageBitmap(image).then((bitmap)=>{
+                if( window.createImageBitmap ){
+                    window.createImageBitmap(image).then((bitmap)=>{
                         this.data[name] = bitmap;
                     });
                 }else{
