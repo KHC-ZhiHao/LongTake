@@ -197,8 +197,6 @@ let app = new LongTake( 'app', 1920, 1080 );
 
 ### OffscreenCanvas
 
-__因為在apple產品上有支援度上的錯誤，這個功能暫時關閉__
-
 Container是一個靜態的容器，在支援OffscreenCanvas2D的瀏覽器下，所有的bitmap會指向OffscreenCanvas2D而不是DOM，這讓建立Worker環境有了曙光。
 
 可以從這麼[範例](https://github.com/KHC-ZhiHao/LongTake/blob/master/test/worker/index.js)中得知我是如何實踐Worker中繪製canvas的。

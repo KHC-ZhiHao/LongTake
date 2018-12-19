@@ -502,7 +502,7 @@ class Bitmap extends ModuleBase {
 
     constructor( width = 100, height = 100, element, context = '2d' ){
         super("Bitmap");
-        this.offscreenCanvasSupport = false;
+        this.offscreenCanvasSupport = typeof self === 'undefined' ? !!window.OffscreenCanvas : !!self.OffscreenCanvas;
         this.canvas = element || this.offscreenCanvasSupport ? new OffscreenCanvas(width, height) : document.createElement('canvas');
         this.context = this.canvas.getContext(context);
         this.cache = false;
@@ -880,8 +880,7 @@ class LongTake extends ModuleBase {
     close(){
         this.remove = true;
         this.target = null;
-        this.stage.eachChildrenDeep((child)=>{ child.close(); });
-        this.stage = null;
+        this.container.stage.eachChildrenDeep((child)=>{ child.close(); });
         window.removeEventListener( 'resize', this.windowResize.bind(this) );
     }
 
@@ -1206,7 +1205,7 @@ class Sprite extends ModuleBase {
     }
 
     /**
-     * @function super(name);
+     * @function super(name)
      * @desc 當實體化該精靈後，可以使用super呼叫實體化前的函式
      * @param {string} name 呼叫函式名稱
      */
@@ -1256,7 +1255,7 @@ class Sprite extends ModuleBase {
 
     /**
      * @member {number} width 精靈寬(和Bitmap同步)
-     * @member {number} height 精靈高(和Bitmap同步同步)
+     * @member {number} height 精靈高(和Bitmap同步)
      */
 
     get width(){ return this.bitmap.width }
@@ -1845,9 +1844,36 @@ class Sprite extends ModuleBase {
     renderFilter(filter){
         if( filter ){
             let imgData = this.bitmap.getImageData();
-            filter(imgData);
+            filter.call(this, imgData);
             this.bitmap.putImageData(imgData);
             this.eachChildren((child) => {child.renderFilter(filter);});
+        }
+    }
+
+    /**
+     * @function eachImgData(imgData,callback)
+     * @desc 迭代像素
+     * @callback (pixel:object,render:function)
+     */
+
+    eachImgData(imgData, callback) {
+        let data = imgData.data
+        let index = 0
+        let render = function(r = 0, g = 0, b = 0, a = 255) {
+            data[index] = r.red || r
+            data[index + 1] = r.green || g
+            data[index + 2] = r.blue  || b
+            data[index + 3] = r.alpha || a
+        }
+        for (let i = 0; i < data.length; i += 4) {
+            index = i
+            let pixel = {
+                red: data[i],
+                green: data[i + 1],
+                blue : data[i + 2],
+                alpha: data[i + 3],
+            }
+            callback(pixel, render)
         }
     }
 

@@ -64,8 +64,7 @@ class LongTake extends ModuleBase {
     close(){
         this.remove = true;
         this.target = null;
-        this.stage.eachChildrenDeep((child)=>{ child.close(); });
-        this.stage = null;
+        this.container.stage.eachChildrenDeep((child)=>{ child.close(); });
         window.removeEventListener( 'resize', this.windowResize.bind(this) );
     }
 
