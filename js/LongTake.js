@@ -215,6 +215,7 @@ class LongTake extends ModuleBase {
     update(){
         if( this.remove == true ){
             window.cancelAnimationFrame(this.ticker);
+            return null
         }
         this.baseFps += this.framePerSecond;
         this.stageUpdate();
