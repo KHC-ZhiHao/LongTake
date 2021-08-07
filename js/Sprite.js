@@ -279,7 +279,7 @@ class Sprite extends ModuleBase {
 
     scale( width, height ){
         this.scaleWidth = width;
-        this.scaleHeight = height || width;
+        this.scaleHeight = height == null ? width : height;
     }
 
     get scaleWidth(){ return this.transform.scaleWidth }
@@ -354,7 +354,7 @@ class Sprite extends ModuleBase {
 
     setAnchor(x, y){
         this.anchorX = x;
-        this.anchorY = y || x
+        this.anchorY = y == null ? x : y
     }
 
     get x(){ return this.position.x }

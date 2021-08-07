@@ -1,11 +1,11 @@
 declare class LongTake {
     constructor(target: string | HTMLCanvasElement, width: number, height: number)
-    static Loader: new () => Loader
-    static Sprite: new () => Sprite
-    static Bitmap: new () => Bitmap
-    static Helper: new () => Helper
-    static Animate: new () => Animate
-    static Container: new () => Container
+    static Loader: typeof Loader
+    static Sprite: typeof Sprite
+    static Bitmap: typeof Bitmap
+    static Helper: typeof Helper
+    static Animate: typeof Animate
+    static Container: typeof Container
     /** 繪製圖的寬 */
     readonly width: number
     /** 繪製圖的高 */
@@ -206,7 +206,7 @@ declare class Sprite {
     /** 調整精靈的 Bitmap 大小 */
     resize(width: number | { width: number, height: number }, height?: number): void
     /** 加入一個子精靈 */
-    addChildren(sprite: string)
+    addChildren(sprite: Sprite)
     /** 重新排列子精靈，當子精靈有 Z 值改變時會自動觸發 */
     sortChildren(): void
     /** 監聽一個事件 */

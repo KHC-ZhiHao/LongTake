@@ -552,8 +552,8 @@
          */
 
         resize(width, height) {
-            this.width = width || this.width;
-            this.height = height || this.height;
+            this.width = width != null ? width : this.width;
+            this.height = height != null ? height : this.height;
         }
 
         /**
@@ -1153,6 +1153,11 @@
      * @desc 建立一個動畫精靈，為LongTake的驅動核心
      */
 
+    /**
+     * @class Sprite(name)
+     * @desc 建立一個動畫精靈，為LongTake的驅動核心
+     */
+
     class Sprite extends ModuleBase {
 
         constructor(name) {
@@ -1394,7 +1399,7 @@
          * @member {number} scaleHeight 放大高
          * @member {number} rotation 旋轉
          * @member {number} opacity 透明度
-         * @member {number} blendMode 合成模式
+         * @member {string} blendMode 合成模式
          * @member {number} screenScaleWidth 該精靈在最後顯示的總倍率寬
          * @member {number} screenScaleHeight 該精靈在最後顯示的總倍率高
          */
@@ -1428,7 +1433,7 @@
 
         scale(width, height) {
             this.scaleWidth = width;
-            this.scaleHeight = height || width;
+            this.scaleHeight = height == null ? width : height;
         }
 
         get scaleWidth() { return this.transform.scaleWidth }
@@ -1503,7 +1508,7 @@
 
         setAnchor(x, y) {
             this.anchorX = x;
-            this.anchorY = y || x
+            this.anchorY = y == null ? x : y
         }
 
         get x() { return this.position.x }
@@ -1896,6 +1901,7 @@
         }
 
     }
+
 
 
     let __re = LongTake;

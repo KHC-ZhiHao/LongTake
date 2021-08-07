@@ -65,9 +65,9 @@ class Bitmap extends ModuleBase {
      * @desc 調整畫布大小
      */
 
-    resize(width, height){
-        this.width = width || this.width;
-        this.height = height || this.height;
+    resize(width, height) {
+        this.width = width != null ? width : this.width;
+        this.height = height != null ? height : this.height;
     }
 
     /**
