@@ -18,6 +18,10 @@ class Animate extends ModuleBase {
      * @param {function} action 執行動作
      */
 
+    /**
+     * @member {number} over 執行結束
+     */
+
     constructor( options ){
         super("Animate");
         this.validate({
@@ -36,6 +40,7 @@ class Animate extends ModuleBase {
 
     /**
      * @function validate(data)
+     * @private
      * @desc 驗證正確並賦予資料
      */
 

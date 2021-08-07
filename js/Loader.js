@@ -31,7 +31,6 @@ class Loader extends ModuleBase {
 
     /**
      * @function start(loading)
-     * @async
      * @desc 執行載入
      * @param {function(completed,length)} loading 載入時觸發的事件
      */

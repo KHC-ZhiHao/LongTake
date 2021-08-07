@@ -129,7 +129,7 @@ class LongTake extends ModuleBase {
     }
 
     /**
-     * @function addEvent(eventName,callback)
+     * @function addEvent(eventName, callback)
      * @desc 監聽一個事件
      * @param {function} callback 觸發事件
      */
@@ -151,7 +151,7 @@ class LongTake extends ModuleBase {
      * @private
      * @desc 重新設定矯正過後的觸及位置
      */
-    
+
     resetPointerCoordinate(event){
         this.container.pointerX = ( event.offsetX / this.viewScale + this.camera.offsetX ) * ( this.target.width / this.targetRect.width );
         this.container.pointerY = ( event.offsetY / this.viewScale + this.camera.offsetY ) * ( this.target.height / this.targetRect.height ) ;

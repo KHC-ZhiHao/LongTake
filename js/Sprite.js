@@ -245,7 +245,7 @@ class Sprite extends ModuleBase {
      * @member {number} scaleHeight 放大高
      * @member {number} rotation 旋轉
      * @member {number} opacity 透明度
-     * @member {number} blendMode 合成模式
+     * @member {string} blendMode 合成模式
      * @member {number} screenScaleWidth 該精靈在最後顯示的總倍率寬
      * @member {number} screenScaleHeight 該精靈在最後顯示的總倍率高
      */
