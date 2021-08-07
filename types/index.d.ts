@@ -138,6 +138,8 @@ declare class Sprite {
     readonly parent?: Sprite
     /** 子精靈組 */
     readonly children: Sprite[]
+    readonly bitmap: Bitmap
+    readonly context: CanvasRenderingContext2D
     /** 傾斜 X */
     skewX: number
     /** 傾斜 Y */
