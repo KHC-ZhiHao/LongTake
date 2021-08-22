@@ -209,7 +209,8 @@ Container 是一個靜態的容器，在支援 OffscreenCanvas2D 的瀏覽器下
 
 可以從這麼[範例](https://github.com/KHC-ZhiHao/LongTake/blob/master/test/worker/index.js)中得知我是如何實踐Worker中繪製canvas的。
 
->目前 OffscreenCanvas 的支援程度並不高，所以使用這方法基本上只是徒增自己麻煩...
+> 目前 OffscreenCanvas 的支援程度並不高，所以使用這方法基本上只是徒增自己麻煩...
+> 版本 0.3.9 已經停用相關支援。
 
 ### Close
 
