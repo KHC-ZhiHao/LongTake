@@ -37,7 +37,7 @@ class Animate extends ModuleBase {
         this.actionEasing = Easing.get(this.easing);
         this.pace = 1000 / this.push;
         if (this.reverse) {
-            this.time = 1
+            this.time = this.duration
         }
     }
 
