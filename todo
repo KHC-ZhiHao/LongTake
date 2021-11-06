@@ -1,0 +1,5 @@
+☐ 正規化
+☐ demo 增加動態人物
+☐ 修正透明化父子狀態有誤
+☐ 實體化的 sprite 不能被 longtake 核心共享
+☐ 獨立 container 與濾鏡

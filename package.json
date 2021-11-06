@@ -1,11 +1,12 @@
 {
   "name": "longtake",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Very simple canvas library.",
-  "main": "./dist/index.js",
-  "types": "./types/index.d.ts",
+  "main": "./dist-new/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "cross-env webpack --progress --hide-modules",
+    "example-serve": "mini-website-packer serve --conf ./example/config.json --lang zh --root ./example --dist ./dist-example",
+    "example-build": "mini-website-packer build --conf ./example/config.json --root ./example --dist ./dist-example"
   },
   "repository": {
     "type": "git",
@@ -20,5 +21,21 @@
   "bugs": {
     "url": "https://github.com/KHC-ZhiHao/LongTake/issues"
   },
-  "homepage": "https://github.com/KHC-ZhiHao/LongTake#readme"
+  "homepage": "https://github.com/KHC-ZhiHao/LongTake#readme",
+  "devDependencies": {
+    "@babel/core": "^7.4.5",
+    "@babel/preset-env": "^7.4.5",
+    "@types/node": "^13.13.45",
+    "babel-loader": "^8.0.6",
+    "cross-env": "^5.2.0",
+    "mini-website-packer": "^1.0.6",
+    "ts-loader": "^6.2.2",
+    "ts-node": "^9.1.1",
+    "tslint": "^6.1.1",
+    "tslint-config-standard": "^9.0.0",
+    "tslint-loader": "^3.5.4",
+    "typescript": "^4.2.4",
+    "webpack": "^4.35.0",
+    "webpack-cli": "^3.3.5"
+  }
 }

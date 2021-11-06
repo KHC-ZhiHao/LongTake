@@ -117,5 +117,4 @@ class Loader extends ModuleBase {
             });
         }
     }
-
 }

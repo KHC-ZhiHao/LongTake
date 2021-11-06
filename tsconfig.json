@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES5",
+    "downlevelIteration": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": true,
+    "declaration": true,
+    "outDir": "dist-new",
+    "esModuleInterop": true,
+    "lib": [
+      "dom",
+      "ES2015"
+    ]
+  },
+  "include": [
+    "lib/*.ts"
+  ]
+}

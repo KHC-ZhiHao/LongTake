@@ -1,0 +1,22 @@
+<template>
+    <body>
+        <header id="layout-header">123</header>
+        <div id="layout-main">
+            <slot></slot>
+        </div>
+        <footer id="layout-footer">456</footer>
+    </body>
+    <style>
+        #layout-header {
+            height: 50px;
+            background-color: blue;
+        }
+        #layout-main {
+            height: calc(100vh - 100px);
+        }
+        #layout-footer {
+            height: 50px;
+            background-color: blue;
+        }
+    </style>
+</template>
