@@ -1,16 +1,32 @@
-const createAnimationFrame = (callback: (frame: number) => void) => {
+type TickerCallback = (runningTime: number) => void
+
+const createAnimationFrame = (callback: () => void) => {
     if (window && window.requestAnimationFrame) {
-        window.requestAnimationFrame(callback)
+        return () => window.requestAnimationFrame(callback)
     } else {
-        // 1000 / 60
-        setTimeout(callback, 16.6666666666667)
+        return () => setTimeout(callback, 1000 / 60)
     }
 }
 
 export class Ticker {
-    runningTime = 0
-    constructor() { ... }
-    run(callback: () => void) {
+    private stop = false
+    private callback: TickerCallback
+    private runningTime = 0
+    private animationFrame = createAnimationFrame(this.run.bind(this))
+    constructor(callback: TickerCallback) {
+        this.callback = callback
+    }
+    private run() {
         this.runningTime += 1
+        this.callback(this.runningTime)
+        if (this.stop === false) {
+            this.animationFrame()
+        }
+    }
+    start() {
+        this.run()
+    }
+    close() {
+        this.stop = true
     }
 }

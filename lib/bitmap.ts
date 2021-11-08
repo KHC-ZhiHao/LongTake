@@ -1,9 +1,7 @@
 import { Base } from './base'
 
-/** 為掌管位圖的物件 */
-
 export class Bitmap extends Base {
-    /** 內部指向的離屏canvas */
+    /** 自身的 canvas */
     canvas: HTMLCanvasElement
     /** cavnas 2d context */
     context: CanvasRenderingContext2D

@@ -3,27 +3,18 @@ import { Core } from './core'
 import { Sprite } from './sprite'
 import { Bitmap } from './bitmap'
 
-/**一個靜態的精靈容器，負責呈現精靈與位圖的計算結果 */
+/** 一個靜態的精靈容器，負責呈現精靈與位圖的計算結果 */
 
 export class Container extends Base {
-
     core: Core
-    /** 主精靈 */
     stage = new Sprite('Stage')
-    /** 主位圖 */
-    bitmap: Bitmap
-    /** 當 Container 綁定 Core 時，該值會隨著鼠標或觸碰位置改變 */
-    pointerX = 0
-    /** 當 Container 綁定 Core 時，該值會隨著鼠標或觸碰位置改變 */
-    pointerY = 0
-    
+    bitmap = new Bitmap()
     private stackOpacity: number[] = []
     constructor(width: number, height: number, core: Core) {
         super('Container')
         this.core = core || null
         this.stage.resize(0, 0)
         this.stage.render = () => this.stage.cache()
-        this.bitmap = new Bitmap()
         this.bitmap.resize(width, height)
     }
 
