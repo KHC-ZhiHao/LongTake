@@ -136,7 +136,7 @@ export declare class Sprite extends Base {
     /** 傾斜Y */
     set skewY(val: number);
     /** 設定錨點 */
-    setAnchor(x: number, y: number): void;
+    setAnchor(x: number, y?: number): void;
     /** 定位點X */
     get x(): number;
     /** 定位點X */

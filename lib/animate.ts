@@ -53,13 +53,13 @@ export class Animate extends Base {
     constructor(options: Partial<AnimateOptions>) {
         super('Animate')
         this.options = {
-            push: helper.ifEmpty<number>(options.push, 60),
-            begin: helper.ifEmpty<number>(options.begin, 0),
-            duration: helper.ifEmpty<number>(options.duration, 1),
+            push: helper.ifEmpty(options.push, 60),
+            begin: helper.ifEmpty(options.begin, 0),
+            duration: helper.ifEmpty(options.duration, 1),
             easing: helper.ifEmpty<Easings>(options.easing, 'linear'),
-            alternate: helper.ifEmpty<boolean>(options.alternate, false),
-            reverse: helper.ifEmpty<boolean>(options.reverse, false),
-            action: helper.ifEmpty<any>(options.action, (() => null))
+            alternate: helper.ifEmpty(options.alternate, false),
+            reverse: helper.ifEmpty(options.reverse, false),
+            action: helper.ifEmpty(options.action, (() => null))
         }
         this.over = false
         this.actionEasing = easings[this.options.easing]
@@ -68,11 +68,6 @@ export class Animate extends Base {
             this.time = this.options.duration
         }
     }
-
-    /**
-     * @function move()
-     * @desc 往前推動一偵
-     */
 
     /**
      * 往前推動一偵

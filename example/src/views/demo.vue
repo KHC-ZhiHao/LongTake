@@ -17,9 +17,9 @@
 <script lang="ts">
 import Editer from '@/components/editer.vue'
 import { self } from '@/self'
-import { basic } from '@/demo/basic'
+import { basic, children } from '@/demo/basic'
 import { LongTake } from 'longtake'
-import { defineComponent, onMounted, onUnmounted } from 'vue'
+import { defineComponent, onMounted, onUnmounted, watch } from 'vue'
 export default defineComponent({
     components: {
         Editer
@@ -28,7 +28,8 @@ export default defineComponent({
 
         const canvas = self.ref<HTMLCanvasElement>()
         const files = {
-            basic: basic
+            basic: basic,
+            children: children
         }
 
         // =================
@@ -42,6 +43,18 @@ export default defineComponent({
             code: '',
             loading: false,
             longtake: null
+        })
+
+        // =================
+        //
+        // Watch
+        //
+
+        watch(() => self.route, () => {
+            load()
+            refresh()
+        }, {
+            deep: true
         })
 
         // =================
