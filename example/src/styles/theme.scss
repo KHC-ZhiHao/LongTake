@@ -1,0 +1,45 @@
+@use 'sass:map';
+
+$--color-primary: #62567E;
+$--color-success: #EF9E5D;
+$--color-danger: #F56C6C;
+$--color-info: #909399;
+$--color-warning: #E6A23C;
+
+.text--info {
+    color: $--color-info;
+}
+
+.text--success {
+    color: $--color-success;
+}
+
+.text--primary {
+    color: $--color-primary;
+}
+
+.text--danger {
+    color: $--color-danger;
+}
+
+$--colors: () !default;
+$--colors: map.deep-merge(
+  (
+    'primary': (
+      'base': $--color-primary,
+    ),
+    'success': (
+      'base': $--color-success,
+    ),
+    'danger': (
+      'base': $--color-danger,
+    ),
+    'info': (
+      'base': $--color-info,
+    ),
+  ),
+  $--colors
+);
+
+$--font-path: '~element-plus/packages/theme-chalk/src/fonts';
+@import "~element-plus/packages/theme-chalk/src/index";

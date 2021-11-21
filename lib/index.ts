@@ -1,8 +1,14 @@
-import { Core as _Core } from './core'
 import { Sprite as _Sprite } from './sprite'
+import { Loader as _Loader } from './loader'
+import { Animate as _Animate } from './animate'
+import { LongTake as _LongTake } from './longtake'
 
-module.exports = _Core
-module.exports.LongTake = _Core
+export const Sprite = _Sprite
+export const Loader = _Loader
+export const Animate = _Animate
+export const LongTake = _LongTake
 
-export const LongTake = _Core
-export default _Core
+module.exports = LongTake
+module.exports.LongTake = LongTake
+
+export default LongTake

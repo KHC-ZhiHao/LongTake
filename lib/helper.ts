@@ -5,12 +5,14 @@ const trigonometric: Record<string, {
     cos: number
 }> = {}
 
-for( let i = -360 ; i < 360 ; i++ ){
+for (let i = -360; i < 360; i++) {
     trigonometric[i] = {
         sin: Math.sin(i * arc),
         cos: Math.cos(i * arc)
     }
 }
+
+/** 具擴展性的多元物件 */
 
 export const helper = {
 
@@ -18,11 +20,19 @@ export const helper = {
     rarc,
 
     /**
+     * 指定的值如果是 null，則回傳預設值
+     */
+
+    ifEmpty<T>(data: T | undefined, def: T): T {
+        return (data != null ? data : def)
+    },
+
+    /**
      * 獲取角度轉換弧度後的 sin 值
      */
-    
+
     sinByRad(deg: number) {
-        if(trigonometric[Math.round(deg)]) {
+        if (trigonometric[Math.round(deg)]) {
             return trigonometric[Math.round(deg)].sin
         } else {
             return Math.sin(deg * arc)
@@ -32,7 +42,7 @@ export const helper = {
     /**
      * 獲取角度轉換弧度後的cos值
      */
-    
+
     cosByRad(deg: number) {
         if (trigonometric[Math.round(deg)]) {
             return trigonometric[Math.round(deg)].cos
@@ -46,7 +56,7 @@ export const helper = {
      */
 
     getVector(deg: number, distance: number) {
-    	return {
+        return {
             x: distance * helper.cosByRad(deg),
             y: distance * helper.sinByRad(deg)
         }
@@ -57,7 +67,7 @@ export const helper = {
      */
 
     randInt(min: number, max: number) {
-        return Math.floor(Math.random() * ( max-min + 1 ) + min)
+        return Math.floor(Math.random() * (max - min + 1) + min)
     },
 
     /**

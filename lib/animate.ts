@@ -1,89 +1,98 @@
 import { Base } from './base'
-import { easings, Easings } from './easing'
+import { helper } from './helper'
+import { Easings, easings } from './easing'
 
-type Options = {
+type AnimateOptions = {
     /**
-     * 起始運行時間
+     * 每次前進的偵數
      * @default 0
      */
-    begin?: number
+    push: number
     /**
-     * 移動曲線
+     * 起始時間
+     * @default 0
+     */
+    begin: number
+    /**
+     * 持續時間
+     * @default 0
+     */
+    duration: number
+    /**
+     * 緩動函數
      * @see https://easings.net/zh-tw
      * @default 'linear'
      */
-    easing?: Easings
-    /**
-     * 巡迴播放
-     * @default false
-     */
-    alternate?: boolean
+    easing: Easings
     /**
      * 反轉前進
      * @default false
      */
-    reverse?: boolean
+    reverse: boolean
+    /**
+     * 巡迴播放
+     * @default false
+     */
+    alternate: boolean
+    /** 執行動作 */
+    action: (t: number) => void
 }
 
-type Channels = {
-    move: {
-        time: number
-    }
-}
+/**
+ * @desc 一個動畫的載具
+ * @see {easing} https://easings.net/zh-tw
+ */
 
-/** 一個動畫的載具 */
-
-export class Animate extends Base<Channels> {
-    /** 總運行時間 */
-    private duration: number
-    private easing: Easings
-    private alternate: boolean
-    private reverse: boolean
-    /** 現在運行的偵數 */
-    private time: number
-    private over = false
-    private actionEasing: any
-    constructor(duration: number, options: Options) {
+export class Animate extends Base {
+    /** 執行結束 */
+    over = false
+    private time = 0
+    private options: AnimateOptions
+    readonly actionEasing: any
+    readonly pace: number
+    constructor(options: Partial<AnimateOptions>) {
         super('Animate')
-        this.time = options.begin || 0
-        this.easing = options.easing || 'linear'
-        this.reverse = options.reverse || false
-        this.duration = duration
-        this.alternate = options.alternate || false
-        this.actionEasing = easings[this.easing]
-        if (this.reverse) {
-            this.time = this.duration
+        this.options = {
+            push: helper.ifEmpty<number>(options.push, 60),
+            begin: helper.ifEmpty<number>(options.begin, 0),
+            duration: helper.ifEmpty<number>(options.duration, 1),
+            easing: helper.ifEmpty<Easings>(options.easing, 'linear'),
+            alternate: helper.ifEmpty<boolean>(options.alternate, false),
+            reverse: helper.ifEmpty<boolean>(options.reverse, false),
+            action: helper.ifEmpty<any>(options.action, (() => null))
+        }
+        this.over = false
+        this.actionEasing = easings[this.options.easing]
+        this.pace = 1000 / this.options.push
+        if (this.options.reverse) {
+            this.time = this.options.duration
         }
     }
 
     /**
-     * 執行是否結束
+     * @function move()
+     * @desc 往前推動一偵
      */
-
-    isOver() {
-        return this.over
-    }
 
     /**
      * 往前推動一偵
      */
 
-    move(push = 60) {
+    move() {
+        let { push, reverse, duration, action, alternate } = this.options
         let pace = 1000 / push
         if (this.over === false) {
-            let time = this.actionEasing(this.time += this.reverse ? -pace : pace, this.duration)
-            this.emit('move', {
-                time
-            })
-            if (this.alternate) {
-                if (this.time >= this.duration) {
-                    this.reverse = true
-                } else if (this.reverse && this.time <= 0) {
-                    this.reverse = false
+            let time = this.actionEasing(this.time += reverse ? -pace : pace, duration)
+            action(time)
+            if (alternate) {
+                if (this.time >= duration) {
+                    reverse = true
+                } else if (reverse && this.time <= 0) {
+                    reverse = false
                 }
-            } else if (this.reverse && this.time <= 0) {
+            } else if (reverse && this.time <= 0) {
                 this.over = true
-            } else if (this.time >= this.duration) {
+            } else if (this.time >= duration) {
                 this.over = true
             }
             return time
@@ -91,12 +100,10 @@ export class Animate extends Base<Channels> {
         return 1
     }
 
-    /**
-     * 重起計算
-     */
+    /** 重起計算 */
 
     restart() {
-        this.time = this.reverse ? this.duration : 0
+        this.time = this.options.reverse ? this.options.duration : 0
         this.over = false
     }
 }

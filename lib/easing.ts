@@ -10,7 +10,9 @@ export const easings = {
         return -1 * (time /= over) * (time - 2)
     },
     easeInOutQuad(time: number, over: number) {
-        if ((time /= over / 2) < 1) return 1 / 2 * time * time
+        if ((time /= over / 2) < 1) {
+            return 1 / 2 * time * time
+        }
         return -1 / 2 * ((--time) * (time - 2) - 1)
     },
     easeInCubic(time: number, over: number) {
@@ -20,7 +22,9 @@ export const easings = {
         return 1 * ((time = time / over - 1) * time * time + 1)
     },
     easeInOutCubic(time: number, over: number) {
-        if ((time /= over / 2) < 1) return 1 / 2 * time * time * time
+        if ((time /= over / 2) < 1) {
+            return 1 / 2 * time * time * time
+        }
         return 1 / 2 * ((time -= 2) * time * time + 2)
     },
     easeInQuart(time: number, over: number) {
@@ -30,7 +34,9 @@ export const easings = {
         return -1 * ((time = time / over - 1) * time * time * time - 1)
     },
     easeInOutQuart(time: number, over: number) {
-        if ((time /= over / 2) < 1) return 1 / 2 * time * time * time * time
+        if ((time /= over / 2) < 1) {
+            return 1 / 2 * time * time * time * time
+        }
         return -1 / 2 * ((time -= 2) * time * time * time - 2)
     },
     easeInQuint(time: number, over: number) {
@@ -40,7 +46,9 @@ export const easings = {
         return 1 * ((time = time / over - 1) * time * time * time * time + 1)
     },
     easeInOutQuint(time: number, over: number) {
-        if ((time /= over / 2) < 1) return 1 / 2 * time * time * time * time * time
+        if ((time /= over / 2) < 1) {
+            return 1 / 2 * time * time * time * time * time
+        }
         return 1 / 2 * ((time -= 2) * time * time * time * time + 2)
     },
     easeInSine(time: number, over: number) {
@@ -53,14 +61,14 @@ export const easings = {
         return -1 / 2 * (Math.cos(Math.PI * time / over) - 1)
     },
     easeInExpo(time: number, over: number) {
-        return (time == 0) ? 0 : 1 * Math.pow(2, 10 * (time / over - 1))
+        return (time === 0) ? 0 : 1 * Math.pow(2, 10 * (time / over - 1))
     },
     easeOutExpo(time: number, over: number) {
-        return (time == over) ? 1 : 1 * (-Math.pow(2, -10 * time / over) + 1)
+        return (time === over) ? 1 : 1 * (-Math.pow(2, -10 * time / over) + 1)
     },
     easeInOutExpo(time: number, over: number) {
-        if (time == 0) return 0
-        if (time == over) return 1
+        if (time === 0) return 0
+        if (time === over) return 1
         if ((time /= over / 2) < 1) return 1 / 2 * Math.pow(2, 10 * (time - 1))
         return 1 / 2 * (- Math.pow(2, -10 * --time) + 2)
     },
@@ -78,8 +86,8 @@ export const easings = {
         let s = 1.70158
         let p = 0
         let a = 1
-        if (time == 0) return 0
-        if ((time /= over) == 1) return 1
+        if (time === 0) return 0
+        if ((time /= over) === 1) return 1
         if (!p) p = over * .3
         if (a < 1) {
             a = 1
@@ -92,8 +100,8 @@ export const easings = {
         let s = 1.70158
         let p = 0
         let a = 1
-        if (time == 0) return 0
-        if ((time /= over) == 1) return 1
+        if (time === 0) return 0
+        if ((time /= over) === 1) return 1
         if (!p) p = over * .3
         if (a < 1) {
             a = 1
@@ -106,8 +114,8 @@ export const easings = {
         let s = 1.70158
         let p = 0
         let a = 1
-        if (time == 0) return 0
-        if ((time /= over / 2) == 2) return 1
+        if (time === 0) return 0
+        if ((time /= over / 2) === 2) return 1
         if (!p) p = over * (0.3 * 1.5)
         if (a < 1) {
             a = 1

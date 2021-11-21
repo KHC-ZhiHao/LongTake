@@ -22,6 +22,7 @@
     },
     "linterOptions": {
         "exclude": [
+            "./lib/easing.ts",
             "**/node_modules/**"
         ]
     }

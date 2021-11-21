@@ -1,6 +1,11 @@
+/** 具擴展性的多元物件 */
 export declare const helper: {
     arc: number;
     rarc: number;
+    /**
+     * 指定的值如果是 null，則回傳預設值
+     */
+    ifEmpty<T>(data: T | undefined, def: T): T;
     /**
      * 獲取角度轉換弧度後的 sin 值
      */

@@ -1,27 +1,67 @@
 import { Base } from './base'
 import { helper } from './helper'
 import { Bitmap } from './bitmap'
-import { BlendMode } from './types'
+import { Container } from './container'
 
-/** 建立一個動畫精靈，為 LongTake 的驅動單位 */
+type Filter = (imageData: ImageData) => ImageData
+type Pixel = {
+    red: number
+    green: number
+    blue: number
+    alpha: number
+}
+
+/**
+ * 合成模式
+ * @see https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation
+ */
+
+type BlendMode =
+    'source-over'
+    | 'source-in'
+    | 'source-out'
+    | 'source-atop'
+    | 'destination-over'
+    | 'destination-in'
+    | 'destination-out'
+    | 'destination-atop'
+    | 'lighter'
+    | 'copy'
+    | 'xor'
+    | 'multiply'
+    | 'screen'
+    | 'overlay'
+    | 'darken'
+    | 'lighten'
+    | 'color-dodge'
+    | 'color-burn'
+    | 'hard-light'
+    | 'soft-light'
+    | 'difference'
+    | 'exclusion'
+    | 'hue'
+    | 'saturation'
+    | 'color'
+    | 'luminosity'
+
+/** 建立一個動畫精靈，為 LongTake 的驅動核心 */
 
 export class Sprite extends Base {
     name: string
-    parent: Sprite | null = null
-    helper = helper
-    bitmap = new Bitmap()
+    main: Container | null = null
+    event: Record<string, { event: string, callback: (event: any) => void }> = {}
+    bitmap = new Bitmap(100, 100)
     context = this.bitmap.context
-    private children: Sprite[] = []
-
-    private readonly status = {
+    parent: Sprite | null = null
+    children: Sprite[] = []
+    status = {
+        sort: false,
         cache: false,
         remove: false,
         hidden: false,
-        needSort: false,
-        installed: false
+        childrenDead: false
     }
-
-    readonly transform = {
+    transform = {
         skewX: 0,
         skewY: 0,
         scaleWidth: 1,
@@ -30,40 +70,47 @@ export class Sprite extends Base {
         opacity: 255,
         blendMode: 'source-over' as BlendMode
     }
-
-    readonly position = {
+    position = {
         x: 0,
         y: 0,
         z: 0,
+        screenX: 0,
+        screenY: 0,
         anchorX: 0,
-        anchorY: 0,
+        anchorY: 0
+    }
+    filter: Filter | null = null
+    bindUpdateForChild = this.updateForChild.bind(this)
+    constructor(name: string) {
+        super(name || 'Sprite')
+        this.name = name || 'No name'
+        this.bindUpdateForChild = this.updateForChild.bind(this)
     }
 
-    constructor(name: string){
-        super(name || 'Sprite')
-        this.name = name || 'no name'
+    get helper() {
+        return helper
     }
 
     /** 檢測一個物件是否為精靈 */
 
-    static isSprite(object: any){
+    static isSprite(object: any) {
         return object instanceof this
     }
 
     /** 迭代所有子精靈 */
 
-    eachChildren(callback: (sprite: Sprite) => void){
+    eachChildren(callback: (child: Sprite) => void) {
         let len = this.children.length
-        for (let i = 0 ; i < len ; i++) {
+        for (let i = 0; i < len; i++) {
             callback(this.children[i])
         }
     }
 
     /** 迭代所有子精靈(包含子精靈的子精靈) */
 
-    eachChildrenDeep(callback: (sprite: Sprite) => void) {
-        let each = (sprite: Sprite) => {
-            sprite.eachChildren( children => {
+    eachChildrenDeep(callback: (child: Sprite) => void) {
+        let each = function(sprite: Sprite) {
+            sprite.eachChildren(children => {
                 callback(children)
                 each(children)
             })
@@ -71,58 +118,55 @@ export class Sprite extends Base {
         each(this)
     }
 
-    //=============================
-    //
-    // install
-    //
+    /** 被加入 LongTake 時執行，並載入 LongTake */
 
-    /** Sprite 加入 Core 時執行初始化 */
-
-    protected install(){
-        if (this.status.installed === false) {
-            this.status.installed = true
-            this.create()
-        } else {
-            this.systemError('install', 'sprite installed', this)
-        }
+    install(main: Container) {
+        this.main = main
+        this.main.register(this)
+        this.create()
     }
 
-    /** 當被加入 container stage 時呼叫該函式 */
+    /** 當被加入stage時呼叫該函式 */
 
-    create(){ /* user set */ }
+    create() { /* user set */ }
 
-    //=============================
-    //
-    // bitmap
-    //
+    /** 精靈寬(和Bitmap同步) */
+    get width() {
+        return this.bitmap.width
+    }
+    /** 精靈寬(和Bitmap同步) */
+    set width(val) {
+        this.bitmap.width = val
+    }
 
-    /**
-     * @member {number} width 精靈寬(和Bitmap同步)
-     * @member {number} height 精靈高(和Bitmap同步)
-     */
-
-    get width(){ return this.bitmap.width }
-    set width(val){ this.bitmap.width = val }
-
-    get height(){ return this.bitmap.height }
-    set height(val){ this.bitmap.height = val }
+    /** 精靈高(和Bitmap同步) */
+    get height() {
+        return this.bitmap.height
+    }
+    /** 精靈高(和Bitmap同步) */
+    set height(val) {
+        this.bitmap.height = val
+    }
 
     /** 調整精靈的bitmap大小 */
 
-    resize(width: number, height: number){
-        this.bitmap.resize(width, height)
+    resize(width: number | { width: number, height: number }, height?: number) {
+        if (typeof width === 'object') {
+            if (width.width && width.height) {
+                this.bitmap.resize(width.width, width.height)
+            } else {
+                this.systemError('resize', 'Object must have width and height.', width)
+            }
+        } else {
+            this.bitmap.resize(width, height || this.height)
+        }
     }
-
-    //=============================
-    //
-    // family
-    //
 
     /** 加入一個子精靈 */
 
     addChildren(sprite: Sprite) {
         if (Sprite.isSprite(sprite)) {
-            if ( sprite.parent == null) {
+            if (sprite.parent == null) {
                 sprite.parent = this
                 this.children.push(sprite)
                 this.sortChildren()
@@ -134,103 +178,137 @@ export class Sprite extends Base {
         }
     }
 
-    /** 重新排序子精靈，當子精靈有Z值改變時會自動觸發 */
+    /** 重新排列子精靈，當子精靈有 Z 值改變時會自動觸發 */
 
-    private sortChildren() {
-        let newData: Sprite[] = []
-        let childList: Array<Array<Sprite>> = []
-        this.eachChildren(child => {
+    sortChildren() {
+        let newData: any[] = []
+        let childList: any[] = []
+        this.eachChildren((child) => {
             if (childList[child.z] == null) {
                 childList[child.z] = []
             }
             childList[child.z].push(child)
         })
-        for (let children of childList) {
-            if (children) {
-                newData = newData.concat(children)
+        this.each(childList, (list) => {
+            if (Array.isArray(list)) {
+                newData = newData.concat(list)
             }
-        }
+        })
         this.children = newData
     }
 
-    //=============================
-    //
-    // transform
-    //
+    /** 監聽一個事件 */
+
+    on(name: string, event: string, callback: (event: any) => void) {
+        if (this.event[name] == null) {
+            if (this.main && this.main.core) {
+                this.main.core.addEvent(event)
+            }
+            this.event[name] = {
+                event,
+                callback
+            }
+        } else {
+            this.systemError('on', `Event name(${name}) conflict.`)
+        }
+    }
+
+    /** 移除監聽的事件 */
+
+    off(name: string) {
+        delete this.event[name]
+    }
+
+    mainEvent(eventAction: Record<string, any>) {
+        if (this.main == null) {
+            if (this.parent && this.parent.main) {
+                this.install(this.parent.main)
+            }
+        }
+        this.each(eventAction, (event, key) => {
+            this.each(this.event, (data) => {
+                if (data.event === key) {
+                    data.callback(event)
+                }
+            })
+        })
+        this.eachChildren((children) => {
+            children.mainEvent(eventAction)
+        })
+    }
 
     /** 是否有變形 */
 
-    hasTransform(){
+    isTransform() {
         let t = this.transform
-        if (t.skewX !== 0) {
-            return true
-        }
-        if (t.skewY !== 0) {
-            return true
-        }
-        if (t.scaleWidth !== 1) {
-            return true
-        }
-        if (t.scaleHeight !== 1) {
-            return true
-        }
-        if (t.rotation !== 0) {
-            return true
-        }
-        return false
+        return !(t.skewX === 0 && t.skewY === 0 && t.scaleWidth === 1 && t.scaleHeight === 1 && t.rotation === 0)
     }
 
     /** 設定放大倍率 */
 
-    scale(width: number, height?: number) {
+    scale(width: number, height: number) {
         this.scaleWidth = width
         this.scaleHeight = height == null ? width : height
     }
 
+    /** 放大寬 */
     get scaleWidth() {
         return this.transform.scaleWidth
     }
+    /** 放大寬 */
     set scaleWidth(val: number) {
         this.transform.scaleWidth = val
     }
 
-    get scaleHeight(){
+    /** 放大高 */
+    get scaleHeight() {
         return this.transform.scaleHeight
     }
-
+    /** 放大高 */
     set scaleHeight(val: number) {
         this.transform.scaleHeight = val
     }
 
+    /** 該精靈在最後顯示的總倍率寬 */
     get screenScaleWidth(): number {
-        return this.parent == null ? this.scaleWidth : this.scaleWidth * this.parent.screenScaleWidth
+        if (this.parent == null) {
+            return this.scaleWidth
+        }
+        return this.scaleWidth * this.parent.screenScaleWidth
     }
 
+    /** 該精靈在最後顯示的總倍率高 */
     get screenScaleHeight(): number {
-        return this.parent == null ? this.scaleHeight : this.scaleHeight * this.parent.screenScaleHeight
+        if (this.parent == null) {
+            return this.scaleHeight
+        }
+        return this.scaleHeight * this.parent.screenScaleHeight
     }
 
+    /** 旋轉 */
     get rotation() {
         return this.transform.rotation
     }
-
+    /** 旋轉 */
     set rotation(val: number) {
         this.transform.rotation = val % 360
     }
 
+    /** 合成模式 */
     get blendMode() {
         return this.transform.blendMode
     }
-
+    /** 合成模式 */
     set blendMode(val: BlendMode) {
         this.transform.blendMode = val
     }
 
+    /** 透明度 */
     get opacity() {
         return this.transform.opacity
     }
-
-    set opacity(val) {
+    /** 透明度 */
+    set opacity(val: number) {
         if (val <= 0) {
             val = 0
         }
@@ -240,122 +318,116 @@ export class Sprite extends Base {
         this.transform.opacity = val
     }
 
+    /** 傾斜X */
     get skewX() {
         return this.transform.skewX
     }
-
-    set skewX(val: number) {
+    /** 傾斜X */
+    set skewX(val) {
         this.transform.skewX = val
     }
 
+    /** 傾斜Y */
     get skewY() {
         return this.transform.skewY
     }
-
-    set skewY(val: number){
+    /** 傾斜Y */
+    set skewY(val) {
         this.transform.skewY = val
     }
 
-    //=============================
-    //
-    // position
-    //
-
     /** 設定錨點 */
-
     setAnchor(x: number, y: number) {
         this.anchorX = x
         this.anchorY = y == null ? x : y
     }
 
+    /** 定位點X */
     get x() {
         return this.position.x
     }
-
+    /** 定位點X */
     set x(val: number) {
-        this.position.x = val || 0
+        if (typeof val === 'number') {
+            this.position.x = val || 0
+        }
     }
 
-    get y() {
-        return this.position.y
+    /** 定位點Y */
+    get y() { return this.position.y }
+    /** 定位點Y */
+    set y(val) {
+        if (typeof val === 'number') {
+            this.position.y = val || 0
+        }
     }
 
-    set y(val: number) {
-        this.position.y = val || 0
-     }
-
+    /** 高度，每次設定會重新排序 */
     get z() {
         return this.position.z
     }
-
+    /** 高度，每次設定會重新排序 */
     set z(val: number) {
-        this.position.z = val
-        if (this.parent) {
-            this.parent.status.needSort = true
+        if (typeof val === 'number') {
+            this.position.z = val
+            if (this.parent) {
+                this.parent.status.sort = true
+            }
         }
     }
 
-    get screenX() {
-        let pos = this.x - this.width * this.anchorX
-        if (this.parent) {
-            pos += this.parent.screenX + this.parent.width * this.parent.anchorX
-        }
-        return pos
+    /** 絕對位置X */
+    get screenX(): number {
+        return (this.parent ? this.parent.screenX + this.parent.width * this.parent.anchorX : 0) + this.x - this.width * this.anchorX
     }
 
-    get screenY() { 
-        let pos = this.y - this.height * this.anchorY
-        if (this.parent) {
-            pos += this.parent.screenY + this.parent.height * this.parent.anchorY
-        }
-        return pos
+    /** 絕對位置Y */
+    get screenY(): number {
+        return (this.parent ? this.parent.screenY + this.parent.height * this.parent.anchorY : 0) + this.y - this.height * this.anchorY
     }
 
+    /** 絕對位置的錨點位置X */
     get posX() {
         return this.screenX + this.width * this.anchorX
     }
-
+    /** 絕對位置的錨點位置Y */
     get posY() {
         return this.screenY + this.height * this.anchorY
     }
 
+    /** 錨點X */
     get anchorX() {
         return this.position.anchorX
     }
-
-    set anchorX(val: number) {
+    /** 錨點X */
+    set anchorX(val) {
         this.position.anchorX = val
     }
 
+    /** 錨點Y */
     get anchorY() {
         return this.position.anchorY
     }
-
-    set anchorY(val: number) {
+    /** 錨點Y */
+    set anchorY(val) {
         this.position.anchorY = val
     }
-    
-    //=============================
-    //
-    // status
-    //
 
-    canRender() {
+    get canRender() {
         return !this.status.cache
     }
-    
-    canShow() {
+    get canShow() {
         return !this.status.hidden
     }
 
-    /** 快取目前渲染的 bitmap */
+    /** 快取目前渲染的 Bitmap */
 
     cache() {
         this.status.cache = true
         this.bitmap.cache = true
     }
 
-    /** 手動解除快取狀態 */
+    /** 解除快取狀態 */
 
     unCache() {
         this.status.cache = false
@@ -364,8 +436,8 @@ export class Sprite extends Base {
 
     /** 隱藏 */
 
-    hidden(hidden: boolean) {
-        this.status.hidden = hidden ? !!hidden : true;
+    hidden(bool: boolean) {
+        this.status.hidden = bool ? !!bool : true
     }
 
     /** 解除隱藏 */
@@ -391,52 +463,55 @@ export class Sprite extends Base {
 
     getRealPosition() {
         return {
-            x : this.screenX * (this.parent == null ? 1 : this.parent.screenScaleWidth),
-            y : this.screenY * (this.parent == null ? 1 : this.parent.screenScaleHeight)
+            x: this.screenX * (this.parent == null ? 1 : this.parent.screenScaleWidth),
+            y: this.screenY * (this.parent == null ? 1 : this.parent.screenScaleHeight)
         }
     }
 
-    //=============================
-    //
-    // update
-    //
-
     /** 每次渲染圖形時執行此函式，目的為精靈的動作 */
 
-    update(){ /* module set */ }
+    update() { /* module set */ }
 
-    /** 每次執行update時呼叫此函式，處理Z值更動的排序與移除子精靈 */
+    /** 每次執行 update 時呼叫此函式，處理 Z 值更動的排序與移除子精靈 */
 
-    _mainUpdate() {
-        let hasChildRemove = false
-        if (this.status.needSort) {
-            this.status.needSort = false
+    mainUpdate() {
+        if (this.main == null) {
+            if (this.parent && this.parent.main) {
+                this.install(this.parent.main)
+            }
+        }
+        if (this.status.sort) {
+            this.status.sort = false
             this.sortChildren()
         }
         this.update()
-        this.eachChildren(child => {
-            if (child.status.remove == false) {
-                child._mainUpdate()
-            }else{
-                hasChildRemove = true
-            }
-        })
-        if (hasChildRemove) {
-            this.children = this.children.filter(child => {
+        this.eachChildren(this.bindUpdateForChild)
+        if (this.status.childrenDead) {
+            this.status.childrenDead = false
+            this.children = this.children.filter((child) => {
                 if (child.status.remove) {
-                    child.parent = null
-                    return false
-                } else {
-                    return true
+                    child.close()
                 }
+                return !child.status.remove
             })
         }
     }
 
-    //=============================
-    //
-    // remove
-    //
+    /** 呼叫子精靈更新 */
+
+    private updateForChild(child: Sprite) {
+        if (child.status.remove === false) {
+            child.mainUpdate()
+        } else {
+            this.status.childrenDead = true
+        }
+    }
+
+    /** 移除自身的綁定資訊(容易出錯，請使用remove讓精靈在迭代過程中被移除) */
+
+    close() {
+        this.parent = null
+    }
 
     /** 移除自己於父精靈下 */
 
@@ -447,66 +522,116 @@ export class Sprite extends Base {
     /** 移除指定的子精靈 */
 
     removeChild(sprite: Sprite) {
-        if (sprite.parent === this) {
-            sprite.remove()
+        if (Sprite.isSprite(sprite)) {
+            if (sprite.parent === this) {
+                sprite.remove()
+            } else {
+                this.systemError('removeChild', 'Have\'n this sprite', sprite)
+            }
         } else {
-            this.systemError('removeChild', 'Sprite not found', sprite)
+            this.systemError('removeChild', 'Not a sprite', sprite)
         }
     }
 
     /** 移除全部的子精靈 */
 
     clearChildren() {
-        this.eachChildren(child => this.removeChild(child))
+        this.eachChildren((children) => {
+            this.removeChild(children)
+        })
     }
 
-    //=============================
-    //
-    // render
-    //
+    /** 移除指定name的精靈 */
+
+    removeChildrenByName(name: string) {
+        this.eachChildren((children) => {
+            if (children.name === name) {
+                this.removeChild(children)
+            }
+        })
+    }
+
+    /** 移除指定 index 的精靈 */
+
+    removeChildrenByIndex(index: number) {
+        if (typeof index === 'number' && this.children[index]) {
+            this.children[index].remove()
+        }
+    }
 
     /** 渲染 bitmap 的方法 */
-    
+
     render() { /* module set */ }
 
-    /**
-     * @function mainRender()
-     * @private
-     * @desc 主要渲染程序，包含渲染與濾鏡
-     */
+    /** 主要渲染程序，包含渲染與濾鏡 */
 
-    _mainRender() {
-        this.eachChildren(child => child._mainRender())
-        if (this.context && this.canRender()) { 
+    mainRender() {
+        this.eachChildren(this.renderForChild)
+        if (this.canRender) {
             this.context.save()
             this.render()
             this.context.restore()
+            if (this.filter) {
+                this.renderFilter(this.filter)
+            }
             this.context.restore()
             this.bitmap.clearCache()
         }
     }
 
-    /** 將精靈設置成img檔案的解析度，並渲染該圖片且快取 */
+    /** 呼叫子精靈渲染 */
 
-    fromImage(img: HTMLImageElement) {
-        this.resize(img.width, img.height)
-        this.render = () => {
-            this.context?.drawImage(img, 0, 0)
+    renderForChild(child: Sprite) {
+        child.mainRender()
+    }
+
+    /** 將精靈設置成 img 檔案的解析度，並將 render 宣告成渲染該圖片並快取 */
+
+    fromImage(img: HTMLImageElement | HTMLCanvasElement) {
+        this.resize(img)
+        this.render = function() {
+            this.context.drawImage(img, 0, 0)
             this.cache()
         }
         return this
     }
 
-    //=============================
-    //
-    // check
-    //
+    /** 操作堆疊渲染的函式 */
+
+    renderFilter(filter: Filter) {
+        if (filter) {
+            let imgData = this.bitmap.getImageData()
+            filter.call(this, imgData)
+            this.bitmap.putImageData(imgData)
+            this.eachChildren((child) => {
+                child.renderFilter(filter)
+            })
+        }
+    }
+
+    /** 迭代像素 */
+
+    eachImgData(imgData: ImageData, callback: (pixel: Pixel) => void) {
+        let data = imgData.data
+        let index = 0
+        for (let i = 0; i < data.length; i += 4) {
+            index = i
+            let pixel = {
+                red: data[i],
+                green: data[i + 1],
+                blue: data[i + 2],
+                alpha: data[i + 3]
+            }
+            callback(pixel)
+        }
+    }
 
     /** 座標是否在精靈的矩形範圍內 */
 
     inRect(x: number, y: number) {
         let rect = this.getRealSize()
         let position = this.getRealPosition()
-        return (x >= position.x && x <= position.x + rect.width) && (y >= position.y && y <= position.y + rect.height)
+        return (x >= position.x && x <= position.x + rect.width)
+            && (y >= position.y && y <= position.y + rect.height)
     }
 }
