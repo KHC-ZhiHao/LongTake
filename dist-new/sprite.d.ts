@@ -52,7 +52,7 @@ export declare class Sprite extends Base {
     };
     filter: Filter | null;
     bindUpdateForChild: (child: Sprite) => void;
-    constructor(name: string);
+    constructor(name?: string);
     get helper(): {
         arc: number;
         rarc: number;

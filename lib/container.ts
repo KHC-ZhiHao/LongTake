@@ -11,7 +11,7 @@ export class Container extends Base {
     /** 主精靈 */
     stage: Sprite
     /** 主位圖 */
-    bitmap: Bitmap
+    bitmap: Bitmap = {} as any
     context: CanvasRenderingContext2D
     /** 當此Container指向LongTakeCore時，該值會隨著鼠標或觸碰位置改變 */
     pointerX = 0

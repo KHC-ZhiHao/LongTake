@@ -1,21 +1,22 @@
 import '@/styles/index.scss'
-import '@/styles/theme.scss'
+import 'element-plus/dist/index.css'
+import 'codemirror-editor-vue3/dist/style.css'
+import 'codemirror/mode/javascript/javascript.js'
+import 'codemirror/theme/dracula.css'
 
+import Codemirror from 'codemirror-editor-vue3'
 import ElementPlus from 'element-plus'
 import { createApp } from 'vue'
 
 import App from './app.vue'
-import i18n from './locale'
 import store from './store'
 import router from './router'
 
 export const vue = createApp(App)
 
-vue.use(i18n)
 vue.use(store)
 vue.use(router)
-vue.use(ElementPlus, {
-    i18n: i18n.global.t
-})
+vue.use(Codemirror)
+vue.use(ElementPlus)
 
 export const app = vue.mount('#app')

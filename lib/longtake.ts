@@ -35,27 +35,34 @@ export class LongTake extends Base {
     width: number
     /** 繪製圖的高 */
     height: number
-    ticker = 0
-    remove = false
-    /** 目前運行的canvas */
-    target: HTMLCanvasElement
-    context: CanvasRenderingContext2D
-    /** 目前實際運行的fps */
-    baseFps = 0
     /** 整體視圖倍率 */
     viewScale = 1
-    /** 目前運行的偵數 */
-    framePerSecond = 60
-    bindUpdate = this.update.bind(this)
     /** 目前運行的canvas實際大小 */
     targetRect: DOMRect
-    /** 主要運行的container，由本核心驅動內部精靈的update和event */
-    container: Container
     event: Record<string, (event: any) => void> = {}
     eventAction: Record<string, any> = {}
-    private requestAnimationFrame: (callback: any) => number
+    private ticker: any = null
+    private remove = false
+    /** 目前運行的canvas */
+    private target: HTMLCanvasElement
+    private context: CanvasRenderingContext2D
+    /** 目前實際運行的fps */
+    private baseFps = 0
+    /** 目前運行的偵數 */
+    private framePerSecond = 60
+    /** 主要運行的container，由本核心驅動內部精靈的update和event */
+    private container: Container
     private camera = new Camera(this)
+    private bindUpdate = this.update.bind(this)
     private bindWindowResize = this.windowResize.bind(this)
+    private supportRequestAnimationFrame = !!window.requestAnimationFrame
+    private requestAnimationFrame = (callback: any) => {
+        if (this.supportRequestAnimationFrame) {
+            return window.requestAnimationFrame(callback)
+        } else {
+            return setTimeout(callback, 1000 / 60)
+        }
+    }
     constructor(target: string | HTMLCanvasElement, width: number, height: number) {
         super('Main')
         this.target = typeof target === 'string' ? document.getElementById(target) as any : target
@@ -64,7 +71,6 @@ export class LongTake extends Base {
         this.height = height
         this.container = new Container(this.width, this.height, this)
         this.targetRect = this.target.getBoundingClientRect()
-        this.requestAnimationFrame = window.requestAnimationFrame || (callback => setTimeout(callback, 1000 / 60))
         this.addEvent('click', this.resetPointerCoordinate)
         this.addEvent('pointermove', this.resetPointerCoordinate)
         this.windowResize()
@@ -129,7 +135,7 @@ export class LongTake extends Base {
 
     /** 重新設定矯正過後的觸及位置 */
 
-    resetPointerCoordinate(event: { offsetX: number, offsetY: number }) {
+    private resetPointerCoordinate(event: { offsetX: number, offsetY: number }) {
         this.container.pointerX = (event.offsetX / this.viewScale + this.camera.offsetX) * (this.target.width / this.targetRect.width)
         this.container.pointerY = (event.offsetY / this.viewScale + this.camera.offsetY) * (this.target.height / this.targetRect.height)
     }
@@ -142,7 +148,7 @@ export class LongTake extends Base {
         this.targetRect = this.target.getBoundingClientRect()
     }
 
-    windowResize() {
+    private windowResize() {
         this.targetRect = this.target.getBoundingClientRect()
         this.onWindowResize()
     }
@@ -171,9 +177,13 @@ export class LongTake extends Base {
         this.container.addChildren(sprite)
     }
 
-    update() {
+    private update() {
         if (this.remove === true) {
-            window.cancelAnimationFrame(this.ticker)
+            if (this.supportRequestAnimationFrame) {
+                window.cancelAnimationFrame(this.ticker)
+            } else {
+                window.clearTimeout(this.ticker)
+            }
             return null
         }
         this.baseFps += this.framePerSecond
@@ -186,12 +196,12 @@ export class LongTake extends Base {
         this.ticker = this.requestAnimationFrame(this.bindUpdate)
     }
 
-    stageUpdate() {
+    private stageUpdate() {
         this.container.stage.mainEvent(this.eventAction)
         this.container.stageUpdate()
     }
 
-    bitmapUpdate() {
+    private bitmapUpdate() {
         this.container.stageRender()
         this.context.clearRect(0, 0, this.width, this.height)
         this.context.drawImage(this.container.bitmap.canvas, - this.camera.offsetX, -this.camera.offsetY)

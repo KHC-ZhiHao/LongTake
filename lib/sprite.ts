@@ -81,7 +81,7 @@ export class Sprite extends Base {
     }
     filter: Filter | null = null
     bindUpdateForChild = this.updateForChild.bind(this)
-    constructor(name: string) {
+    constructor(name?: string) {
         super(name || 'Sprite')
         this.name = name || 'No name'
         this.bindUpdateForChild = this.updateForChild.bind(this)
@@ -337,7 +337,7 @@ export class Sprite extends Base {
     }
 
     /** 設定錨點 */
-    setAnchor(x: number, y: number) {
+    setAnchor(x: number, y?: number) {
         this.anchorX = x
         this.anchorY = y == null ? x : y
     }

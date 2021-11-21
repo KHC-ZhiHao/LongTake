@@ -3,14 +3,14 @@
         <el-dialog
             v-model="state.dialog"
             width="300px"
-            :title="$t('提醒')"
+            title="提醒"
             :show-close="false"
             :before-close="cancel">
             <div style="padding-left: 1px; font-size: 1.1em">{{ message }}</div>
             <template #footer>
                 <div style="text-align: right">
-                    <el-button @click="cancel" :disabled="loading">{{ $t('取消') }}</el-button>
-                    <el-button @click="confirm" type="primary" :loading="loading">{{ $t('確定') }}</el-button>
+                    <el-button @click="cancel" :disabled="loading">取消</el-button>
+                    <el-button @click="confirm" type="primary" :loading="loading">確定</el-button>
                 </div>
             </template>
         </el-dialog>

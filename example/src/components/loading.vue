@@ -12,7 +12,6 @@
 </template>
 
 <script lang="ts">
-import { getStaticPath } from '@/utils/path'
 import { defineComponent } from 'vue'
 export default defineComponent({
     props: {
@@ -24,9 +23,7 @@ export default defineComponent({
         }
     },
     setup() {
-        return {
-            getStaticPath
-        }
+        return {}
     }
 })
 </script>
