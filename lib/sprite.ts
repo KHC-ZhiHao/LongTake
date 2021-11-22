@@ -3,7 +3,6 @@ import { helper } from './helper'
 import { Bitmap } from './bitmap'
 import { Container } from './container'
 
-type Filter = (imageData: ImageData) => ImageData
 type Pixel = {
     red: number
     green: number
@@ -17,7 +16,8 @@ type Pixel = {
  */
 
 type BlendMode =
-    'source-over'
+    'inherit'
+    | 'source-over'
     | 'source-in'
     | 'source-out'
     | 'source-atop'
@@ -68,7 +68,7 @@ export class Sprite extends Base {
         scaleHeight: 1,
         rotation: 0,
         opacity: 255,
-        blendMode: 'source-over' as BlendMode
+        blendMode: 'inherit' as BlendMode
     }
     position = {
         x: 0,
@@ -79,8 +79,7 @@ export class Sprite extends Base {
         anchorX: 0,
         anchorY: 0
     }
-    filter: Filter | null = null
-    bindUpdateForChild = this.updateForChild.bind(this)
+    private bindUpdateForChild = this.updateForChild.bind(this)
     constructor(name?: string) {
         super(name || 'Sprite')
         this.name = name || 'No name'
@@ -152,7 +151,7 @@ export class Sprite extends Base {
 
     resize(width: number | { width: number, height: number }, height?: number) {
         if (typeof width === 'object') {
-            if (width.width && width.height) {
+            if (width.width != null && width.height != null) {
                 this.bitmap.resize(width.width, width.height)
             } else {
                 this.systemError('resize', 'Object must have width and height.', width)
@@ -459,6 +458,41 @@ export class Sprite extends Base {
         }
     }
 
+    /** 獲得呈現在畫布上的實際大小(含子代) */
+
+    getScreenSize() {
+        let size = this.getRealSize()
+        let x1 = 0
+        let x2 = x1 + size.width
+        let y1 = 0
+        let y2 = y1 + size.height
+        this.eachChildren(child => {
+            let size = child.getScreenSize()
+            let cx1 = child.x
+            let cx2 = cx1 + size.width
+            let cy1 = child.y
+            let cy2 = cy1 + size.height
+            if (cx1 < x1) {
+                x1 = cx1
+            }
+            if (cx2 > x2) {
+                x2 = cx2
+            }
+            if (cy1 < y1) {
+                y1 = cy1
+            }
+            if (cy2 > y2) {
+                y2 = cy2
+            }
+        })
+        let width = x2 - x1
+        let height = y2 - y1
+        return {
+            width,
+            height
+        }
+    }
+
     /** 獲取精靈在畫布的準確位置 */
 
     getRealPosition() {
@@ -571,17 +605,13 @@ export class Sprite extends Base {
             this.context.save()
             this.render()
             this.context.restore()
-            if (this.filter) {
-                this.renderFilter(this.filter)
-            }
-            this.context.restore()
             this.bitmap.clearCache()
         }
     }
 
     /** 呼叫子精靈渲染 */
 
-    renderForChild(child: Sprite) {
+    private renderForChild(child: Sprite) {
         child.mainRender()
     }
 
@@ -596,26 +626,11 @@ export class Sprite extends Base {
         return this
     }
 
-    /** 操作堆疊渲染的函式 */
-
-    renderFilter(filter: Filter) {
-        if (filter) {
-            let imgData = this.bitmap.getImageData()
-            filter.call(this, imgData)
-            this.bitmap.putImageData(imgData)
-            this.eachChildren((child) => {
-                child.renderFilter(filter)
-            })
-        }
-    }
-
     /** 迭代像素 */
 
     eachImgData(imgData: ImageData, callback: (pixel: Pixel) => void) {
         let data = imgData.data
-        let index = 0
         for (let i = 0; i < data.length; i += 4) {
-            index = i
             let pixel = {
                 red: data[i],
                 green: data[i + 1],

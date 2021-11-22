@@ -68,8 +68,8 @@ export class Bitmap extends Base {
     /** 調整畫布大小 */
 
     resize(width: number, height: number) {
-        this.width = width != null ? width : this.width
-        this.height = height != null ? height : this.height
+        this.width = width != null ? (Math.floor(width) || 1) : this.width
+        this.height = height != null ? (Math.floor(height) || 1) : this.height
     }
 
     /** 清空畫布 */

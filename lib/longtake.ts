@@ -2,6 +2,7 @@ import { Base } from './base'
 import { Container } from './container'
 import { Sprite } from './sprite'
 import { Loader } from './loader'
+import { helper } from './helper'
 import { Animate } from './animate'
 
 class Camera {
@@ -76,6 +77,10 @@ export class LongTake extends Base {
         this.windowResize()
         this.update()
         window.addEventListener('resize', this.bindWindowResize)
+    }
+
+    static get helper() {
+        return helper
     }
 
     static get Sprite() {

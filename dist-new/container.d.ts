@@ -15,7 +15,6 @@ export declare class Container extends Base {
     pointerX: number;
     /** 當此Container指向LongTakeCore時，該值會隨著鼠標或觸碰位置改變 */
     pointerY: number;
-    private stackOpacity;
     constructor(width: number, height: number, core?: LongTake);
     /** 位圖寬(與位圖同步) */
     get width(): number;
@@ -32,5 +31,4 @@ export declare class Container extends Base {
     draw(): void;
     render(sprite: Sprite): void;
     transform(sprite: Sprite): void;
-    restore(sprite: Sprite): void;
 }

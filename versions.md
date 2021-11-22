@@ -5,3 +5,4 @@
 3. 將 event unon 破壞性修改至 off
 4. 將 eachImgData 移除了渲染行為
 5. 移除 Container post
+6. 移除 filter

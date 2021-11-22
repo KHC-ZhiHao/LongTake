@@ -180,6 +180,10 @@ export declare class Sprite extends Base {
         width: number;
         height: number;
     };
+    getScreenSize(): {
+        width: number;
+        height: number;
+    };
     /** 獲取精靈在畫布的準確位置 */
     getRealPosition(): {
         x: number;

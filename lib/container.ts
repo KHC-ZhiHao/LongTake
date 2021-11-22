@@ -25,6 +25,7 @@ export class Container extends Base {
         this.context = this.bitmap.context
         this.stage.install(this)
         this.stage.resize(0, 0)
+        this.stage.blendMode = 'source-over'
         this.stage.render = function() {
             this.cache()
         }
@@ -98,7 +99,9 @@ export class Container extends Base {
     transform(sprite: Sprite) {
         let context = this.context
         context.globalAlpha = context.globalAlpha * (sprite.opacity / 255)
-        context.globalCompositeOperation = sprite.blendMode
+        if (sprite.blendMode !== 'inherit') {
+            context.globalCompositeOperation = sprite.blendMode
+        }
         if (sprite.isTransform() === false) {
             return
         }

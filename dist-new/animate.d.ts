@@ -48,10 +48,6 @@ export declare class Animate extends Base {
     readonly pace: number;
     constructor(options: Partial<AnimateOptions>);
     /**
-     * @function move()
-     * @desc 往前推動一偵
-     */
-    /**
      * 往前推動一偵
      */
     move(): any;
