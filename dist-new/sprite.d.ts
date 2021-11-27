@@ -1,7 +1,6 @@
 import { Base } from './base';
 import { Bitmap } from './bitmap';
 import { Container } from './container';
-declare type Filter = (imageData: ImageData) => ImageData;
 declare type Pixel = {
     red: number;
     green: number;
@@ -12,7 +11,7 @@ declare type Pixel = {
  * 合成模式
  * @see https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation
  */
-declare type BlendMode = 'source-over' | 'source-in' | 'source-out' | 'source-atop' | 'destination-over' | 'destination-in' | 'destination-out' | 'destination-atop' | 'lighter' | 'copy' | 'xor' | 'multiply' | 'screen' | 'overlay' | 'darken' | 'lighten' | 'color-dodge' | 'color-burn' | 'hard-light' | 'soft-light' | 'difference' | 'exclusion' | 'hue' | 'saturation' | 'color' | 'luminosity';
+declare type BlendMode = 'inherit' | 'source-over' | 'source-in' | 'source-out' | 'source-atop' | 'destination-over' | 'destination-in' | 'destination-out' | 'destination-atop' | 'lighter' | 'copy' | 'xor' | 'multiply' | 'screen' | 'overlay' | 'darken' | 'lighten' | 'color-dodge' | 'color-burn' | 'hard-light' | 'soft-light' | 'difference' | 'exclusion' | 'hue' | 'saturation' | 'color' | 'luminosity';
 /** 建立一個動畫精靈，為 LongTake 的驅動核心 */
 export declare class Sprite extends Base {
     name: string;
@@ -50,8 +49,7 @@ export declare class Sprite extends Base {
         anchorX: number;
         anchorY: number;
     };
-    filter: Filter | null;
-    bindUpdateForChild: (child: Sprite) => void;
+    private bindUpdateForChild;
     constructor(name?: string);
     get helper(): {
         arc: number;
@@ -65,7 +63,7 @@ export declare class Sprite extends Base {
         };
         randInt(min: number, max: number): number;
         getAngle(x: number, y: number, ax: number, ay: number): number;
-        getVisibility(): "xs" | "sm" | "md" | "lg" | "xl"; /** 檢測一個物件是否為精靈 */
+        getVisibility(): "xs" | "sm" | "md" | "lg" | "xl";
     };
     /** 檢測一個物件是否為精靈 */
     static isSprite(object: any): boolean;
@@ -180,6 +178,7 @@ export declare class Sprite extends Base {
         width: number;
         height: number;
     };
+    /** 獲得呈現在畫布上的實際大小(含子代) */
     getScreenSize(): {
         width: number;
         height: number;
@@ -212,14 +211,14 @@ export declare class Sprite extends Base {
     /** 主要渲染程序，包含渲染與濾鏡 */
     mainRender(): void;
     /** 呼叫子精靈渲染 */
-    renderForChild(child: Sprite): void;
-    /** 將精靈設置成 img 檔案的解析度，並將 render 宣告成渲染該圖片並快取 */
-    fromImage(img: HTMLImageElement | HTMLCanvasElement): this;
-    /** 操作堆疊渲染的函式 */
-    renderFilter(filter: Filter): void;
+    private renderForChild;
     /** 迭代像素 */
     eachImgData(imgData: ImageData, callback: (pixel: Pixel) => void): void;
     /** 座標是否在精靈的矩形範圍內 */
     inRect(x: number, y: number): boolean;
+}
+export declare class ImageSprite extends Sprite {
+    readonly render: any;
+    constructor(image: HTMLImageElement | ImageBitmap);
 }
 export {};

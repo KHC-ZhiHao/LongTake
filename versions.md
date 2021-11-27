@@ -6,3 +6,7 @@
 4. 將 eachImgData 移除了渲染行為
 5. 移除 Container post
 6. 移除 filter
+7. 移除 onWindowResize
+8. 移除 setFPS
+9. 移除 forElementResize
+10. 移除 targetResize

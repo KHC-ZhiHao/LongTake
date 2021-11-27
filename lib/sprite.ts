@@ -120,9 +120,13 @@ export class Sprite extends Base {
     /** 被加入 LongTake 時執行，並載入 LongTake */
 
     install(main: Container) {
-        this.main = main
-        this.main.register(this)
-        this.create()
+        if (this.main == null) {
+            this.main = main
+            this.main.register(this)
+            this.create()
+        } else {
+            this.systemError('install', 'sprite already installed', this)
+        }
     }
 
     /** 當被加入stage時呼叫該函式 */
@@ -295,7 +299,11 @@ export class Sprite extends Base {
 
     /** 合成模式 */
     get blendMode() {
-        return this.transform.blendMode
+        if (this.parent && this.transform.blendMode === 'inherit') {
+            return this.parent.transform.blendMode
+        } else {
+            return this.transform.blendMode
+        }
     }
     /** 合成模式 */
     set blendMode(val: BlendMode) {
@@ -544,6 +552,7 @@ export class Sprite extends Base {
     /** 移除自身的綁定資訊(容易出錯，請使用remove讓精靈在迭代過程中被移除) */
 
     close() {
+        this.main = null
         this.parent = null
     }
 
@@ -615,17 +624,6 @@ export class Sprite extends Base {
         child.mainRender()
     }
 
-    /** 將精靈設置成 img 檔案的解析度，並將 render 宣告成渲染該圖片並快取 */
-
-    fromImage(img: HTMLImageElement | HTMLCanvasElement) {
-        this.resize(img)
-        this.render = function() {
-            this.context.drawImage(img, 0, 0)
-            this.cache()
-        }
-        return this
-    }
-
     /** 迭代像素 */
 
     eachImgData(imgData: ImageData, callback: (pixel: Pixel) => void) {
@@ -648,5 +646,17 @@ export class Sprite extends Base {
         let position = this.getRealPosition()
         return (x >= position.x && x <= position.x + rect.width)
             && (y >= position.y && y <= position.y + rect.height)
+    }
+}
+
+export class ImageSprite extends Sprite {
+    readonly render: any = null
+    constructor(image: HTMLImageElement | ImageBitmap) {
+        super()
+        this.resize(image)
+        this.render = () => {
+            this.context.drawImage(image, 0, 0)
+            this.cache()
+        }
     }
 }

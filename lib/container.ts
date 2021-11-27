@@ -99,9 +99,7 @@ export class Container extends Base {
     transform(sprite: Sprite) {
         let context = this.context
         context.globalAlpha = context.globalAlpha * (sprite.opacity / 255)
-        if (sprite.blendMode !== 'inherit') {
-            context.globalCompositeOperation = sprite.blendMode
-        }
+        context.globalCompositeOperation = sprite.blendMode
         if (sprite.isTransform() === false) {
             return
         }

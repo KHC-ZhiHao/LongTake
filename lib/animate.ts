@@ -15,7 +15,7 @@ type AnimateOptions = {
     begin: number
     /**
      * 持續時間
-     * @default 0
+     * @default 1
      */
     duration: number
     /**
@@ -64,9 +64,7 @@ export class Animate extends Base {
         this.over = false
         this.actionEasing = easings[this.options.easing]
         this.pace = 1000 / this.options.push
-        if (this.options.reverse) {
-            this.time = this.options.duration
-        }
+        this.time = this.options.begin
     }
 
     /**
@@ -77,13 +75,14 @@ export class Animate extends Base {
         let { push, reverse, duration, action, alternate } = this.options
         let pace = 1000 / push
         if (this.over === false) {
-            let time = this.actionEasing(this.time += reverse ? -pace : pace, duration)
+            this.time += reverse ? -pace : pace
+            let time = this.actionEasing(this.time, duration)
             action(time)
             if (alternate) {
                 if (this.time >= duration) {
-                    reverse = true
+                    this.options.reverse = true
                 } else if (reverse && this.time <= 0) {
-                    reverse = false
+                    this.options.reverse = false
                 }
             } else if (reverse && this.time <= 0) {
                 this.over = true

@@ -1,9 +1,9 @@
 import { Base } from './base'
 import { Container } from './container'
-import { Sprite } from './sprite'
 import { Loader } from './loader'
 import { helper } from './helper'
 import { Animate } from './animate'
+import { Sprite, ImageSprite } from './sprite'
 
 class Camera {
     x = 0
@@ -14,43 +14,37 @@ class Camera {
     }
 
     get offsetX() {
-        return this.checkBorder(this.x, this.core.width * this.core.viewScale, this.core.targetRect.width)
+        return this.checkBorder(this.x, this.core.width, this.core.targetRect.width)
     }
 
     get offsetY() {
-        return this.checkBorder(this.y, this.core.height * this.core.viewScale, this.core.targetRect.height)
+        return this.checkBorder(this.y, this.core.height, this.core.targetRect.height)
     }
 
     checkBorder(now: number, view: number, target: number) {
-        now = now * this.core.viewScale
+        now = now
         let front = target / 2
         let back = view - front
-        return now > front ? (now > back ? view - target : (now - front) / this.core.viewScale) : 0
+        return now > front ? (now > back ? view - target : (now - front)) : 0
     }
 }
 
 /** 核心 */
 
 export class LongTake extends Base {
-    /** 繪製圖的寬 */
-    width: number
-    /** 繪製圖的高 */
-    height: number
-    /** 整體視圖倍率 */
-    viewScale = 1
     /** 目前運行的canvas實際大小 */
     targetRect: DOMRect
     event: Record<string, (event: any) => void> = {}
     eventAction: Record<string, any> = {}
+    /** 繪製圖的寬 */
+    readonly width: number
+    /** 繪製圖的高 */
+    readonly height: number
     private ticker: any = null
     private remove = false
     /** 目前運行的canvas */
     private target: HTMLCanvasElement
     private context: CanvasRenderingContext2D
-    /** 目前實際運行的fps */
-    private baseFps = 0
-    /** 目前運行的偵數 */
-    private framePerSecond = 60
     /** 主要運行的container，由本核心驅動內部精靈的update和event */
     private container: Container
     private camera = new Camera(this)
@@ -87,6 +81,10 @@ export class LongTake extends Base {
         return Sprite
     }
 
+    static get ImageSprite() {
+        return ImageSprite
+    }
+
     static get Animate() {
         return Animate
     }
@@ -95,19 +93,16 @@ export class LongTake extends Base {
         return Loader
     }
 
-    /** 設置動畫的FPS */
+    /** 清空所有精靈 */
 
-    setFPS(fps: number) {
-        if (typeof fps === 'number' && fps > 0 && fps <= 60) {
-            this.framePerSecond = fps
-        } else {
-            this.systemError('setFPS', 'FPS must between 1 to 60.', fps)
-        }
+    clear() {
+        this.container.stage.clearChildren()
     }
 
     /** 關閉這個Longtake */
 
     close() {
+        this.clear()
         this.remove = true
         this.container.stage.eachChildrenDeep((child) => {
             child.close()
@@ -138,48 +133,21 @@ export class LongTake extends Base {
         }
     }
 
-    /** 重新設定矯正過後的觸及位置 */
-
-    private resetPointerCoordinate(event: { offsetX: number, offsetY: number }) {
-        this.container.pointerX = (event.offsetX / this.viewScale + this.camera.offsetX) * (this.target.width / this.targetRect.width)
-        this.container.pointerY = (event.offsetY / this.viewScale + this.camera.offsetY) * (this.target.height / this.targetRect.height)
-    }
-
-    /** 調整視圖 canvas 的大小 */
-
-    targetResize(width: number, height: number) {
-        this.target.width = width
-        this.target.height = height
-        this.targetRect = this.target.getBoundingClientRect()
-    }
-
-    private windowResize() {
-        this.targetRect = this.target.getBoundingClientRect()
-        this.onWindowResize()
-    }
-
-    /** 當畫面旋轉或縮放時觸發該function(自定義) */
-
-    onWindowResize() { /* module set */ }
-
-    /** 縮放視圖倍率至指定element大小(cover縮放模式) */
-
-    forElementResize(element: HTMLElement, scale = 1) {
-        this.targetResize(element.clientWidth, element.clientHeight)
-        if (element.clientWidth / this.width < element.clientHeight / this.height) {
-            this.viewScale = element.clientHeight / this.height * scale
-        } else {
-            this.viewScale = element.clientWidth / this.width * scale
-        }
-        this.context.restore()
-        this.context.save()
-        this.context.scale(this.viewScale, this.viewScale)
-    }
-
     /** 加入一個精靈至 container 底下 */
 
     addChildren(sprite: Sprite) {
         this.container.addChildren(sprite)
+    }
+
+    /** 重新設定矯正過後的觸及位置 */
+
+    private resetPointerCoordinate(event: { offsetX: number, offsetY: number }) {
+        this.container.pointerX = (event.offsetX + this.camera.offsetX) * (this.target.width / this.targetRect.width)
+        this.container.pointerY = (event.offsetY + this.camera.offsetY) * (this.target.height / this.targetRect.height)
+    }
+
+    private windowResize() {
+        this.targetRect = this.target.getBoundingClientRect()
     }
 
     private update() {
@@ -191,12 +159,8 @@ export class LongTake extends Base {
             }
             return null
         }
-        this.baseFps += this.framePerSecond
         this.stageUpdate()
-        if (this.baseFps >= 60) {
-            this.bitmapUpdate()
-            this.baseFps = this.baseFps % 60
-        }
+        this.bitmapUpdate()
         this.eventAction = {}
         this.ticker = this.requestAnimationFrame(this.bindUpdate)
     }

@@ -12,21 +12,12 @@
 </template>
 
 <script lang="ts">
-import { LocationFilled, Film, FullScreen, ArrowDown, ArrowUp, DocumentAdd, CircleCheck, Document, Delete, VideoPause, MoreFilled } from '@element-plus/icons'
+import { ArrowLeftBold, ArrowRightBold } from '@element-plus/icons'
 import { computed, defineComponent, PropType } from 'vue'
 export default defineComponent({
     components: {
-        Film,
-        Delete,
-        ArrowUp,
-        Document,
-        ArrowDown,
-        FullScreen,
-        VideoPause,
-        MoreFilled,
-        CircleCheck,
-        DocumentAdd,
-        LocationFilled
+        ArrowLeftBold,
+        ArrowRightBold
     },
     props: {
         size: {

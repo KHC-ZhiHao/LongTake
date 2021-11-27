@@ -13,7 +13,7 @@ declare type AnimateOptions = {
     begin: number;
     /**
      * 持續時間
-     * @default 0
+     * @default 1
      */
     duration: number;
     /**
