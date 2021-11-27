@@ -20,6 +20,7 @@ import { LongTake } from 'longtake'
 import { farmRender } from '@/theme/farm'
 import { treeRender } from '@/theme/tree'
 import { twinRender } from '@/theme/twin'
+import { sheepRender } from '@/theme/sheep'
 import { defineComponent, watch, onMounted, onUnmounted } from 'vue'
 export default defineComponent({
     components: {
@@ -41,6 +42,10 @@ export default defineComponent({
             twin: {
                 color: '#fff',
                 render: twinRender
+            },
+            sheep: {
+                color: '#000',
+                render: sheepRender
             }
         }
 
