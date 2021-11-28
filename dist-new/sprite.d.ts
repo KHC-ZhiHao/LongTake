@@ -1,4 +1,4 @@
-import { Base } from './base';
+import { Event } from './base';
 import { Bitmap } from './bitmap';
 import { Container } from './container';
 declare type Pixel = {
@@ -12,14 +12,13 @@ declare type Pixel = {
  * @see https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation
  */
 declare type BlendMode = 'inherit' | 'source-over' | 'source-in' | 'source-out' | 'source-atop' | 'destination-over' | 'destination-in' | 'destination-out' | 'destination-atop' | 'lighter' | 'copy' | 'xor' | 'multiply' | 'screen' | 'overlay' | 'darken' | 'lighten' | 'color-dodge' | 'color-burn' | 'hard-light' | 'soft-light' | 'difference' | 'exclusion' | 'hue' | 'saturation' | 'color' | 'luminosity';
+declare type Channels = {
+    click: {};
+};
 /** 建立一個動畫精靈，為 LongTake 的驅動核心 */
-export declare class Sprite extends Base {
+export declare class Sprite extends Event<Channels> {
     name: string;
     main: Container | null;
-    event: Record<string, {
-        event: string;
-        callback: (event: any) => void;
-    }>;
     bitmap: Bitmap;
     context: CanvasRenderingContext2D;
     parent: Sprite | null;
@@ -67,6 +66,7 @@ export declare class Sprite extends Base {
     };
     /** 檢測一個物件是否為精靈 */
     static isSprite(object: any): boolean;
+    _onClick(screenX: number, screenY: number): void;
     /** 迭代所有子精靈 */
     eachChildren(callback: (child: Sprite) => void): void;
     /** 迭代所有子精靈(包含子精靈的子精靈) */
@@ -74,7 +74,7 @@ export declare class Sprite extends Base {
     /** 被加入 LongTake 時執行，並載入 LongTake */
     install(main: Container): void;
     /** 當被加入stage時呼叫該函式 */
-    create(): void;
+    create(sprite: this): void;
     /** 精靈寬(和Bitmap同步) */
     get width(): number;
     /** 精靈寬(和Bitmap同步) */
@@ -92,11 +92,6 @@ export declare class Sprite extends Base {
     addChildren(sprite: Sprite): void;
     /** 重新排列子精靈，當子精靈有 Z 值改變時會自動觸發 */
     sortChildren(): void;
-    /** 監聽一個事件 */
-    on(name: string, event: string, callback: (event: any) => void): void;
-    /** 移除監聽的事件 */
-    off(name: string): void;
-    mainEvent(eventAction: Record<string, any>): void;
     /** 是否有變形 */
     isTransform(): boolean;
     /** 設定放大倍率 */
@@ -178,18 +173,13 @@ export declare class Sprite extends Base {
         width: number;
         height: number;
     };
-    /** 獲得呈現在畫布上的實際大小(含子代) */
-    getScreenSize(): {
-        width: number;
-        height: number;
-    };
     /** 獲取精靈在畫布的準確位置 */
     getRealPosition(): {
         x: number;
         y: number;
     };
     /** 每次渲染圖形時執行此函式，目的為精靈的動作 */
-    update(): void;
+    update(sprite: this): void;
     /** 每次執行 update 時呼叫此函式，處理 Z 值更動的排序與移除子精靈 */
     mainUpdate(): void;
     /** 呼叫子精靈更新 */
@@ -207,7 +197,7 @@ export declare class Sprite extends Base {
     /** 移除指定 index 的精靈 */
     removeChildrenByIndex(index: number): void;
     /** 渲染 bitmap 的方法 */
-    render(): void;
+    render(sprite: this): void;
     /** 主要渲染程序，包含渲染與濾鏡 */
     mainRender(): void;
     /** 呼叫子精靈渲染 */
@@ -220,5 +210,18 @@ export declare class Sprite extends Base {
 export declare class ImageSprite extends Sprite {
     readonly render: any;
     constructor(image: HTMLImageElement | ImageBitmap);
+}
+declare type TextOptions = {
+    color: string;
+    fontSize: number;
+    fontFamily: string;
+    backgroundColor: string | null;
+};
+export declare class TextSprite extends Sprite {
+    private text;
+    private options;
+    readonly render: any;
+    constructor(options?: Partial<TextOptions>);
+    setContent(text: string): void;
 }
 export {};

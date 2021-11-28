@@ -1,7 +1,8 @@
-import { Base } from './base'
+import { Event } from './base'
 import { helper } from './helper'
 import { Bitmap } from './bitmap'
 import { Container } from './container'
+import { byteLength } from './utils'
 
 type Pixel = {
     red: number
@@ -44,12 +45,15 @@ type BlendMode =
     | 'color'
     | 'luminosity'
 
+type Channels = {
+    click: {}
+}
+
 /** 建立一個動畫精靈，為 LongTake 的驅動核心 */
 
-export class Sprite extends Base {
+export class Sprite extends Event<Channels> {
     name: string
     main: Container | null = null
-    event: Record<string, { event: string, callback: (event: any) => void }> = {}
     bitmap = new Bitmap(100, 100)
     context = this.bitmap.context
     parent: Sprite | null = null
@@ -96,6 +100,19 @@ export class Sprite extends Base {
         return object instanceof this
     }
 
+    _onClick(screenX: number, screenY: number) {
+        this.eachChildren(child => {
+            let listener = child.on('click', () => this.emit('click', {}))
+            child._onClick(screenX, screenY)
+            listener.off()
+        })
+        if (this.getChannelListenerSize('click')) {
+            if (this.inRect(screenX, screenY)) {
+                this.emit('click', {})
+            }
+        }
+    }
+
     /** 迭代所有子精靈 */
 
     eachChildren(callback: (child: Sprite) => void) {
@@ -122,8 +139,7 @@ export class Sprite extends Base {
     install(main: Container) {
         if (this.main == null) {
             this.main = main
-            this.main.register(this)
-            this.create()
+            this.create(this)
         } else {
             this.systemError('install', 'sprite already installed', this)
         }
@@ -131,7 +147,7 @@ export class Sprite extends Base {
 
     /** 當被加入stage時呼叫該函式 */
 
-    create() { /* user set */ }
+    create(sprite: this) { /* user set */ }
 
     /** 精靈寬(和Bitmap同步) */
     get width() {
@@ -198,46 +214,6 @@ export class Sprite extends Base {
             }
         })
         this.children = newData
-    }
-
-    /** 監聽一個事件 */
-
-    on(name: string, event: string, callback: (event: any) => void) {
-        if (this.event[name] == null) {
-            if (this.main && this.main.core) {
-                this.main.core.addEvent(event)
-            }
-            this.event[name] = {
-                event,
-                callback
-            }
-        } else {
-            this.systemError('on', `Event name(${name}) conflict.`)
-        }
-    }
-
-    /** 移除監聽的事件 */
-
-    off(name: string) {
-        delete this.event[name]
-    }
-
-    mainEvent(eventAction: Record<string, any>) {
-        if (this.main == null) {
-            if (this.parent && this.parent.main) {
-                this.install(this.parent.main)
-            }
-        }
-        this.each(eventAction, (event, key) => {
-            this.each(this.event, (data) => {
-                if (data.event === key) {
-                    data.callback(event)
-                }
-            })
-        })
-        this.eachChildren((children) => {
-            children.mainEvent(eventAction)
-        })
     }
 
     /** 是否有變形 */
@@ -466,41 +442,6 @@ export class Sprite extends Base {
         }
     }
 
-    /** 獲得呈現在畫布上的實際大小(含子代) */
-
-    getScreenSize() {
-        let size = this.getRealSize()
-        let x1 = 0
-        let x2 = x1 + size.width
-        let y1 = 0
-        let y2 = y1 + size.height
-        this.eachChildren(child => {
-            let size = child.getScreenSize()
-            let cx1 = child.x
-            let cx2 = cx1 + size.width
-            let cy1 = child.y
-            let cy2 = cy1 + size.height
-            if (cx1 < x1) {
-                x1 = cx1
-            }
-            if (cx2 > x2) {
-                x2 = cx2
-            }
-            if (cy1 < y1) {
-                y1 = cy1
-            }
-            if (cy2 > y2) {
-                y2 = cy2
-            }
-        })
-        let width = x2 - x1
-        let height = y2 - y1
-        return {
-            width,
-            height
-        }
-    }
-
     /** 獲取精靈在畫布的準確位置 */
 
     getRealPosition() {
@@ -512,7 +453,7 @@ export class Sprite extends Base {
 
     /** 每次渲染圖形時執行此函式，目的為精靈的動作 */
 
-    update() { /* module set */ }
+    update(sprite: this) { /* module set */ }
 
     /** 每次執行 update 時呼叫此函式，處理 Z 值更動的排序與移除子精靈 */
 
@@ -526,7 +467,7 @@ export class Sprite extends Base {
             this.status.sort = false
             this.sortChildren()
         }
-        this.update()
+        this.update(this)
         this.eachChildren(this.bindUpdateForChild)
         if (this.status.childrenDead) {
             this.status.childrenDead = false
@@ -604,7 +545,7 @@ export class Sprite extends Base {
 
     /** 渲染 bitmap 的方法 */
 
-    render() { /* module set */ }
+    render(sprite: this) { /* module set */ }
 
     /** 主要渲染程序，包含渲染與濾鏡 */
 
@@ -612,7 +553,7 @@ export class Sprite extends Base {
         this.eachChildren(this.renderForChild)
         if (this.canRender) {
             this.context.save()
-            this.render()
+            this.render(this)
             this.context.restore()
             this.bitmap.clearCache()
         }
@@ -631,8 +572,8 @@ export class Sprite extends Base {
         for (let i = 0; i < data.length; i += 4) {
             let pixel = {
                 red: data[i],
-                green: data[i + 1],
                 blue: data[i + 2],
+                green: data[i + 1],
                 alpha: data[i + 3]
             }
             callback(pixel)
@@ -658,5 +599,45 @@ export class ImageSprite extends Sprite {
             this.context.drawImage(image, 0, 0)
             this.cache()
         }
+    }
+}
+
+type TextOptions = {
+    color: string
+    fontSize: number
+    fontFamily: string
+    backgroundColor: string | null
+}
+
+export class TextSprite extends Sprite {
+    private text: string = ''
+    private options: TextOptions
+    readonly render: any = null
+    constructor(options: Partial<TextOptions> = {}) {
+        super()
+        this.options = {
+            color: this.helper.ifEmpty(options.color, '#000'),
+            fontSize: this.helper.ifEmpty(options.fontSize, 18),
+            fontFamily: this.helper.ifEmpty(options.fontFamily, 'Arial'),
+            backgroundColor: this.helper.ifEmpty(options.backgroundColor, null)
+        }
+        this.render = () => {
+            if (this.options.backgroundColor) {
+                this.context.fillStyle = this.options.backgroundColor
+                this.context.fillRect(0, 0, this.width, this.height)
+            }
+            this.context.textBaseline = 'top'
+            this.context.font = `${this.options.fontSize}px ${this.options.fontFamily}`
+            this.context.fillStyle = this.options.color
+            this.context.fillText(this.text || '', 0, 0)
+            this.cache()
+        }
+    }
+
+    setContent(text: string) {
+        let length = byteLength(text)
+        this.text = text
+        this.resize(this.options.fontSize * length / 2, this.options.fontSize)
+        this.unCache()
     }
 }

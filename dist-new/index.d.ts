@@ -1,12 +1,13 @@
 import { Loader as _Loader } from './loader';
 import { Animate as _Animate } from './animate';
 import { LongTake as _LongTake } from './longtake';
-import { Sprite as _Sprite, ImageSprite as _ImageSprite } from './sprite';
+import { Sprite as _Sprite, TextSprite as _TextSprite, ImageSprite as _ImageSprite } from './sprite';
 export declare type Sprite = _Sprite;
 export declare type Loader = _Loader;
 export declare type Animate = _Animate;
-export declare type ImageSprite = _ImageSprite;
 export declare type LongTake = _LongTake;
+export declare type TextSprite = _TextSprite;
+export declare type ImageSprite = _ImageSprite;
 export declare const helper: {
     arc: number;
     rarc: number;
@@ -25,5 +26,6 @@ export declare const Sprite: typeof _Sprite;
 export declare const Loader: typeof _Loader;
 export declare const Animate: typeof _Animate;
 export declare const LongTake: typeof _LongTake;
+export declare const TextSprite: typeof _TextSprite;
 export declare const ImageSprite: typeof _ImageSprite;
 export default LongTake;

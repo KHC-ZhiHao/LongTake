@@ -217,7 +217,7 @@ export const twinRender = async (app: LongTake) => {
             this.light.update = function() {
                 this.animate.move()
             }
-            this.light.render = function() {
+            this.light.render = function({ context }) {
                 let r = this.width / 2
                 let grd = this.context.createRadialGradient(r, r, r / 3, r, r, r)
                 grd.addColorStop(0, '#24bfe2')

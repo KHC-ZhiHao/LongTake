@@ -1,41 +1,30 @@
-import { Base } from './base'
-import { Container } from './container'
+import { Event } from './base'
 import { Loader } from './loader'
 import { helper } from './helper'
 import { Animate } from './animate'
-import { Sprite, ImageSprite } from './sprite'
-
-class Camera {
-    x = 0
-    y = 0
-    core: LongTake
-    constructor(core: LongTake) {
-        this.core = core
-    }
-
-    get offsetX() {
-        return this.checkBorder(this.x, this.core.width, this.core.targetRect.width)
-    }
-
-    get offsetY() {
-        return this.checkBorder(this.y, this.core.height, this.core.targetRect.height)
-    }
-
-    checkBorder(now: number, view: number, target: number) {
-        now = now
-        let front = target / 2
-        let back = view - front
-        return now > front ? (now > back ? view - target : (now - front)) : 0
-    }
-}
+import { Container } from './container'
+import { Sprite, ImageSprite, TextSprite } from './sprite'
+import { ListenerGroup, pointer } from './event'
 
 /** 核心 */
 
-export class LongTake extends Base {
-    /** 目前運行的canvas實際大小 */
-    targetRect: DOMRect
-    event: Record<string, (event: any) => void> = {}
-    eventAction: Record<string, any> = {}
+type Channels = {
+    click: {
+        x: number
+        y: number
+    }
+    pointerdown: {
+        x: number
+        y: number
+    }
+    pointermove: {
+        x: number
+        y: number
+    }
+    pointerup: {}
+}
+
+export class LongTake extends Event<Channels> {
     /** 繪製圖的寬 */
     readonly width: number
     /** 繪製圖的高 */
@@ -45,11 +34,10 @@ export class LongTake extends Base {
     /** 目前運行的canvas */
     private target: HTMLCanvasElement
     private context: CanvasRenderingContext2D
+    private pointerEvent: ListenerGroup
     /** 主要運行的container，由本核心驅動內部精靈的update和event */
     private container: Container
-    private camera = new Camera(this)
     private bindUpdate = this.update.bind(this)
-    private bindWindowResize = this.windowResize.bind(this)
     private supportRequestAnimationFrame = !!window.requestAnimationFrame
     private requestAnimationFrame = (callback: any) => {
         if (this.supportRequestAnimationFrame) {
@@ -58,19 +46,15 @@ export class LongTake extends Base {
             return setTimeout(callback, 1000 / 60)
         }
     }
-    constructor(target: string | HTMLCanvasElement, width: number, height: number) {
+    constructor(target: string | HTMLCanvasElement, width?: number, height?: number) {
         super('Main')
         this.target = typeof target === 'string' ? document.getElementById(target) as any : target
         this.context = this.target.getContext('2d')!
-        this.width = width
-        this.height = height
+        this.width = width != null ? width : this.target.width
+        this.height = height != null ? height : this.target.height
         this.container = new Container(this.width, this.height, this)
-        this.targetRect = this.target.getBoundingClientRect()
-        this.addEvent('click', this.resetPointerCoordinate)
-        this.addEvent('pointermove', this.resetPointerCoordinate)
-        this.windowResize()
+        this.pointerEvent = new ListenerGroup(this.target)
         this.update()
-        window.addEventListener('resize', this.bindWindowResize)
     }
 
     static get helper() {
@@ -83,6 +67,10 @@ export class LongTake extends Base {
 
     static get ImageSprite() {
         return ImageSprite
+    }
+
+    static get TextSprite() {
+        return TextSprite
     }
 
     static get Animate() {
@@ -104,33 +92,10 @@ export class LongTake extends Base {
     close() {
         this.clear()
         this.remove = true
+        this.pointerEvent.close()
         this.container.stage.eachChildrenDeep((child) => {
             child.close()
         })
-        window.removeEventListener('resize', this.bindWindowResize)
-    }
-
-    /** 移動鏡頭至 x,y */
-
-    setCamera(x: number, y: number) {
-        this.camera.x = x
-        this.camera.y = y
-    }
-
-    /** 監聽一個事件 */
-
-    addEvent(eventName: string, callback?: (event: any) => void) {
-        if (this.event[eventName] == null) {
-            this.event[eventName] = (event) => {
-                if (this.eventAction[eventName] == null) {
-                    this.eventAction[eventName] = event
-                    if (callback) {
-                        callback.bind(this)(event)
-                    }
-                }
-            }
-            this.target.addEventListener(eventName, this.event[eventName])
-        }
     }
 
     /** 加入一個精靈至 container 底下 */
@@ -139,15 +104,19 @@ export class LongTake extends Base {
         this.container.addChildren(sprite)
     }
 
-    /** 重新設定矯正過後的觸及位置 */
+    /** 啟動互動模式 */
 
-    private resetPointerCoordinate(event: { offsetX: number, offsetY: number }) {
-        this.container.pointerX = (event.offsetX + this.camera.offsetX) * (this.target.width / this.targetRect.width)
-        this.container.pointerY = (event.offsetY + this.camera.offsetY) * (this.target.height / this.targetRect.height)
-    }
-
-    private windowResize() {
-        this.targetRect = this.target.getBoundingClientRect()
+    enableInteractive() {
+        this.pointerEvent = pointer(this.target, {
+            end: () => this.emit('pointerup', {}),
+            move: ({ x, y }) => this.emit('pointermove', { x, y }),
+            start: ({ x, y }) => this.emit('pointerdown', { x, y }),
+            click: ({ x, y }) => this.emit('click', { x, y })
+        })
+        this.target.style.touchAction = 'none'
+        this.on('click', (data) => {
+            this.container.stage.eachChildren(child => child._onClick(data.x, data.y))
+        })
     }
 
     private update() {
@@ -161,18 +130,16 @@ export class LongTake extends Base {
         }
         this.stageUpdate()
         this.bitmapUpdate()
-        this.eventAction = {}
         this.ticker = this.requestAnimationFrame(this.bindUpdate)
     }
 
     private stageUpdate() {
-        this.container.stage.mainEvent(this.eventAction)
         this.container.stageUpdate()
     }
 
     private bitmapUpdate() {
         this.container.stageRender()
         this.context.clearRect(0, 0, this.width, this.height)
-        this.context.drawImage(this.container.bitmap.canvas, - this.camera.offsetX, -this.camera.offsetY)
+        this.context.drawImage(this.container.bitmap.canvas, 0, 0)
     }
 }

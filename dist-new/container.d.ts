@@ -20,8 +20,6 @@ export declare class Container extends Base {
     get width(): number;
     /** 位圖高(與位圖同步) */
     get height(): number;
-    /** 當 sprite 優先註冊過事件，在 install container 的時候回補註冊至 LongTake */
-    register(sprite: Sprite): void;
     stageUpdate(): void;
     stageRender(): void;
     /** 獲取該 Container 的 ImageBitmap */

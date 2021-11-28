@@ -1,13 +1,14 @@
 <template>
     <div class="main-wrapper">
-        <!-- <div>
-            <a href="">example</a>
-            <a href="">github</a>
-        </div> -->
-        <div ref="title" class="main-title">LongTake</div>
-        <div>
-            <Botton icon="arrow-left-bold" @click="next(-1)"></Botton>
-            <Botton icon="arrow-right-bold" @click="next(1)"></Botton>
+        <div class="main-nav">
+            <div class="main-title" ref="title">LongTake</div>
+            <div class="pt2">
+                <Botton icon="arrow-left-bold" @click="next(-1)"></Botton>
+                <Botton @click="toDemo">Docs</Botton>
+                <Botton @click="toDemo">Demo</Botton>
+                <Botton @click="toDemo">GitHub</Botton>
+                <Botton icon="arrow-right-bold" @click="next(1)"></Botton>
+            </div>
         </div>
         <canvas class="main-canvas" ref="canvas" width="1920" height="1080"></canvas>
     </div>
@@ -36,7 +37,7 @@ export default defineComponent({
                 render: farmRender
             },
             tree: {
-                color: '#000',
+                color: '#fff',
                 render: treeRender
             },
             twin: {
@@ -114,6 +115,15 @@ export default defineComponent({
             }
         }
 
+        const toDemo = () => {
+            self.router.push({
+                name: 'demo',
+                params: {
+                    name: 'basic'
+                }
+            })
+        }
+
         // =================
         //
         // Done
@@ -123,7 +133,8 @@ export default defineComponent({
             next,
             title,
             state,
-            canvas
+            canvas,
+            toDemo
         }
     }
 })
@@ -135,11 +146,19 @@ export default defineComponent({
         width: 100vw;
         height: 100vh;
         text-align: center;
+        .main-nav {
+            z-index: 10;
+            top: 10vh;
+            width: 100%;
+            text-align: center;
+            position: absolute;
+        }
         .main-title {
+            font-family: 'Overpass', sans-serif;
             font-size: 5em;
+            font-weight: 900;
         }
         .main-canvas {
-            z-index: -1;
             top: 0;
             left: 0;
             width: 100%;
@@ -147,7 +166,10 @@ export default defineComponent({
             object-fit: cover;
             object-position: center;
             position: absolute;
-            background-color: red;
+            background-color: #fff;
+            background-image: url('/images/loading.gif');
+            background-repeat: no-repeat;
+            background-position: center;
         }
     }
 </style>

@@ -26,9 +26,7 @@ export class Container extends Base {
         this.stage.install(this)
         this.stage.resize(0, 0)
         this.stage.blendMode = 'source-over'
-        this.stage.render = function() {
-            this.cache()
-        }
+        this.stage.render = () => this.stage.cache()
     }
 
     /** 位圖寬(與位圖同步) */
@@ -38,18 +36,6 @@ export class Container extends Base {
     /** 位圖高(與位圖同步) */
     get height() {
         return this.bitmap.canvas.height
-    }
-
-    /** 當 sprite 優先註冊過事件，在 install container 的時候回補註冊至 LongTake */
-
-    register(sprite: Sprite) {
-        if (this.core) {
-            this.each(sprite.event, (value) => {
-                if (this.core && this.core.event[value.event] == null) {
-                    this.core.addEvent(value.event)
-                }
-            })
-        }
     }
 
     stageUpdate() {

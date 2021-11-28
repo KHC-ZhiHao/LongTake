@@ -1,13 +1,24 @@
-import { Base } from './base';
+import { Event } from './base';
 import { Loader } from './loader';
 import { Animate } from './animate';
-import { Sprite, ImageSprite } from './sprite';
+import { Sprite, ImageSprite, TextSprite } from './sprite';
 /** 核心 */
-export declare class LongTake extends Base {
-    /** 目前運行的canvas實際大小 */
-    targetRect: DOMRect;
-    event: Record<string, (event: any) => void>;
-    eventAction: Record<string, any>;
+declare type Channels = {
+    click: {
+        x: number;
+        y: number;
+    };
+    pointerdown: {
+        x: number;
+        y: number;
+    };
+    pointermove: {
+        x: number;
+        y: number;
+    };
+    pointerup: {};
+};
+export declare class LongTake extends Event<Channels> {
     /** 繪製圖的寬 */
     readonly width: number;
     /** 繪製圖的高 */
@@ -17,14 +28,13 @@ export declare class LongTake extends Base {
     /** 目前運行的canvas */
     private target;
     private context;
+    private pointerEvent;
     /** 主要運行的container，由本核心驅動內部精靈的update和event */
     private container;
-    private camera;
     private bindUpdate;
-    private bindWindowResize;
     private supportRequestAnimationFrame;
     private requestAnimationFrame;
-    constructor(target: string | HTMLCanvasElement, width: number, height: number);
+    constructor(target: string | HTMLCanvasElement, width?: number, height?: number);
     static get helper(): {
         arc: number;
         rarc: number;
@@ -41,22 +51,19 @@ export declare class LongTake extends Base {
     };
     static get Sprite(): typeof Sprite;
     static get ImageSprite(): typeof ImageSprite;
+    static get TextSprite(): typeof TextSprite;
     static get Animate(): typeof Animate;
     static get Loader(): typeof Loader;
     /** 清空所有精靈 */
     clear(): void;
     /** 關閉這個Longtake */
     close(): void;
-    /** 移動鏡頭至 x,y */
-    setCamera(x: number, y: number): void;
-    /** 監聽一個事件 */
-    addEvent(eventName: string, callback?: (event: any) => void): void;
     /** 加入一個精靈至 container 底下 */
     addChildren(sprite: Sprite): void;
-    /** 重新設定矯正過後的觸及位置 */
-    private resetPointerCoordinate;
-    private windowResize;
+    /** 啟動互動模式 */
+    enableInteractive(): void;
     private update;
     private stageUpdate;
     private bitmapUpdate;
 }
+export {};

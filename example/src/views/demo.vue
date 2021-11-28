@@ -2,7 +2,20 @@
     <el-container>
         <el-header>Header</el-header>
         <el-container>
-            <el-aside width="300px">Aside</el-aside>
+            <el-aside class="pa2" width="300px">
+                <div class="pa2">Basic</div>
+                <div class="pa2 pt1 pb1" v-for="item of basic" :key="item.name">
+                    <Botton  block @click="load(item.name)">
+                        {{ item.title }}
+                    </Botton>
+                </div>
+                <div class="pa2">Interactive</div>
+                <div class="pa2 pt1 pb1" v-for="item of interactive" :key="item.name">
+                    <Botton  block @click="load(item.name)">
+                        {{ item.title }}
+                    </Botton>
+                </div>
+            </el-aside>
             <el-main>
                 <div class="content">
                     <canvas class="demo-canvas" ref="canvas" width="960" height="600"></canvas>
@@ -16,21 +29,21 @@
 
 <script lang="ts">
 import Editer from '@/components/editer.vue'
+import Botton from '@/components/botton.vue'
 import { self } from '@/self'
-import { basic, children } from '@/demo/basic'
 import { LongTake } from 'longtake'
+import { DemoAttr } from '@/demo'
+import { basic } from '@/demo/basic'
+import { interactive } from '@/demo/interactive'
 import { defineComponent, onMounted, onUnmounted, watch } from 'vue'
 export default defineComponent({
     components: {
-        Editer
+        Editer,
+        Botton
     },
     setup() {
 
         const canvas = self.ref<HTMLCanvasElement>()
-        const files = {
-            basic: basic,
-            children: children
-        }
 
         // =================
         //
@@ -38,9 +51,10 @@ export default defineComponent({
         //
 
         const state = self.data({
+            demo: null as DemoAttr,
             desc: '',
-            title: '',
             code: '',
+            title: '',
             loading: false,
             longtake: null
         })
@@ -51,8 +65,8 @@ export default defineComponent({
         //
 
         watch(() => self.route, () => {
-            load()
-            refresh()
+            let name = self.route.params.name as any
+            load(name)
         }, {
             deep: true
         })
@@ -63,8 +77,8 @@ export default defineComponent({
         //
 
         onMounted(() => {
-            load()
-            refresh()
+            let name = self.route.params.name as any
+            load(name)
         })
 
         onUnmounted(() => {
@@ -78,27 +92,40 @@ export default defineComponent({
         // Methods
         //
 
-        const load = () => {
-            let name = self.route.params.name as any
-            let file = files[name]
-            if (file) {
+        const load = (name: string) => {
+            let items = [...basic, ...interactive]
+            state.demo = items.find(e => e.name === name)
+            if (state.demo) {
+                state.desc = state.demo.desc
+                state.title = state.demo.title
                 // @ts-ignore
                 state.code = window.js_beautify(`
                     // longtake = new LongTake('canvas', 960, 600)
-                    ${file.code}
+                    ${state.demo.code}
                 `)
             } else {
-                state.code = '(longtake, LongTake) => {}'
+                // @ts-ignore
+                state.code = window.js_beautify(`
+                    // longtake = new LongTake('canvas', 960, 600)
+                    (longtake, LongTake) => {}
+                `)
             }
+            self.router.replace({
+                params: {
+                    name
+                }
+            })
+            refresh()
         }
 
         const refresh = () => {
             if (state.longtake) {
                 state.longtake.close()
+                canvas.value.style.touchAction = 'auto'
             }
             /* eslint no-eval: off */
             let method = eval(state.code)
-            state.longtake = new LongTake(canvas.value, 960, 600)
+            state.longtake = new LongTake(canvas.value)
             method(state.longtake, LongTake)
         }
 
@@ -112,6 +139,9 @@ export default defineComponent({
         //
 
         return {
+            load,
+            basic,
+            interactive,
             state,
             canvas,
             edited,
