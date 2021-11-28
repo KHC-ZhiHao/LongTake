@@ -32,6 +32,7 @@ export declare class LongTake extends Event<Channels> {
     /** 主要運行的container，由本核心驅動內部精靈的update和event */
     private container;
     private bindUpdate;
+    private interactive;
     private supportRequestAnimationFrame;
     private requestAnimationFrame;
     constructor(target: string | HTMLCanvasElement, width?: number, height?: number);
@@ -61,7 +62,7 @@ export declare class LongTake extends Event<Channels> {
     /** 加入一個精靈至 container 底下 */
     addChildren(sprite: Sprite): void;
     /** 啟動互動模式 */
-    enableInteractive(): void;
+    enableInteractive(): null | undefined;
     private update;
     private stageUpdate;
     private bitmapUpdate;

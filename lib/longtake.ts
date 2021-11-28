@@ -38,6 +38,7 @@ export class LongTake extends Event<Channels> {
     /** 主要運行的container，由本核心驅動內部精靈的update和event */
     private container: Container
     private bindUpdate = this.update.bind(this)
+    private interactive = false
     private supportRequestAnimationFrame = !!window.requestAnimationFrame
     private requestAnimationFrame = (callback: any) => {
         if (this.supportRequestAnimationFrame) {
@@ -96,6 +97,10 @@ export class LongTake extends Event<Channels> {
         this.container.stage.eachChildrenDeep((child) => {
             child.close()
         })
+        if (this.interactive) {
+            this.interactive = false
+            this.target.style.touchAction = 'auto'
+        }
     }
 
     /** 加入一個精靈至 container 底下 */
@@ -107,6 +112,11 @@ export class LongTake extends Event<Channels> {
     /** 啟動互動模式 */
 
     enableInteractive() {
+        if (this.interactive) {
+            console.warn(`interactive already enabled.`)
+            return null
+        }
+        this.interactive = true
         this.pointerEvent = pointer(this.target, {
             end: () => this.emit('pointerup', {}),
             move: ({ x, y }) => this.emit('pointermove', { x, y }),
@@ -115,7 +125,9 @@ export class LongTake extends Event<Channels> {
         })
         this.target.style.touchAction = 'none'
         this.on('click', (data) => {
-            this.container.stage.eachChildren(child => child._onClick(data.x, data.y))
+            if (this.interactive) {
+                this.container.stage.eachChildren(child => child._onClick(data.x, data.y))
+            }
         })
     }
 

@@ -101,12 +101,18 @@ export class Sprite extends Event<Channels> {
     }
 
     _onClick(screenX: number, screenY: number) {
+        let called = false
         this.eachChildren(child => {
-            let listener = child.on('click', () => this.emit('click', {}))
+            let listener = child.on('click', () => {
+                if (called === false) {
+                    called = true
+                    this.emit('click', {})
+                }
+            })
             child._onClick(screenX, screenY)
             listener.off()
         })
-        if (this.getChannelListenerSize('click')) {
+        if (called === false && this.getChannelListenerSize('click')) {
             if (this.inRect(screenX, screenY)) {
                 this.emit('click', {})
             }
