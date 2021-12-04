@@ -153,7 +153,7 @@ export default defineComponent({
         }
 
         const toApis = () => {
-            console.log('123')
+            window.open('https://github.com/KHC-ZhiHao/LongTake/blob/master/apis/summary.md')
         }
 
         const toDemo = () => {
