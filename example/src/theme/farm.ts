@@ -2,9 +2,9 @@ import { LongTake, ImageSprite, Loader } from 'longtake'
 
 const loader = new Loader()
 
-loader.add('fan', '/images/theme-farm/fan.png')
-loader.add('farm', '/images/theme-farm/farm.png')
-loader.add('space', '/images/theme-farm/space.png')
+loader.add('fan', './images/theme-farm/fan.png')
+loader.add('farm', './images/theme-farm/farm.png')
+loader.add('space', './images/theme-farm/space.png')
 
 export const farmRender = async(app: LongTake) => {
     loader.start()

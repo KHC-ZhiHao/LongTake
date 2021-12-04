@@ -3,14 +3,14 @@ import { LongTake, ImageSprite, Loader, Animate } from 'longtake'
 
 const loader = new Loader()
 
-loader.add('cap', '/images/theme-tree/cap.png')
-loader.add('ray', '/images/theme-tree/lightray.png')
-loader.add('main', '/images/theme-tree/main.jpg')
-loader.add('leaf1', '/images/theme-tree/leaf1.png')
-loader.add('leaf2', '/images/theme-tree/leaf2.png')
-loader.add('shadow', '/images/theme-tree/shadow.png')
-loader.add('branch1', '/images/theme-tree/branch1.png')
-loader.add('branch2', '/images/theme-tree/branch2.png')
+loader.add('cap', './images/theme-tree/cap.png')
+loader.add('ray', './images/theme-tree/lightray.png')
+loader.add('main', './images/theme-tree/main.jpg')
+loader.add('leaf1', './images/theme-tree/leaf1.png')
+loader.add('leaf2', './images/theme-tree/leaf2.png')
+loader.add('shadow', './images/theme-tree/shadow.png')
+loader.add('branch1', './images/theme-tree/branch1.png')
+loader.add('branch2', './images/theme-tree/branch2.png')
 
 export const treeRender = async(app: LongTake) => {
     class Leaf extends ImageSprite {

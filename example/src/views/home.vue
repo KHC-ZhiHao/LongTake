@@ -35,7 +35,13 @@
                 </Botton>
             </div>
         </div>
-        <canvas class="main-canvas" ref="canvas" width="1920" height="1080"></canvas>
+        <canvas
+            style="background-image: url('./images/loading.gif');"
+            class="main-canvas"
+            ref="canvas"
+            width="1920"
+            height="1080">
+        </canvas>
     </div>
 </template>
 
@@ -210,7 +216,6 @@ export default defineComponent({
             object-position: center;
             position: absolute;
             background-color: #CCC;
-            background-image: url('/images/loading.gif');
             background-repeat: no-repeat;
             background-position: center;
         }

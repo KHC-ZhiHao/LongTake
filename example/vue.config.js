@@ -1,3 +1,9 @@
 module.exports = {
-    productionSourceMap: false
+    publicPath: '',
+    productionSourceMap: false,
+    configureWebpack: {
+        resolve: {
+            extensions: ['*', '.mjs', '.js', '.vue', '.json', '.gif']
+        }
+    }
 }

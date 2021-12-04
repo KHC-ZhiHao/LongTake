@@ -2,13 +2,13 @@ import { LongTake, Sprite, Animate, ImageSprite, Loader } from 'longtake'
 
 const loader = new Loader()
 
-loader.add('BackGround', '/images/theme-sheep/main-banner-background.png')
-loader.add('SheepBody', '/images/theme-sheep/sheep-body.png')
-loader.add('SheepBody1', '/images/theme-sheep/sheep-body-1.png')
-loader.add('SheepBody2', '/images/theme-sheep/sheep-body-2.png')
-loader.add('SheepBody3', '/images/theme-sheep/sheep-body-3.png')
-loader.add('SheepBody4', '/images/theme-sheep/sheep-body-4.png')
-loader.add('SheepBody5', '/images/theme-sheep/sheep-body-5.png')
+loader.add('BackGround', './images/theme-sheep/main-banner-background.png')
+loader.add('SheepBody', './images/theme-sheep/sheep-body.png')
+loader.add('SheepBody1', './images/theme-sheep/sheep-body-1.png')
+loader.add('SheepBody2', './images/theme-sheep/sheep-body-2.png')
+loader.add('SheepBody3', './images/theme-sheep/sheep-body-3.png')
+loader.add('SheepBody4', './images/theme-sheep/sheep-body-4.png')
+loader.add('SheepBody5', './images/theme-sheep/sheep-body-5.png')
 
 const inIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || /iPad|iPhone|iPod/.test(navigator.platform) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
 
