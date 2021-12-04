@@ -44,10 +44,9 @@ type Channels = {
 /** 建立一個動畫精靈，為 LongTake 的驅動核心 */
 
 export class Sprite extends Event<Channels> {
-    main: Container | null = null
-    bitmap = new Bitmap(100, 100)
     parent: Sprite | null = null
-    context = this.bitmap.context
+    _bitmap = new Bitmap(100, 100)
+    _main: Container | null = null
     _children: Sprite[] = []
     _status = {
         sort: false,
@@ -78,6 +77,10 @@ export class Sprite extends Event<Channels> {
     constructor() {
         super('Sprite')
         this.bindUpdateForChild = this.updateForChild.bind(this)
+    }
+
+    get context() {
+        return this._bitmap.context
     }
 
     get helper() {
@@ -133,47 +136,47 @@ export class Sprite extends Event<Channels> {
     /** 被加入 LongTake 時執行，並載入 LongTake */
 
     _install(main: Container) {
-        if (this.main == null) {
-            this.main = main
+        if (this._main == null) {
+            this._main = main
             this.create(this)
         } else {
             this.systemError('install', 'sprite already installed', this)
         }
     }
 
-    /** 當被加入stage時呼叫該函式 */
+    /** 當被加入 stage 時呼叫該函式 */
 
     create(sprite: this) { /* user set */ }
 
-    /** 精靈寬(和Bitmap同步) */
+    /** 精靈寬 */
     get width() {
-        return this.bitmap.width
+        return this._bitmap.width
     }
-    /** 精靈寬(和Bitmap同步) */
+    /** 精靈寬 */
     set width(val) {
-        this.bitmap.width = val
+        this._bitmap.width = val
     }
 
-    /** 精靈高(和Bitmap同步) */
+    /** 精靈高 */
     get height() {
-        return this.bitmap.height
+        return this._bitmap.height
     }
-    /** 精靈高(和Bitmap同步) */
+    /** 精靈高 */
     set height(val) {
-        this.bitmap.height = val
+        this._bitmap.height = val
     }
 
-    /** 調整精靈的bitmap大小 */
+    /** 調整精靈的大小 */
 
     resize(width: number | { width: number, height: number }, height?: number) {
         if (typeof width === 'object') {
             if (width.width != null && width.height != null) {
-                this.bitmap.resize(width.width, width.height)
+                this._bitmap.resize(width.width, width.height)
             } else {
                 this.systemError('resize', 'Object must have width and height.', width)
             }
         } else {
-            this.bitmap.resize(width, height || this.height)
+            this._bitmap.resize(width, height || this.height)
         }
     }
 
@@ -403,20 +406,20 @@ export class Sprite extends Event<Channels> {
 
     cache() {
         this._status.cache = true
-        this.bitmap.cache = true
+        this._bitmap.cache = true
     }
 
     /** 解除快取狀態 */
 
     unCache() {
         this._status.cache = false
-        this.bitmap.cache = false
+        this._bitmap.cache = false
     }
 
     /** 隱藏 */
 
-    hidden(bool: boolean) {
-        this._status.hidden = bool ? !!bool : true
+    hidden() {
+        this._status.hidden = true
     }
 
     /** 解除隱藏 */
@@ -454,9 +457,9 @@ export class Sprite extends Event<Channels> {
     /** 每次執行 update 時呼叫此函式，處理 Z 值更動的排序與移除子精靈 */
 
     _mainUpdate() {
-        if (this.main == null) {
-            if (this.parent && this.parent.main) {
-                this._install(this.parent.main)
+        if (this._main == null) {
+            if (this.parent && this.parent._main) {
+                this._install(this.parent._main)
             }
         }
         if (this._status.sort) {
@@ -489,7 +492,7 @@ export class Sprite extends Event<Channels> {
     /** 移除自身的綁定資訊(容易出錯，請使用remove讓精靈在迭代過程中被移除) */
 
     _close() {
-        this.main = null
+        this._main = null
         this.parent = null
     }
 
@@ -541,7 +544,7 @@ export class Sprite extends Event<Channels> {
             this.context.save()
             this.render(this)
             this.context.restore()
-            this.bitmap.clearCache()
+            this._bitmap.clearCache()
         }
     }
 
@@ -598,11 +601,11 @@ export class TextSprite extends Sprite {
             let unit = this.options.fontSize + 14
             let padding = this.options.padding * 2
             this.resize(unit * this.getByteLength(), unit)
-            this.bitmap.clear()
+            this.context.clearRect(0, 0, this.width, this.height)
             this.drawText(0, 4)
-            let trim = this.bitmap.getTrimSize()
+            let trim = this._bitmap.getTrimSize()
             this.resize(trim.width + padding, trim.height + padding)
-            this.bitmap.clear()
+            this.context.clearRect(0, 0, this.width, this.height)
             if (this.options.backgroundColor) {
                 this.context.fillStyle = this.options.backgroundColor
                 this.context.fillRect(0, 0, this.width, this.height)

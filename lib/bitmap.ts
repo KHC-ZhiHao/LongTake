@@ -10,7 +10,7 @@ export class Bitmap extends Base {
     /** 是否為快取狀態 */
     cache = false
     /** 由快取產生的圖片buffer */
-    imgBitmap: HTMLImageElement | null = null
+    private imgBitmap: HTMLImageElement | null = null
 
     private _width = 0
     private _height = 0
