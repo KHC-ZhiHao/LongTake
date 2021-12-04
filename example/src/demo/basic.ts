@@ -108,7 +108,7 @@ export const basic: DemoAttr[] = [
                     }
                 }
                 let image = new Image()
-                image.src = '/images/KaohBear.png'
+                image.src = 'images/KaohBear.png'
                 image.onload = () => {
                     longtake.addChildren(new Bear(image))
                 }
