@@ -7,8 +7,6 @@ export declare class Bitmap extends Base {
     readonly context: CanvasRenderingContext2D;
     /** 是否為快取狀態 */
     cache: boolean;
-    /** 由context.getImageData取得的int8Array位圖元素 */
-    imgData: ImageData | null;
     /** 由快取產生的圖片buffer */
     imgBitmap: HTMLImageElement | null;
     private _width;
@@ -20,7 +18,7 @@ export declare class Bitmap extends Base {
     get height(): number;
     set height(val: number);
     /** 獲取渲染目標 */
-    getRenderTarget(): HTMLImageElement | HTMLCanvasElement;
+    getRenderTarget(): HTMLCanvasElement | HTMLImageElement;
     /** 調整畫布大小 */
     resize(width: number, height: number): void;
     /** 清空畫布 */
@@ -35,4 +33,11 @@ export declare class Bitmap extends Base {
     getImageData(): ImageData;
     /** 清空圖片並貼上圖片資料 */
     putImageData(imgData: ImageData): void;
+    /** 獲得排除空白空間的矩形 */
+    getTrimSize(): {
+        top: number;
+        left: number;
+        width: number;
+        height: number;
+    };
 }

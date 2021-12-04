@@ -29,6 +29,7 @@ export declare class LongTake extends Event<Channels> {
     private target;
     private context;
     private pointerEvent;
+    private listenerGroup;
     /** 主要運行的container，由本核心驅動內部精靈的update和event */
     private container;
     private bindUpdate;
@@ -49,6 +50,7 @@ export declare class LongTake extends Event<Channels> {
         randInt(min: number, max: number): number;
         getAngle(x: number, y: number, ax: number, ay: number): number;
         getVisibility(): "xs" | "sm" | "md" | "lg" | "xl";
+        getRandomColor(): string;
     };
     static get Sprite(): typeof Sprite;
     static get ImageSprite(): typeof ImageSprite;

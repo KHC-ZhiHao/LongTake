@@ -33,4 +33,8 @@ export declare const helper: {
      * 檢測目前螢幕裝置大小
      */
     getVisibility(): "xs" | "sm" | "md" | "lg" | "xl";
+    /**
+     * 隨機獲取顏色
+     */
+    getRandomColor(): string;
 };

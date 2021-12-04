@@ -13,6 +13,5 @@ export declare const pointer: (element: Element, params: {
     end: () => void;
     move: (params: Site) => void;
     start: (params: Site) => void;
-    click: (params: Site) => void;
 }) => ListenerGroup;
 export {};

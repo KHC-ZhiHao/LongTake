@@ -2,14 +2,6 @@ import { Event } from './base'
 import { helper } from './helper'
 import { Bitmap } from './bitmap'
 import { Container } from './container'
-import { byteLength } from './utils'
-
-type Pixel = {
-    red: number
-    green: number
-    blue: number
-    alpha: number
-}
 
 /**
  * 合成模式
@@ -52,20 +44,19 @@ type Channels = {
 /** 建立一個動畫精靈，為 LongTake 的驅動核心 */
 
 export class Sprite extends Event<Channels> {
-    name: string
     main: Container | null = null
     bitmap = new Bitmap(100, 100)
-    context = this.bitmap.context
     parent: Sprite | null = null
-    children: Sprite[] = []
-    status = {
+    context = this.bitmap.context
+    _children: Sprite[] = []
+    _status = {
         sort: false,
         cache: false,
         remove: false,
         hidden: false,
         childrenDead: false
     }
-    transform = {
+    _transform = {
         skewX: 0,
         skewY: 0,
         scaleWidth: 1,
@@ -74,7 +65,7 @@ export class Sprite extends Event<Channels> {
         opacity: 255,
         blendMode: 'inherit' as BlendMode
     }
-    position = {
+    _position = {
         x: 0,
         y: 0,
         z: 0,
@@ -84,9 +75,8 @@ export class Sprite extends Event<Channels> {
         anchorY: 0
     }
     private bindUpdateForChild = this.updateForChild.bind(this)
-    constructor(name?: string) {
-        super(name || 'Sprite')
-        this.name = name || 'No name'
+    constructor() {
+        super('Sprite')
         this.bindUpdateForChild = this.updateForChild.bind(this)
     }
 
@@ -122,9 +112,9 @@ export class Sprite extends Event<Channels> {
     /** 迭代所有子精靈 */
 
     eachChildren(callback: (child: Sprite) => void) {
-        let len = this.children.length
+        let len = this._children.length
         for (let i = 0; i < len; i++) {
-            callback(this.children[i])
+            callback(this._children[i])
         }
     }
 
@@ -142,7 +132,7 @@ export class Sprite extends Event<Channels> {
 
     /** 被加入 LongTake 時執行，並載入 LongTake */
 
-    install(main: Container) {
+    _install(main: Container) {
         if (this.main == null) {
             this.main = main
             this.create(this)
@@ -193,8 +183,8 @@ export class Sprite extends Event<Channels> {
         if (Sprite.isSprite(sprite)) {
             if (sprite.parent == null) {
                 sprite.parent = this
-                this.children.push(sprite)
-                this.sortChildren()
+                this._children.push(sprite)
+                this._sortChildren()
             } else {
                 this.systemError('addChildren', 'Sprite have parent.', sprite)
             }
@@ -205,7 +195,7 @@ export class Sprite extends Event<Channels> {
 
     /** 重新排列子精靈，當子精靈有 Z 值改變時會自動觸發 */
 
-    sortChildren() {
+    _sortChildren() {
         let newData: any[] = []
         let childList: any[] = []
         this.eachChildren((child) => {
@@ -219,13 +209,13 @@ export class Sprite extends Event<Channels> {
                 newData = newData.concat(list)
             }
         })
-        this.children = newData
+        this._children = newData
     }
 
     /** 是否有變形 */
 
     isTransform() {
-        let t = this.transform
+        let t = this._transform
         return !(t.skewX === 0 && t.skewY === 0 && t.scaleWidth === 1 && t.scaleHeight === 1 && t.rotation === 0)
     }
 
@@ -238,20 +228,20 @@ export class Sprite extends Event<Channels> {
 
     /** 放大寬 */
     get scaleWidth() {
-        return this.transform.scaleWidth
+        return this._transform.scaleWidth
     }
     /** 放大寬 */
     set scaleWidth(val: number) {
-        this.transform.scaleWidth = val
+        this._transform.scaleWidth = val
     }
 
     /** 放大高 */
     get scaleHeight() {
-        return this.transform.scaleHeight
+        return this._transform.scaleHeight
     }
     /** 放大高 */
     set scaleHeight(val: number) {
-        this.transform.scaleHeight = val
+        this._transform.scaleHeight = val
     }
 
     /** 該精靈在最後顯示的總倍率寬 */
@@ -272,29 +262,29 @@ export class Sprite extends Event<Channels> {
 
     /** 旋轉 */
     get rotation() {
-        return this.transform.rotation
+        return this._transform.rotation
     }
     /** 旋轉 */
     set rotation(val: number) {
-        this.transform.rotation = val % 360
+        this._transform.rotation = val % 360
     }
 
     /** 合成模式 */
     get blendMode() {
-        if (this.parent && this.transform.blendMode === 'inherit') {
-            return this.parent.transform.blendMode
+        if (this.parent && this._transform.blendMode === 'inherit') {
+            return this.parent._transform.blendMode
         } else {
-            return this.transform.blendMode
+            return this._transform.blendMode
         }
     }
     /** 合成模式 */
     set blendMode(val: BlendMode) {
-        this.transform.blendMode = val
+        this._transform.blendMode = val
     }
 
     /** 透明度 */
     get opacity() {
-        return this.transform.opacity
+        return this._transform.opacity
     }
     /** 透明度 */
     set opacity(val: number) {
@@ -304,25 +294,25 @@ export class Sprite extends Event<Channels> {
         if (val >= 255) {
             val = 255
         }
-        this.transform.opacity = val
+        this._transform.opacity = val
     }
 
     /** 傾斜X */
     get skewX() {
-        return this.transform.skewX
+        return this._transform.skewX
     }
     /** 傾斜X */
     set skewX(val) {
-        this.transform.skewX = val
+        this._transform.skewX = val
     }
 
     /** 傾斜Y */
     get skewY() {
-        return this.transform.skewY
+        return this._transform.skewY
     }
     /** 傾斜Y */
     set skewY(val) {
-        this.transform.skewY = val
+        this._transform.skewY = val
     }
 
     /** 設定錨點 */
@@ -333,34 +323,34 @@ export class Sprite extends Event<Channels> {
 
     /** 定位點X */
     get x() {
-        return this.position.x
+        return this._position.x
     }
     /** 定位點X */
     set x(val: number) {
         if (typeof val === 'number') {
-            this.position.x = val || 0
+            this._position.x = val || 0
         }
     }
 
     /** 定位點Y */
-    get y() { return this.position.y }
+    get y() { return this._position.y }
     /** 定位點Y */
     set y(val) {
         if (typeof val === 'number') {
-            this.position.y = val || 0
+            this._position.y = val || 0
         }
     }
 
     /** 高度，每次設定會重新排序 */
     get z() {
-        return this.position.z
+        return this._position.z
     }
     /** 高度，每次設定會重新排序 */
     set z(val: number) {
         if (typeof val === 'number') {
-            this.position.z = val
+            this._position.z = val
             if (this.parent) {
-                this.parent.status.sort = true
+                this.parent._status.sort = true
             }
         }
     }
@@ -386,53 +376,53 @@ export class Sprite extends Event<Channels> {
 
     /** 錨點X */
     get anchorX() {
-        return this.position.anchorX
+        return this._position.anchorX
     }
     /** 錨點X */
     set anchorX(val) {
-        this.position.anchorX = val
+        this._position.anchorX = val
     }
 
     /** 錨點Y */
     get anchorY() {
-        return this.position.anchorY
+        return this._position.anchorY
     }
     /** 錨點Y */
     set anchorY(val) {
-        this.position.anchorY = val
+        this._position.anchorY = val
     }
 
     get canRender() {
-        return !this.status.cache
+        return !this._status.cache
     }
     get canShow() {
-        return !this.status.hidden
+        return !this._status.hidden
     }
 
     /** 快取目前渲染的 Bitmap */
 
     cache() {
-        this.status.cache = true
+        this._status.cache = true
         this.bitmap.cache = true
     }
 
     /** 解除快取狀態 */
 
     unCache() {
-        this.status.cache = false
+        this._status.cache = false
         this.bitmap.cache = false
     }
 
     /** 隱藏 */
 
     hidden(bool: boolean) {
-        this.status.hidden = bool ? !!bool : true
+        this._status.hidden = bool ? !!bool : true
     }
 
     /** 解除隱藏 */
 
     unHidden() {
-        this.status.hidden = false
+        this._status.hidden = false
     }
 
     /** 獲取該精靈實際呈現的大小 */
@@ -463,25 +453,25 @@ export class Sprite extends Event<Channels> {
 
     /** 每次執行 update 時呼叫此函式，處理 Z 值更動的排序與移除子精靈 */
 
-    mainUpdate() {
+    _mainUpdate() {
         if (this.main == null) {
             if (this.parent && this.parent.main) {
-                this.install(this.parent.main)
+                this._install(this.parent.main)
             }
         }
-        if (this.status.sort) {
-            this.status.sort = false
-            this.sortChildren()
+        if (this._status.sort) {
+            this._status.sort = false
+            this._sortChildren()
         }
         this.update(this)
         this.eachChildren(this.bindUpdateForChild)
-        if (this.status.childrenDead) {
-            this.status.childrenDead = false
-            this.children = this.children.filter((child) => {
-                if (child.status.remove) {
-                    child.close()
+        if (this._status.childrenDead) {
+            this._status.childrenDead = false
+            this._children = this._children.filter((child) => {
+                if (child._status.remove) {
+                    child._close()
                 }
-                return !child.status.remove
+                return !child._status.remove
             })
         }
     }
@@ -489,16 +479,16 @@ export class Sprite extends Event<Channels> {
     /** 呼叫子精靈更新 */
 
     private updateForChild(child: Sprite) {
-        if (child.status.remove === false) {
-            child.mainUpdate()
+        if (child._status.remove === false) {
+            child._mainUpdate()
         } else {
-            this.status.childrenDead = true
+            this._status.childrenDead = true
         }
     }
 
     /** 移除自身的綁定資訊(容易出錯，請使用remove讓精靈在迭代過程中被移除) */
 
-    close() {
+    _close() {
         this.main = null
         this.parent = null
     }
@@ -506,7 +496,7 @@ export class Sprite extends Event<Channels> {
     /** 移除自己於父精靈下 */
 
     remove() {
-        this.status.remove = true
+        this._status.remove = true
     }
 
     /** 移除指定的子精靈 */
@@ -531,21 +521,11 @@ export class Sprite extends Event<Channels> {
         })
     }
 
-    /** 移除指定name的精靈 */
-
-    removeChildrenByName(name: string) {
-        this.eachChildren((children) => {
-            if (children.name === name) {
-                this.removeChild(children)
-            }
-        })
-    }
-
     /** 移除指定 index 的精靈 */
 
     removeChildrenByIndex(index: number) {
-        if (typeof index === 'number' && this.children[index]) {
-            this.children[index].remove()
+        if (typeof index === 'number' && this._children[index]) {
+            this._children[index].remove()
         }
     }
 
@@ -555,7 +535,7 @@ export class Sprite extends Event<Channels> {
 
     /** 主要渲染程序，包含渲染與濾鏡 */
 
-    mainRender() {
+    _mainRender() {
         this.eachChildren(this.renderForChild)
         if (this.canRender) {
             this.context.save()
@@ -568,22 +548,7 @@ export class Sprite extends Event<Channels> {
     /** 呼叫子精靈渲染 */
 
     private renderForChild(child: Sprite) {
-        child.mainRender()
-    }
-
-    /** 迭代像素 */
-
-    eachImgData(imgData: ImageData, callback: (pixel: Pixel) => void) {
-        let data = imgData.data
-        for (let i = 0; i < data.length; i += 4) {
-            let pixel = {
-                red: data[i],
-                blue: data[i + 2],
-                green: data[i + 1],
-                alpha: data[i + 3]
-            }
-            callback(pixel)
-        }
+        child._mainRender()
     }
 
     /** 座標是否在精靈的矩形範圍內 */
@@ -610,6 +575,7 @@ export class ImageSprite extends Sprite {
 
 type TextOptions = {
     color: string
+    padding: number
     fontSize: number
     fontFamily: string
     backgroundColor: string | null
@@ -623,27 +589,54 @@ export class TextSprite extends Sprite {
         super()
         this.options = {
             color: this.helper.ifEmpty(options.color, '#000'),
+            padding: this.helper.ifEmpty(options.padding, 0),
             fontSize: this.helper.ifEmpty(options.fontSize, 18),
             fontFamily: this.helper.ifEmpty(options.fontFamily, 'Arial'),
             backgroundColor: this.helper.ifEmpty(options.backgroundColor, null)
         }
         this.render = () => {
+            let unit = this.options.fontSize + 14
+            let padding = this.options.padding * 2
+            this.resize(unit * this.getByteLength(), unit)
+            this.bitmap.clear()
+            this.drawText(0, 4)
+            let trim = this.bitmap.getTrimSize()
+            this.resize(trim.width + padding, trim.height + padding)
+            this.bitmap.clear()
             if (this.options.backgroundColor) {
                 this.context.fillStyle = this.options.backgroundColor
                 this.context.fillRect(0, 0, this.width, this.height)
             }
-            this.context.textBaseline = 'top'
-            this.context.font = `${this.options.fontSize}px ${this.options.fontFamily}`
-            this.context.fillStyle = this.options.color
-            this.context.fillText(this.text || '', 0, 0)
+            this.drawText(trim.left * -1 + this.options.padding, trim.top / 2 * -1 + this.options.padding)
             this.cache()
         }
     }
 
+    private drawText(offsetX: number, offsetY: number) {
+        this.context.textBaseline = 'top'
+        this.context.font = `${this.options.fontSize}px ${this.options.fontFamily}`
+        this.context.fillStyle = this.options.color
+        this.context.fillText(this.text || '', offsetX, offsetY)
+    }
+
+    private getByteLength() {
+        let size = this.text.length
+        for (let i = this.text.length - 1; i >= 0; i--) {
+            let code = this.text.charCodeAt(i)
+            if (code > 0x7f && code <= 0x7ff) {
+                size++
+            } else if (code > 0x7ff && code <= 0xffff) {
+                size += 2
+            }
+            if (code >= 0xDC00 && code <= 0xDFFF) {
+                i--
+            }
+        }
+        return size
+    }
+
     setContent(text: string) {
-        let length = byteLength(text)
         this.text = text
-        this.resize(this.options.fontSize * length / 2, this.options.fontSize)
         this.unCache()
     }
 }

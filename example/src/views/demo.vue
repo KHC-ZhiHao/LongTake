@@ -1,31 +1,50 @@
 <template>
     <el-container>
-        <el-header>Header</el-header>
+        <el-header>
+            <div>
+                <Botton
+                    icon="arrow-left-bold"
+                    color="#000"
+                    background-color="transparent"
+                    @click="goBack">
+                </Botton>
+                <span style="font-size: 1.3em; vertical-align: middle;">展示間</span>
+            </div>
+        </el-header>
         <el-container>
             <el-aside class="pa2" width="300px">
                 <div class="pa2">Basic</div>
                 <div class="pa2 pt1 pb1" v-for="item of basic" :key="item.name">
-                    <Botton  block @click="load(item.name)">
+                    <Botton block @click="load(item.name)">
                         {{ item.title }}
                     </Botton>
                 </div>
                 <div class="pa2">Interactive</div>
                 <div class="pa2 pt1 pb1" v-for="item of interactive" :key="item.name">
-                    <Botton  block @click="load(item.name)">
+                    <Botton block @click="load(item.name)">
                         {{ item.title }}
                     </Botton>
                 </div>
                 <div class="pa2">Animate</div>
                 <div class="pa2 pt1 pb1" v-for="item of animate" :key="item.name">
-                    <Botton  block @click="load(item.name)">
+                    <Botton block @click="load(item.name)">
                         {{ item.title }}
                     </Botton>
                 </div>
             </el-aside>
             <el-main>
                 <div class="content">
+                    <h3 class="ph2">{{ state.title }}</h3>
+                    <div class="ph2 pt0 pb4">{{ state.desc }}</div>
                     <canvas class="demo-canvas" ref="canvas" width="960" height="600"></canvas>
-                    <el-button type="primary" @click="refresh">Primary</el-button>
+                    <div class="pv2">
+                        <el-button
+                            style="width: 100%;"
+                            type="primary"
+                            @click="refresh">
+                            Refresh
+                        </el-button>
+                    </div>
                     <Editer @edited="edited" :code="state.code"></Editer>
                 </div>
             </el-main>
@@ -140,6 +159,12 @@ export default defineComponent({
             state.code = code
         }
 
+        const goBack = () => {
+            self.router.push({
+                name: 'home'
+            })
+        }
+
         // =================
         //
         // Done
@@ -148,6 +173,7 @@ export default defineComponent({
         return {
             load,
             basic,
+            goBack,
             animate,
             interactive,
             state,

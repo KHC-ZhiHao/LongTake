@@ -1,13 +1,38 @@
 <template>
     <div class="main-wrapper">
         <div class="main-nav">
-            <div class="main-title" ref="title">LongTake</div>
+            <div class="main-title" ref="title" :style="`color: ${state.color}`">LongTake</div>
             <div class="pt2">
-                <Botton icon="arrow-left-bold" @click="next(-1)"></Botton>
-                <Botton @click="toDemo">Docs</Botton>
-                <Botton @click="toDemo">Demo</Botton>
-                <Botton @click="toDemo">GitHub</Botton>
-                <Botton icon="arrow-right-bold" @click="next(1)"></Botton>
+                <Botton
+                    icon="arrow-left-bold"
+                    @click="next(-1)"
+                    :color="state.color"
+                    :background-color="state.backgroundColor">
+                </Botton>
+                <Botton
+                    @click="toApis"
+                    :color="state.color"
+                    :background-color="state.backgroundColor">
+                    APIs
+                </Botton>
+                <Botton
+                    @click="toDemo"
+                    :color="state.color"
+                    :background-color="state.backgroundColor">
+                    Demo
+                </Botton>
+                <Botton
+                    @click="toGitHub"
+                    :color="state.color"
+                    :background-color="state.backgroundColor">
+                    GitHub
+                </Botton>
+                <Botton
+                    icon="arrow-right-bold"
+                    @click="next(1)"
+                    :color="state.color"
+                    :background-color="state.backgroundColor">
+                </Botton>
             </div>
         </div>
         <canvas class="main-canvas" ref="canvas" width="1920" height="1080"></canvas>
@@ -34,18 +59,22 @@ export default defineComponent({
         const themes = {
             farm: {
                 color: '#fff',
+                backgroundColor: '#000',
                 render: farmRender
             },
             tree: {
                 color: '#fff',
+                backgroundColor: '#59572E',
                 render: treeRender
             },
             twin: {
                 color: '#fff',
+                backgroundColor: '#000',
                 render: twinRender
             },
             sheep: {
                 color: '#000',
+                backgroundColor: '#FD9C44',
                 render: sheepRender
             }
         }
@@ -58,6 +87,8 @@ export default defineComponent({
         const state = self.data({
             index: 0,
             theme: 'farm' as keyof typeof themes,
+            color: '',
+            backgroundColor: '',
             longtake: null as LongTake
         })
 
@@ -75,7 +106,8 @@ export default defineComponent({
 
         onMounted(() => {
             let keys = Object.keys(themes)
-            state.theme = keys[LongTake.helper.randInt(0, keys.length - 1)] as any
+            state.index = LongTake.helper.randInt(0, keys.length - 1)
+            state.theme = keys[state.index] as any
             render()
         })
 
@@ -110,9 +142,18 @@ export default defineComponent({
             state.longtake = new LongTake(canvas.value, 1920, 1080)
             let theme = themes[state.theme]
             if (theme) {
-                title.value.style.color = theme.color
                 theme.render(state.longtake)
+                state.color = theme.color
+                state.backgroundColor = theme.backgroundColor
             }
+        }
+
+        const toGitHub = () => {
+            window.open('https://github.com/KHC-ZhiHao/LongTake')
+        }
+
+        const toApis = () => {
+            console.log('123')
         }
 
         const toDemo = () => {
@@ -134,7 +175,9 @@ export default defineComponent({
             title,
             state,
             canvas,
-            toDemo
+            toApis,
+            toDemo,
+            toGitHub
         }
     }
 })
@@ -166,7 +209,7 @@ export default defineComponent({
             object-fit: cover;
             object-position: center;
             position: absolute;
-            background-color: #fff;
+            background-color: #CCC;
             background-image: url('/images/loading.gif');
             background-repeat: no-repeat;
             background-position: center;

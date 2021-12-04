@@ -2,9 +2,96 @@ import { DemoAttr } from './index'
 
 export const animate: DemoAttr[] = [
     {
+        name: 'firework',
+        title: 'Fire Work',
+        desc: '點擊畫面可以發射一發煙火。',
+        code: /* javascript */ `
+            (longtake, LongTake) => {
+                const minRandom = (min, max) => {
+                    return Math.random() * (max - min) + min
+                }
+                class Bomb extends LongTake.Sprite {
+                    constructor(x, y) {
+                        super()
+                        let size = minRandom(10, 20)
+                        this.resize(size, size)
+                        this.setAnchor(0.5, 0.5)
+                        this.x = x
+                        this.y = y
+                        this.opacity = 0
+                        this.angle = minRandom(0, Math.PI * 2)
+                        this.speed = minRandom(1, 10)
+                        this.friction = 0.95
+                        this.gravity = 1
+                        this.size = minRandom(3, 6)
+                        this.alpha = 1
+                        this.decay = minRandom(0.015, 0.03)
+                    }
+                    update() {
+                        this.speed *= this.friction
+                        this.x += Math.cos(this.angle) * this.speed
+                        this.y += Math.sin(this.angle) * this.speed + this.gravity
+                        this.alpha -= this.decay
+                        this.rotation = this.alpha * 360
+                        this.opacity = 255
+                        this.scale(this.alpha, this.alpha)
+                        if (this.alpha <= this.decay) {
+                            this.remove()
+                        }
+                    }
+                    render() {
+                        this.context.fillStyle = this.helper.getRandomColor()
+                        this.context.fillRect(0, 0, this.width, this.height)
+                        this.cache()
+                    }
+                }
+                
+                class FireWork extends LongTake.Sprite {
+                    constructor(tx, ty) {
+                        super()
+                        this.tx = tx
+                        this.ty = ty
+                        this.x = tx
+                        this.y = ty + 200
+                        this.opacity = 0
+                        this.resize(10, 10)
+                        this.setAnchor(0.5, 0.5)
+                        this.animate = new LongTake.Animate({
+                            duration: 300,
+                            easing: 'easeInCirc',
+                            action: t => {
+                                this.y = ty + (200 * (1 - t))
+                                this.opacity = t * 2 * 255
+                            }
+                        })
+                    }
+                    update() {
+                        if (this.animate.over) {
+                            for (let i = 0; i < 10; i++) {
+                                longtake.addChildren(new Bomb(this.x, this.y))
+                            }
+                            this.remove()
+                        } else {
+                            this.animate.move()
+                        }
+                    }
+                    render() {
+                        this.context.fillStyle = this.helper.getRandomColor()
+                        this.context.fillRect(0, 0, this.width, this.height)
+                        this.cache()
+                    }
+                }
+                longtake.addChildren(new FireWork(longtake.width / 2, longtake.height / 2))
+                longtake.on('click', ({ x, y }) => {
+                    longtake.addChildren(new FireWork(x, y))
+                })
+            }
+        `
+    },
+    {
         name: 'live',
         title: 'Live2D',
-        desc: '',
+        desc: '複雜元件組合的示範。',
         code: /* javascript */ `
             (longtake, LongTake) => {
                 const loader = new LongTake.Loader()
@@ -292,7 +379,6 @@ export const animate: DemoAttr[] = [
                 }
                 loader.start()
                 loader.onload(() => {
-                    longtake.enableInteractive()
                     longtake.addChildren(new Grandma())
                 })   
             }

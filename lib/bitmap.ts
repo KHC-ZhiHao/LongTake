@@ -9,8 +9,6 @@ export class Bitmap extends Base {
     readonly context: CanvasRenderingContext2D
     /** 是否為快取狀態 */
     cache = false
-    /** 由context.getImageData取得的int8Array位圖元素 */
-    imgData: ImageData | null = null
     /** 由快取產生的圖片buffer */
     imgBitmap: HTMLImageElement | null = null
 
@@ -21,7 +19,6 @@ export class Bitmap extends Base {
         super('Bitmap')
         this.canvas = element || document.createElement('canvas')
         this.context = this.canvas.getContext('2d')!
-        this.imgData = null
         this.imgBitmap = null
         this._width = this.canvas.width
         this._height = this.canvas.height
@@ -91,7 +88,6 @@ export class Bitmap extends Base {
     /** 解除並清除圖片資料快取 */
 
     clearCache() {
-        this.imgData = null
         this.imgBitmap = null
     }
 
@@ -111,10 +107,7 @@ export class Bitmap extends Base {
     /** 獲取快取圖片資料 */
 
     getImageData() {
-        if (this.imgData == null) {
-            this.imgData = this.context.getImageData(0, 0, this.width, this.height)
-        }
-        return this.imgData
+        return this.context.getImageData(0, 0, this.width, this.height)
     }
 
     /** 清空圖片並貼上圖片資料 */
@@ -122,5 +115,49 @@ export class Bitmap extends Base {
     putImageData(imgData: ImageData) {
         this.clear()
         this.context.putImageData(imgData, 0, 0)
+    }
+
+    /** 獲得排除空白空間的矩形 */
+
+    getTrimSize() {
+        let { data, width } = this.getImageData()
+        let bound = {
+            top: null! as number,
+            left: null! as number,
+            right: null! as number,
+            bottom: null! as number
+        }
+        for (let i = 0; i < data.length; i += 4) {
+            if (data[i + 3] !== 0) {
+                let x = (i / 4) % width
+                let y = ~~((i / 4) / width)
+                if (bound.top == null) {
+                    bound.top = y
+                }
+                if (bound.left == null) {
+                    bound.left = x
+                } else if (x < bound.left) {
+                    bound.left = x
+                }
+                if (bound.right == null) {
+                    bound.right = x
+                } else if (bound.right < x) {
+                    bound.right = x
+                }
+                if (bound.bottom == null) {
+                    bound.bottom = y
+                } else if (bound.bottom < y) {
+                    bound.bottom = y
+                }
+            }
+        }
+        let trimHeight = bound.bottom - bound.top
+        let trimWidth = bound.right - bound.left
+        return {
+            top: bound.top,
+            left: bound.left,
+            width: trimWidth,
+            height: trimHeight
+        }
     }
 }

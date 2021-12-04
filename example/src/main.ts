@@ -9,12 +9,10 @@ import ElementPlus from 'element-plus'
 import { createApp } from 'vue'
 
 import App from './app.vue'
-import store from './store'
 import router from './router'
 
 export const vue = createApp(App)
 
-vue.use(store)
 vue.use(router)
 vue.use(Codemirror)
 vue.use(ElementPlus)

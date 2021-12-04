@@ -4,7 +4,7 @@ export const basic: DemoAttr[] = [
     {
         name: 'basic',
         title: 'Basic',
-        desc: '',
+        desc: '快速建立一個 Sprite。',
         code: /* javascript */`
             (longtake, LongTake) => {
                 let sprite = new LongTake.Sprite('basic')
@@ -28,7 +28,7 @@ export const basic: DemoAttr[] = [
     {
         name: 'children',
         title: 'Children',
-        desc: '',
+        desc: '可以在 Sprite 加入子代，下列例子示範如何繼承透明度。',
         code: /* javascript */ `
             (longtake, LongTake) => {
                 class DemoSprite extends LongTake.Sprite {
@@ -69,7 +69,7 @@ export const basic: DemoAttr[] = [
     {
         name: 'text',
         title: 'Text',
-        desc: '',
+        desc: '透過 TextSprite 可以繪製一個符合文字長度的 Sprite。',
         code: /* javascript */ `
             (longtake, LongTake) => {
                 class Text extends LongTake.TextSprite {
@@ -77,7 +77,8 @@ export const basic: DemoAttr[] = [
                         super({
                             color: 'blue',
                             fontSize: 48,
-                            backgroundColor: '#FF0000'
+                            backgroundColor: '#FF0000',
+                            padding: 20
                         })
                         this.x = longtake.width / 2
                         this.y = longtake.height / 2
@@ -92,7 +93,7 @@ export const basic: DemoAttr[] = [
     {
         name: 'image',
         title: 'Image',
-        desc: '',
+        desc: '透過 ImageSprite 可以輕鬆顯示圖片。',
         code: /* javascript */ `
             (longtake, LongTake) => {
                 class Bear extends LongTake.ImageSprite {

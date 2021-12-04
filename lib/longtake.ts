@@ -35,6 +35,7 @@ export class LongTake extends Event<Channels> {
     private target: HTMLCanvasElement
     private context: CanvasRenderingContext2D
     private pointerEvent: ListenerGroup
+    private listenerGroup: ListenerGroup
     /** 主要運行的container，由本核心驅動內部精靈的update和event */
     private container: Container
     private bindUpdate = this.update.bind(this)
@@ -55,6 +56,14 @@ export class LongTake extends Event<Channels> {
         this.height = height != null ? height : this.target.height
         this.container = new Container(this.width, this.height, this)
         this.pointerEvent = new ListenerGroup(this.target)
+        this.listenerGroup = new ListenerGroup(this.target)
+        this.listenerGroup.add('click', event => this.emit('click', {
+            x: event.offsetX,
+            y: event.offsetY
+        }))
+        this.on('click', (data) => {
+            this.container.stage.eachChildren(child => child._onClick(data.x, data.y))
+        })
         this.update()
     }
 
@@ -94,8 +103,9 @@ export class LongTake extends Event<Channels> {
         this.clear()
         this.remove = true
         this.pointerEvent.close()
+        this.listenerGroup.close()
         this.container.stage.eachChildrenDeep((child) => {
-            child.close()
+            child._close()
         })
         if (this.interactive) {
             this.interactive = false
@@ -120,15 +130,9 @@ export class LongTake extends Event<Channels> {
         this.pointerEvent = pointer(this.target, {
             end: () => this.emit('pointerup', {}),
             move: ({ x, y }) => this.emit('pointermove', { x, y }),
-            start: ({ x, y }) => this.emit('pointerdown', { x, y }),
-            click: ({ x, y }) => this.emit('click', { x, y })
+            start: ({ x, y }) => this.emit('pointerdown', { x, y })
         })
         this.target.style.touchAction = 'none'
-        this.on('click', (data) => {
-            if (this.interactive) {
-                this.container.stage.eachChildren(child => child._onClick(data.x, data.y))
-            }
-        })
     }
 
     private update() {

@@ -4,7 +4,7 @@ export const interactive: DemoAttr[] = [
     {
         name: 'click',
         title: 'Click',
-        desc: '',
+        desc: '透過 on("click") 可以監聽 Sprite 是否有被點擊。',
         code: /* javascript */ `
             (longtake, LongTake) => {
                 class Button extends LongTake.Sprite {
@@ -32,8 +32,6 @@ export const interactive: DemoAttr[] = [
                 let centerY = longtake.height / 2
                 let mainBtn = new Button(centerX, centerY)
                 mainBtn.addChildren(new Button(30, 30))
-                // 啟用互動模式
-                longtake.enableInteractive()
                 longtake.addChildren(mainBtn)
             }
         `
@@ -41,7 +39,7 @@ export const interactive: DemoAttr[] = [
     {
         name: 'drag',
         title: 'Drag',
-        desc: '',
+        desc: '啟用 enableInteractive() 啟用 pointer 互動事件，可以嘗試拖曳方塊。',
         code: /* javascript */ `
             (longtake, LongTake) => {
                 class Block extends LongTake.Sprite {
@@ -59,7 +57,7 @@ export const interactive: DemoAttr[] = [
                 }
                 let block = new Block()
                 let dragging = false
-                // 啟用互動模式
+                // 要使用 pointer 相關事件必須啟用互動模式
                 longtake.enableInteractive()
                 longtake.on('pointerdown', ({ x, y }) => {
                     if (block.inRect(x, y)) {

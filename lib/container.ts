@@ -20,10 +20,10 @@ export class Container extends Base {
     constructor(width: number, height: number, core?: LongTake) {
         super('Container')
         this.core = core || null
-        this.stage = new Sprite('Stage')
+        this.stage = new Sprite()
         this.bitmap = new Bitmap(width, height)
         this.context = this.bitmap.context
-        this.stage.install(this)
+        this.stage._install(this)
         this.stage.resize(0, 0)
         this.stage.blendMode = 'source-over'
         this.stage.render = () => this.stage.cache()
@@ -39,11 +39,11 @@ export class Container extends Base {
     }
 
     stageUpdate() {
-        this.stage.mainUpdate()
+        this.stage._mainUpdate()
     }
 
     stageRender() {
-        this.stage.mainRender()
+        this.stage._mainRender()
         this.draw()
     }
 
@@ -74,9 +74,9 @@ export class Container extends Base {
             if (realPosition.x < this.width && realPosition.y < this.height) {
                 this.context.drawImage(sprite.bitmap.getRenderTarget(), screenX, screenY)
             }
-            let len = sprite.children.length
+            let len = sprite._children.length
             for (let i = 0; i < len; i++) {
-                this.render(sprite.children[i])
+                this.render(sprite._children[i])
             }
             this.context.restore()
         }

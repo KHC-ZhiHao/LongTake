@@ -63,16 +63,9 @@ export const pointer = (element: Element, params: {
     end: () => void
     move: (params: Site) => void
     start: (params: Site) => void
-    click: (params: Site) => void
 }) => {
-    let { click, start, move, end } = params
+    let { start, move, end } = params
     let group = new ListenerGroup(element)
-    group.add('click', (event) => {
-        click({
-            x: event.offsetX,
-            y: event.offsetY
-        })
-    })
     if (inSafari()) {
         group.add('touchstart', event => {
             let { x, y } = getLayerPosition(event)

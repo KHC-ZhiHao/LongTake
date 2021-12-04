@@ -21,6 +21,7 @@ export declare const helper: {
     randInt(min: number, max: number): number;
     getAngle(x: number, y: number, ax: number, ay: number): number;
     getVisibility(): "xs" | "sm" | "md" | "lg" | "xl";
+    getRandomColor(): string;
 };
 export declare const Sprite: typeof _Sprite;
 export declare const Loader: typeof _Loader;
