@@ -39,7 +39,7 @@ type AnimateOptions = {
 }
 
 /**
- * @desc 一個動畫的載具
+ * @desc 動畫執行的載具
  * @see {easing} https://easings.net/zh-tw
  */
 
