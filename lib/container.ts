@@ -72,7 +72,7 @@ export class Container extends Base {
             this.context.save()
             this.transform(sprite)
             if (realPosition.x < this.width && realPosition.y < this.height) {
-                this.context.drawImage(sprite.bitmap.getRenderTarget(), screenX, screenY)
+                this.context.drawImage(sprite._bitmap.getRenderTarget(), screenX, screenY)
             }
             let len = sprite._children.length
             for (let i = 0; i < len; i++) {

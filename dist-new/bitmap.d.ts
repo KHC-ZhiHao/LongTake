@@ -8,7 +8,7 @@ export declare class Bitmap extends Base {
     /** 是否為快取狀態 */
     cache: boolean;
     /** 由快取產生的圖片buffer */
-    imgBitmap: HTMLImageElement | null;
+    private imgBitmap;
     private _width;
     private _height;
     constructor(width?: number, height?: number, element?: HTMLCanvasElement);
@@ -18,7 +18,7 @@ export declare class Bitmap extends Base {
     get height(): number;
     set height(val: number);
     /** 獲取渲染目標 */
-    getRenderTarget(): HTMLCanvasElement | HTMLImageElement;
+    getRenderTarget(): HTMLImageElement | HTMLCanvasElement;
     /** 調整畫布大小 */
     resize(width: number, height: number): void;
     /** 清空畫布 */

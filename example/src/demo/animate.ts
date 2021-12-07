@@ -89,6 +89,16 @@ export const animate: DemoAttr[] = [
         `
     },
     {
+        name: 'bear-party',
+        title: 'Bear Party',
+        desc: '點擊螢幕建立一支熊。',
+        code: /* javascript */ `
+            (longtake, LongTake) => {
+
+            }
+        `
+    },
+    {
         name: 'live',
         title: 'Live2D',
         desc: '複雜元件組合的示範。',

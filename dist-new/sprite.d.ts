@@ -11,10 +11,9 @@ declare type Channels = {
 };
 /** 建立一個動畫精靈，為 LongTake 的驅動核心 */
 export declare class Sprite extends Event<Channels> {
-    main: Container | null;
-    bitmap: Bitmap;
     parent: Sprite | null;
-    context: CanvasRenderingContext2D;
+    _bitmap: Bitmap;
+    _main: Container | null;
     _children: Sprite[];
     _status: {
         sort: boolean;
@@ -43,6 +42,7 @@ export declare class Sprite extends Event<Channels> {
     };
     private bindUpdateForChild;
     constructor();
+    get context(): CanvasRenderingContext2D;
     get helper(): {
         arc: number;
         rarc: number;
@@ -67,17 +67,17 @@ export declare class Sprite extends Event<Channels> {
     eachChildrenDeep(callback: (child: Sprite) => void): void;
     /** 被加入 LongTake 時執行，並載入 LongTake */
     _install(main: Container): void;
-    /** 當被加入stage時呼叫該函式 */
+    /** 當被加入 stage 時呼叫該函式 */
     create(sprite: this): void;
-    /** 精靈寬(和Bitmap同步) */
+    /** 精靈寬 */
     get width(): number;
-    /** 精靈寬(和Bitmap同步) */
+    /** 精靈寬 */
     set width(val: number);
-    /** 精靈高(和Bitmap同步) */
+    /** 精靈高 */
     get height(): number;
-    /** 精靈高(和Bitmap同步) */
+    /** 精靈高 */
     set height(val: number);
-    /** 調整精靈的bitmap大小 */
+    /** 調整精靈的大小 */
     resize(width: number | {
         width: number;
         height: number;
@@ -159,7 +159,7 @@ export declare class Sprite extends Event<Channels> {
     /** 解除快取狀態 */
     unCache(): void;
     /** 隱藏 */
-    hidden(bool: boolean): void;
+    hidden(): void;
     /** 解除隱藏 */
     unHidden(): void;
     /** 獲取該精靈實際呈現的大小 */
