@@ -598,15 +598,13 @@ export class TextSprite extends Sprite {
             backgroundColor: this.helper.ifEmpty(options.backgroundColor, null)
         }
         this.render = () => {
-            let unit = (this.options.fontSize + 14) * this.getByteLength()
+            let unit = this.options.fontSize + 14
             let padding = this.options.padding * 2
-            this.resize(unit, unit)
+            this.resize(unit * this.getByteLength(), unit)
             this.context.clearRect(0, 0, this.width, this.height)
             this.drawText(0, 4)
             let trim = this._bitmap.getTrimSize()
-            let width = trim.width + padding
-            let height = trim.height + padding
-            this.resize(width, height)
+            this.resize(trim.width + padding, trim.height + padding)
             this.context.clearRect(0, 0, this.width, this.height)
             if (this.options.backgroundColor) {
                 this.context.fillStyle = this.options.backgroundColor

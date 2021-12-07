@@ -78,6 +78,7 @@ export const basic: DemoAttr[] = [
                             color: 'blue',
                             fontSize: 48,
                             backgroundColor: '#FF0000',
+                            resolution: 2,
                             padding: 20
                         })
                         this.x = longtake.width / 2

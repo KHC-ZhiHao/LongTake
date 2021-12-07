@@ -26,9 +26,9 @@ export const twinRender = async (app: LongTake) => {
         time = 400
         create() {
             this.width = 600
-            this.height = this.main.height
+            this.height = app.height
             this.opacity = 50
-            this.x = this.main.width / 2 - this.width / 2
+            this.x = app.width / 2 - this.width / 2
         }
         update() {
             if (this.time === 0) {
@@ -45,7 +45,7 @@ export const twinRender = async (app: LongTake) => {
         animate = new Animate({
             duration: 1000,
             action: t => {
-                this.y = -this.height + (this.main.height + this.height) * t
+                this.y = -this.height + (app.height + this.height) * t
             }
         })
         create() {
@@ -76,9 +76,9 @@ export const twinRender = async (app: LongTake) => {
             this.waveScale = scale
         }
         create() {
-            this.y = this.main.height - 10
-            this.resize(this.main.width, 10)
-            let t = this.main.width / this.imgWidth
+            this.y = app.height - 10
+            this.resize(app.width, 10)
+            let t = app.width / this.imgWidth
             for (let i = 0; i < t; i++) {
                 this.addChildren(new Wave(this.imgWidth * i, this.waveScale))
             }
@@ -101,13 +101,13 @@ export const twinRender = async (app: LongTake) => {
             this.scale(scale, scale)
         }
         create() {
-            this.start = this.speed * (this.x / this.main.width)
+            this.start = this.speed * (this.x / app.width)
             this.setAnchor(0.5, 1)
             this.animate = new LongTake.Animate({
                 begin: this.start,
                 duration: this.speed,
                 action: t => {
-                    this.x = -this.width + (this.main.width + this.width * 2) * t
+                    this.x = -this.width + (app.width + this.width * 2) * t
                     this.y = this.dir * 2 + this.dir * Math.sin(t * 360)
                 }
             })

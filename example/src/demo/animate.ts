@@ -91,10 +91,64 @@ export const animate: DemoAttr[] = [
     {
         name: 'bear-party',
         title: 'Bear Party',
-        desc: '點擊螢幕建立一支熊。',
+        desc: '點擊畫面能產生更多高熊。',
         code: /* javascript */ `
             (longtake, LongTake) => {
-
+                let count = 5
+                let image = new Image()
+                image.src = 'images/KaohBear.png'
+                class Bear extends LongTake.ImageSprite {
+                    constructor(x, y) {
+                        super(image)
+                        this.x = x
+                        this.y = y
+                        this.dir = this.helper.randInt(0, 360)
+                        this.setAnchor(0.5)
+                        let vector = this.helper.getVector(this.dir, 10)
+                        this.vx = vector.x
+                        this.vy = vector.y
+                    }
+                    update() {
+                        this.x += this.vx
+                        this.y += this.vy
+                        let size = this.getRealSize()
+                        if (this.x + size.width / 2 > longtake.width || this.x - size.width / 2 < 0) {
+                            this.vx *= -1
+                        }
+                        if (this.y + size.height / 2 > longtake.height || this.y - size.height / 2 < 0) {
+                            this.vy *= -1
+                        }
+                    }
+                }
+                class CountText extends LongTake.TextSprite {
+                    constructor() {
+                        super({
+                            padding: 10,
+                            fontSize: 24
+                        })
+                        this.setContent(5)
+                    }
+                    create() {
+                        this.x = longtake.width / 2
+                        this.y = 20
+                        this.z = 100
+                        this.setAnchor(0.5, 0.5)
+                    }
+                }
+                let countText = new CountText()
+                for (let i = 0; i < 5; i++) {
+                    longtake.addChildren(new Bear(longtake.width / 2, longtake.height / 2))
+                }
+                image.onload = () => {
+                    longtake.addChildren(countText)
+                    longtake.on('click', ({ x, y }) => {
+                        count += 5
+                        countText.setContent(count.toString())
+                        for (let i = 0; i < 5; i++) {
+                            longtake.addChildren(new Bear(x, y))
+                        }
+                    })
+                }
             }
         `
     },
