@@ -53,6 +53,7 @@ export class Sprite extends Event<Channels> {
         cache: false,
         remove: false,
         hidden: false,
+        antiAliasing: true,
         childrenDead: false
     }
     _transform = {
@@ -164,6 +165,16 @@ export class Sprite extends Event<Channels> {
     /** 精靈高 */
     set height(val) {
         this._bitmap.height = val
+    }
+
+    /** 抗鋸齒 */
+    get antiAliasing() {
+        return this._status.antiAliasing
+    }
+
+    /** 抗鋸齒 */
+    set antiAliasing(val: boolean) {
+        this._status.antiAliasing = val
     }
 
     /** 調整精靈的大小 */
@@ -619,7 +630,7 @@ export class TextSprite extends Sprite {
         this.context.textBaseline = 'top'
         this.context.font = `${this.options.fontSize}px ${this.options.fontFamily}`
         this.context.fillStyle = this.options.color
-        this.context.fillText(this.text || '', offsetX, offsetY)
+        this.context.fillText(this.text || '', Math.round(offsetX) + 0.5, Math.round(offsetY) + 0.5)
     }
 
     private getByteLength() {
@@ -640,6 +651,7 @@ export class TextSprite extends Sprite {
 
     setContent(text: string) {
         this.text = text
+        this.antiAliasing = false
         this.unCache()
     }
 }

@@ -10,8 +10,7 @@ export class Bitmap extends Base {
     /** 是否為快取狀態 */
     cache = false
     /** 由快取產生的圖片buffer */
-    private imgBitmap: HTMLImageElement | null = null
-
+    private imgBitmap: HTMLImageElement | ImageBitmap | null = null
     private _width = 0
     private _height = 0
 
@@ -78,11 +77,17 @@ export class Bitmap extends Base {
     /** 當此位圖快取時，將 render target 轉換成 img or imagebitmap 加速渲染 */
 
     cacheImageBitmap() {
-        let img = new Image()
-        img.onload = () => {
-            this.imgBitmap = img
+        if (typeof window.createImageBitmap !== 'undefined') {
+            createImageBitmap(this.canvas).then(ImageBitmap => {
+                this.imgBitmap = ImageBitmap
+            })
+        } else {
+            let img = new Image()
+            img.onload = () => {
+                this.imgBitmap = img
+            }
+            img.src = this.canvas.toDataURL()
         }
-        img.src = this.canvas.toDataURL()
     }
 
     /** 解除並清除圖片資料快取 */

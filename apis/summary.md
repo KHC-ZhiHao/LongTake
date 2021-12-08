@@ -99,6 +99,13 @@ new LongTake.Sprite()
 
 放大高。
 
+#### antiAliasing
+
+* type: boolean
+* default: true
+
+是否啟用抗鋸齒。
+
 #### screenScaleWidth
 
 * readonly

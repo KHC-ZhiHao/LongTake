@@ -20,6 +20,7 @@ export declare class Sprite extends Event<Channels> {
         cache: boolean;
         remove: boolean;
         hidden: boolean;
+        antiAliasing: boolean;
         childrenDead: boolean;
     };
     _transform: {
@@ -77,6 +78,10 @@ export declare class Sprite extends Event<Channels> {
     get height(): number;
     /** 精靈高 */
     set height(val: number);
+    /** 抗鋸齒 */
+    get antiAliasing(): boolean;
+    /** 抗鋸齒 */
+    set antiAliasing(val: boolean);
     /** 調整精靈的大小 */
     resize(width: number | {
         width: number;

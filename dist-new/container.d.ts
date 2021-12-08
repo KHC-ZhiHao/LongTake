@@ -22,8 +22,6 @@ export declare class Container extends Base {
     get height(): number;
     stageUpdate(): void;
     stageRender(): void;
-    /** 獲取該 Container 的 ImageBitmap */
-    getImageBitmap(callback: (canvas: HTMLCanvasElement) => void): void;
     /** 加入一個子精靈 */
     addChildren(sprite: Sprite): void;
     draw(): void;

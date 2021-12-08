@@ -52,6 +52,7 @@ export class LongTake extends Event<Channels> {
         super('Main')
         this.target = typeof target === 'string' ? document.getElementById(target) as any : target
         this.context = this.target.getContext('2d')!
+        this.context.imageSmoothingEnabled = false
         this.width = width != null ? width : this.target.width
         this.height = height != null ? height : this.target.height
         this.container = new Container(this.width, this.height, this)
@@ -153,9 +154,9 @@ export class LongTake extends Event<Channels> {
         this.container.stageUpdate()
     }
 
-    private bitmapUpdate() {
+    private async bitmapUpdate() {
         this.container.stageRender()
         this.context.clearRect(0, 0, this.width, this.height)
-        this.context.drawImage(this.container.bitmap.canvas, 0, 0)
+        this.context.drawImage(this.container.bitmap.canvas, 0, 0, this.width, this.height)
     }
 }

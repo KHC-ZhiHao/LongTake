@@ -47,12 +47,6 @@ export class Container extends Base {
         this.draw()
     }
 
-    /** 獲取該 Container 的 ImageBitmap */
-
-    getImageBitmap(callback: (canvas: HTMLCanvasElement) => void) {
-        callback(this.bitmap.canvas)
-    }
-
     /** 加入一個子精靈 */
 
     addChildren(sprite: Sprite) {
@@ -68,11 +62,14 @@ export class Container extends Base {
         if (sprite.canShow) {
             let screenX = Math.round(sprite.screenX)
             let screenY = Math.round(sprite.screenY)
-            let realPosition = sprite.getRealPosition()
+            if (sprite.antiAliasing === false) {
+                this.context.imageSmoothingEnabled = false
+            }
             this.context.save()
             this.transform(sprite)
-            if (realPosition.x < this.width && realPosition.y < this.height) {
-                this.context.drawImage(sprite._bitmap.getRenderTarget(), screenX, screenY)
+            this.context.drawImage(sprite._bitmap.getRenderTarget(), screenX, screenY, sprite.width, sprite.height)
+            if (sprite.antiAliasing === false) {
+                this.context.imageSmoothingEnabled = true
             }
             let len = sprite._children.length
             for (let i = 0; i < len; i++) {

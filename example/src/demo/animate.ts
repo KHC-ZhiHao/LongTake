@@ -100,13 +100,12 @@ export const animate: DemoAttr[] = [
                 class Bear extends LongTake.ImageSprite {
                     constructor(x, y) {
                         super(image)
+                        let vector = this.helper.getVector(this.helper.randInt(0, 360), 5)
                         this.x = x
                         this.y = y
-                        this.dir = this.helper.randInt(0, 360)
-                        this.setAnchor(0.5)
-                        let vector = this.helper.getVector(this.dir, 10)
                         this.vx = vector.x
                         this.vy = vector.y
+                        this.setAnchor(0.5)
                     }
                     update() {
                         this.x += this.vx
@@ -123,23 +122,23 @@ export const animate: DemoAttr[] = [
                 class CountText extends LongTake.TextSprite {
                     constructor() {
                         super({
-                            padding: 10,
+                            padding: 24,
                             fontSize: 24
                         })
-                        this.setContent(5)
                     }
                     create() {
                         this.x = longtake.width / 2
                         this.y = 20
                         this.z = 100
                         this.setAnchor(0.5, 0.5)
+                        this.setContent(5)
                     }
                 }
                 let countText = new CountText()
-                for (let i = 0; i < 5; i++) {
-                    longtake.addChildren(new Bear(longtake.width / 2, longtake.height / 2))
-                }
                 image.onload = () => {
+                    for (let i = 0; i < 5; i++) {
+                        longtake.addChildren(new Bear(longtake.width / 2, longtake.height / 2))
+                    }
                     longtake.addChildren(countText)
                     longtake.on('click', ({ x, y }) => {
                         count += 5
