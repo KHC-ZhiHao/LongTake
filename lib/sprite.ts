@@ -598,9 +598,16 @@ type TextOptions = {
 export class TextSprite extends Sprite {
     private text: string = ''
     private options: TextOptions
+    private trim = {
+        top: 0,
+        left: 0,
+        width: 0,
+        height: 0
+    }
     readonly render: any = null
     constructor(options: Partial<TextOptions> = {}) {
         super()
+        this.antiAliasing = false
         this.options = {
             color: this.helper.ifEmpty(options.color, '#000'),
             padding: this.helper.ifEmpty(options.padding, 0),
@@ -609,34 +616,29 @@ export class TextSprite extends Sprite {
             backgroundColor: this.helper.ifEmpty(options.backgroundColor, null)
         }
         this.render = () => {
-            let unit = this.options.fontSize + 14
-            let padding = this.options.padding * 2
-            this.resize(unit * this.getByteLength(), unit)
-            this.context.clearRect(0, 0, this.width, this.height)
-            this.drawText(0, 4)
-            let trim = this._bitmap.getTrimSize()
-            this.resize(trim.width + padding, trim.height + padding)
             this.context.clearRect(0, 0, this.width, this.height)
             if (this.options.backgroundColor) {
                 this.context.fillStyle = this.options.backgroundColor
                 this.context.fillRect(0, 0, this.width, this.height)
             }
-            this.drawText(trim.left * -1 + this.options.padding, trim.top / 2 * -1 + this.options.padding)
+            let x = this.trim.left * -1 + this.options.padding
+            let y = this.trim.top / 2 * -1 + this.options.padding
+            this.drawText(this.context, x, y)
             this.cache()
         }
     }
 
-    private drawText(offsetX: number, offsetY: number) {
-        this.context.textBaseline = 'top'
-        this.context.font = `${this.options.fontSize}px ${this.options.fontFamily}`
-        this.context.fillStyle = this.options.color
-        this.context.fillText(this.text || '', Math.round(offsetX) + 0.5, Math.round(offsetY) + 0.5)
+    private drawText(context: CanvasRenderingContext2D, offsetX: number, offsetY: number) {
+        context.textBaseline = 'top'
+        context.font = `${this.options.fontSize}px ${this.options.fontFamily}`
+        context.fillStyle = this.options.color
+        context.fillText(this.text || '', Math.round(offsetX) + 0.5, Math.round(offsetY) + 0.5)
     }
 
-    private getByteLength() {
-        let size = this.text.length
-        for (let i = this.text.length - 1; i >= 0; i--) {
-            let code = this.text.charCodeAt(i)
+    private getByteLength(text: string) {
+        let size = text.length
+        for (let i = text.length - 1; i >= 0; i--) {
+            let code = text.charCodeAt(i)
             if (code > 0x7f && code <= 0x7ff) {
                 size++
             } else if (code > 0x7ff && code <= 0xffff) {
@@ -650,8 +652,13 @@ export class TextSprite extends Sprite {
     }
 
     setContent(text: string) {
+        let unit = this.options.fontSize + 14
+        let padding = this.options.padding * 2
+        let bitmap = new Bitmap(unit * this.getByteLength(text), unit)
         this.text = text
-        this.antiAliasing = false
+        this.drawText(bitmap.context, 0, 4)
+        this.trim = bitmap.getTrimSize()
+        this.resize(this.trim.width + padding, this.trim.height + padding)
         this.unCache()
     }
 }

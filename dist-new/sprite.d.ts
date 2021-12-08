@@ -216,6 +216,7 @@ declare type TextOptions = {
 export declare class TextSprite extends Sprite {
     private text;
     private options;
+    private trim;
     readonly render: any;
     constructor(options?: Partial<TextOptions>);
     private drawText;
