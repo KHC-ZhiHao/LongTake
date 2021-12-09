@@ -68,6 +68,10 @@ export class LongTake extends Event<Channels> {
         this.update()
     }
 
+    static get version() {
+        return '1.0'
+    }
+
     static get helper() {
         return helper
     }

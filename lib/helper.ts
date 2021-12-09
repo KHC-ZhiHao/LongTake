@@ -87,7 +87,7 @@ export const helper = {
      */
 
     getVisibility() {
-        let width = document.body.clientWidth
+        let width = window.screen.availWidth
         if (width < 600) {
             return 'xs'
         }

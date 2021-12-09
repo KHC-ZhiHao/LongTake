@@ -39,6 +39,7 @@ type BlendMode =
 
 type Channels = {
     click: {}
+    remove: {}
 }
 
 /** 建立一個動畫精靈，為 LongTake 的驅動核心 */
@@ -480,13 +481,16 @@ export class Sprite extends Event<Channels> {
         this.update(this)
         this.eachChildren(this.bindUpdateForChild)
         if (this._status.childrenDead) {
+            const removeChild: Sprite[] = []
             this._status.childrenDead = false
             this._children = this._children.filter((child) => {
                 if (child._status.remove) {
                     child._close()
+                    removeChild.push(child)
                 }
                 return !child._status.remove
             })
+            removeChild.forEach(child => child.emit('remove', {}))
         }
     }
 
