@@ -4,6 +4,14 @@ import { Animate } from './animate';
 import { Sprite, ImageSprite, TextSprite } from './sprite';
 /** 核心 */
 declare type Channels = {
+    keydown: {
+        key: string;
+        code: string;
+    };
+    keyup: {
+        key: string;
+        code: string;
+    };
     click: {
         x: number;
         y: number;
@@ -29,6 +37,7 @@ export declare class LongTake extends Event<Channels> {
     private target;
     private context;
     private pointerEvent;
+    private listenerWindowGroup;
     private listenerGroup;
     /** 主要運行的container，由本核心驅動內部精靈的update和event */
     private container;

@@ -34,6 +34,18 @@ pointer 相關事件必須啟用 enableInteractive() 才會生效。
 
 被點擊時觸發。
 
+#### keydown
+
+* data: { key: string, code: number }
+
+鍵盤案下時觸發。
+
+#### keyup
+
+* data: { key: string, code: number }
+
+鍵盤釋放時觸發。
+
 #### pointerdown
 
 * data: { x: number, y: number }

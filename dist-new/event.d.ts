@@ -1,7 +1,7 @@
 export declare class ListenerGroup {
     private element;
     private listeners;
-    constructor(element: Element);
+    constructor(element: Element | Window);
     add(name: string, callback: (...params: any[]) => void): void;
     close(): void;
 }

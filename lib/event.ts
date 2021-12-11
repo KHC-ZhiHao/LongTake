@@ -37,9 +37,9 @@ const inSafari = () => {
 }
 
 export class ListenerGroup {
-    private element: Element
+    private element: Element | Window
     private listeners: [string, any][] = []
-    constructor(element: Element) {
+    constructor(element: Element | Window) {
         this.element = element
     }
     add(name: string, callback: (...params: any[]) => void) {

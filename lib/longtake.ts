@@ -9,6 +9,14 @@ import { ListenerGroup, pointer } from './event'
 /** 核心 */
 
 type Channels = {
+    keydown: {
+        key: string
+        code: string
+    }
+    keyup: {
+        key: string
+        code: string
+    }
     click: {
         x: number
         y: number
@@ -35,6 +43,7 @@ export class LongTake extends Event<Channels> {
     private target: HTMLCanvasElement
     private context: CanvasRenderingContext2D
     private pointerEvent: ListenerGroup
+    private listenerWindowGroup: ListenerGroup
     private listenerGroup: ListenerGroup
     /** 主要運行的container，由本核心驅動內部精靈的update和event */
     private container: Container
@@ -58,9 +67,18 @@ export class LongTake extends Event<Channels> {
         this.container = new Container(this.width, this.height, this)
         this.pointerEvent = new ListenerGroup(this.target)
         this.listenerGroup = new ListenerGroup(this.target)
+        this.listenerWindowGroup = new ListenerGroup(window)
         this.listenerGroup.add('click', event => this.emit('click', {
             x: event.offsetX,
             y: event.offsetY
+        }))
+        this.listenerWindowGroup.add('keydown', event => this.emit('keydown', {
+            key: event.key,
+            code: event.keyCode
+        }))
+        this.listenerWindowGroup.add('keyup', event => this.emit('keyup', {
+            key: event.key,
+            code: event.keyCode
         }))
         this.on('click', (data) => {
             this.container.stage.eachChildren(child => child._onClick(data.x, data.y))
@@ -109,6 +127,7 @@ export class LongTake extends Event<Channels> {
         this.remove = true
         this.pointerEvent.close()
         this.listenerGroup.close()
+        this.listenerWindowGroup.close()
         this.container.stage.eachChildrenDeep((child) => {
             child._close()
         })
