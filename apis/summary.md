@@ -24,6 +24,34 @@
 new LongTake(target: string | HTMLCanvasElement, width?: number, height?: number)
 ```
 
+### Events
+
+pointer 相關事件必須啟用 enableInteractive() 才會生效。
+
+#### click
+
+* data: { x: number, y: number }
+
+被點擊時觸發。
+
+#### pointerdown
+
+* data: { x: number, y: number }
+
+指標或是觸控開始時觸發。
+
+#### pointermove
+
+* data: { x: number, y: number }
+
+指標或是觸控開始後移動時觸發。
+
+#### pointerup
+
+* data: {}
+
+指標或是觸控離開時觸發。
+
 ### Methods
 
 #### clear(): void
@@ -55,6 +83,26 @@ new LongTake.Sprite()
 #### isSprite(object: any): boolean
 
 檢測一個物件是否為精靈。
+
+### Events
+
+#### click
+
+* data: {}
+
+被點擊時觸發。
+
+#### remove
+
+* data: {}
+
+從父類被移除時觸發。
+
+#### inited
+
+* data: {}
+
+完成 creata、update、render 第一輪後會被觸發。
 
 ### Properties
 
@@ -242,7 +290,7 @@ new LongTake.Sprite()
 
 #### cache(): void
 
-快取目前渲染的 Bitmap。
+不再執行 render 的方法，並將現在的結果快取成圖片。
 
 #### unCache(): void
 

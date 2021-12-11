@@ -141,7 +141,7 @@ export class Event<T extends Record<string, Record<string, any>>> extends Base {
         if (this.listeners.has(key) === false) {
             this.listeners.set(key, [])
         }
-        (this.listeners.get(key) as any).push(listener)
+        (this.listeners.get(key) as any).unshift(listener)
         return listener
     }
 }

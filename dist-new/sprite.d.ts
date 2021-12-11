@@ -9,6 +9,7 @@ declare type BlendMode = 'inherit' | 'source-over' | 'source-in' | 'source-out' 
 declare type Channels = {
     click: {};
     remove: {};
+    inited: {};
 };
 /** 建立一個動畫精靈，為 LongTake 的驅動核心 */
 export declare class Sprite extends Event<Channels> {
@@ -19,6 +20,7 @@ export declare class Sprite extends Event<Channels> {
     _status: {
         sort: boolean;
         cache: boolean;
+        inited: boolean;
         remove: boolean;
         hidden: boolean;
         antiAliasing: boolean;

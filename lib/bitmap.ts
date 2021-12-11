@@ -96,30 +96,10 @@ export class Bitmap extends Base {
         this.imgBitmap = null
     }
 
-    /** 取得位元位置的像素元素 */
-
-    getPixel(x: number, y: number) {
-        let imgData = this.getImageData()
-        let site = (x * (imgData.width * 4)) + (y * 4)
-        return [
-            imgData.data[site],
-            imgData.data[site + 1],
-            imgData.data[site + 2],
-            imgData.data[site + 3]
-        ]
-    }
-
     /** 獲取快取圖片資料 */
 
     getImageData() {
         return this.context.getImageData(0, 0, this.width, this.height)
-    }
-
-    /** 清空圖片並貼上圖片資料 */
-
-    putImageData(imgData: ImageData) {
-        this.clear()
-        this.context.putImageData(imgData, 0, 0)
     }
 
     /** 獲得排除空白空間的矩形 */

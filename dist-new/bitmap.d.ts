@@ -27,12 +27,8 @@ export declare class Bitmap extends Base {
     cacheImageBitmap(): void;
     /** 解除並清除圖片資料快取 */
     clearCache(): void;
-    /** 取得位元位置的像素元素 */
-    getPixel(x: number, y: number): number[];
     /** 獲取快取圖片資料 */
     getImageData(): ImageData;
-    /** 清空圖片並貼上圖片資料 */
-    putImageData(imgData: ImageData): void;
     /** 獲得排除空白空間的矩形 */
     getTrimSize(): {
         top: number;

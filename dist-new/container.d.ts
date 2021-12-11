@@ -26,5 +26,6 @@ export declare class Container extends Base {
     addChildren(sprite: Sprite): void;
     draw(): void;
     render(sprite: Sprite): void;
+    private needSave;
     transform(sprite: Sprite): void;
 }

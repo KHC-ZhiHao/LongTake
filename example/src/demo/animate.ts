@@ -106,6 +106,13 @@ export const animate: DemoAttr[] = [
                         this.vx = vector.x
                         this.vy = vector.y
                         this.setAnchor(0.5)
+                        this.on('inited', () => {
+                            this.context.globalAlpha = 0.5
+                            this.context.globalCompositeOperation = 'source-atop'
+                            this.context.fillStyle = this.helper.getRandomColor()
+                            this.context.fillRect(0, 0, this.width, this.height)
+                            this.context.globalCompositeOperation = 'source-over'
+                        })
                     }
                     update() {
                         this.x += this.vx
@@ -402,6 +409,7 @@ export const animate: DemoAttr[] = [
                     }
                     render() {
                         this.messagesPause += 1
+                        this.context.save()
                         this.context.drawImage(loader.get('Grandma-9'), 0, 0)
                         this.context.rotate(-0.035)
                         this.context.scale(3, 3)
@@ -414,6 +422,7 @@ export const animate: DemoAttr[] = [
                             this.cache()
                             this.parent.stopTalk = true
                         }
+                        this.context.restore()
                     }
                 }
                 

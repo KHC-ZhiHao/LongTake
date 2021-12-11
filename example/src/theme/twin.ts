@@ -174,7 +174,7 @@ export const twinRender = async (app: LongTake) => {
 
         let scene = new ImageSprite(loader.get('scene'))
         scene.create = function() {
-            this.y = this.main.height - this.height
+            this.y = app.height - this.height
         }
 
         let light = new ImageSprite(loader.get('light'))
@@ -185,7 +185,7 @@ export const twinRender = async (app: LongTake) => {
         let rock = new ImageSprite(loader.get('rock'))
         rock.create = function () {
             this.x = 1015
-            this.y = this.main.height - this.height
+            this.y = app.height - this.height
         }
 
         let butterfly = new ImageSprite(loader.get('butterfly'))

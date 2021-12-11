@@ -40,6 +40,7 @@ type BlendMode =
 type Channels = {
     click: {}
     remove: {}
+    inited: {}
 }
 
 /** 建立一個動畫精靈，為 LongTake 的驅動核心 */
@@ -52,6 +53,7 @@ export class Sprite extends Event<Channels> {
     _status = {
         sort: false,
         cache: false,
+        inited: false,
         remove: false,
         hidden: false,
         antiAliasing: true,
@@ -556,10 +558,11 @@ export class Sprite extends Event<Channels> {
     _mainRender() {
         this.eachChildren(this.renderForChild)
         if (this.canRender) {
-            this.context.save()
             this.render(this)
-            this.context.restore()
             this._bitmap.clearCache()
+        }
+        if (this._status.inited === false) {
+            this.emit('inited', {})
         }
     }
 
@@ -583,10 +586,10 @@ export class ImageSprite extends Sprite {
     readonly render: any = null
     constructor(image: HTMLImageElement | ImageBitmap) {
         super()
+        this.on('inited', () => this.cache())
         this.resize(image)
         this.render = () => {
             this.context.drawImage(image, 0, 0)
-            this.cache()
         }
     }
 }

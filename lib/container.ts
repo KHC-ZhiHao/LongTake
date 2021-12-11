@@ -62,10 +62,13 @@ export class Container extends Base {
         if (sprite.canShow) {
             let screenX = Math.round(sprite.screenX)
             let screenY = Math.round(sprite.screenY)
+            let needSave = this.needSave(sprite)
             if (sprite.antiAliasing === false) {
                 this.context.imageSmoothingEnabled = false
             }
-            this.context.save()
+            if (needSave) {
+                this.context.save()
+            }
             this.transform(sprite)
             this.context.drawImage(sprite._bitmap.getRenderTarget(), screenX, screenY, sprite.width, sprite.height)
             if (sprite.antiAliasing === false) {
@@ -75,29 +78,43 @@ export class Container extends Base {
             for (let i = 0; i < len; i++) {
                 this.render(sprite._children[i])
             }
-            this.context.restore()
+            if (needSave) {
+                this.context.restore()
+            }
+        }
+    }
+
+    private needSave(sprite: Sprite) {
+        if (this.context.globalCompositeOperation === sprite.blendMode && sprite.opacity === 255 && sprite.isTransform() === false) {
+            return false
+        } else {
+            return true
         }
     }
 
     transform(sprite: Sprite) {
         let context = this.context
-        context.globalAlpha = context.globalAlpha * (sprite.opacity / 255)
-        context.globalCompositeOperation = sprite.blendMode
-        if (sprite.isTransform() === false) {
-            return
+        let blendMode = sprite.blendMode
+        if (sprite.opacity !== 255) {
+            context.globalAlpha = context.globalAlpha * (sprite.opacity / 255)
         }
-        let posX = sprite.posX
-        let posY = sprite.posY
-        context.translate(posX, posY)
-        if (sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1) {
-            context.scale(sprite.scaleWidth, sprite.scaleHeight)
+        if (blendMode !== this.context.globalCompositeOperation) {
+            context.globalCompositeOperation = blendMode
         }
-        if (sprite.rotation !== 0) {
-            context.rotate(sprite.rotation * sprite.helper.arc)
+        if (sprite.isTransform()) {
+            let posX = sprite.posX
+            let posY = sprite.posY
+            context.translate(posX, posY)
+            if (sprite.scaleHeight !== 1 || sprite.scaleWidth !== 1) {
+                context.scale(sprite.scaleWidth, sprite.scaleHeight)
+            }
+            if (sprite.rotation !== 0) {
+                context.rotate(sprite.rotation * sprite.helper.arc)
+            }
+            if (sprite.skewX !== 0 || sprite.skewY !== 0) {
+                context.transform(1, sprite.skewX, sprite.skewY, 1, 0, 0)
+            }
+            context.translate(-(posX), -(posY))
         }
-        if (sprite.skewX !== 0 || sprite.skewY !== 0) {
-            context.transform(1, sprite.skewX, sprite.skewY, 1, 0, 0)
-        }
-        context.translate(-(posX), -(posY))
     }
 }

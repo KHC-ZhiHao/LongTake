@@ -115,5 +115,37 @@ export const basic: DemoAttr[] = [
                 }
             }
         `
+    },
+    {
+        name: 'filter',
+        title: 'Image Filter',
+        desc: 'ImageSprite 可以透過 inited 事件在 image cache 之前更改像素資源。',
+        code: /* javascript */ `
+            (longtake, LongTake) => {
+                class Bear extends LongTake.ImageSprite {
+                    constructor(image) {
+                        super(image)
+                        this.x = longtake.width / 2
+                        this.y = longtake.height / 2
+                        this.setAnchor(0.5)
+                        this.on('inited', () => {
+                            this.context.globalAlpha = 0.5
+                            this.context.globalCompositeOperation = 'source-atop'
+                            this.context.fillStyle = 'blue'
+                            this.context.fillRect(0, 0, this.width, this.height)
+                            this.context.globalCompositeOperation = 'source-over'
+                        })
+                    }
+                    update() {
+                        this.rotation += 1
+                    }
+                }
+                let image = new Image()
+                image.src = 'images/KaohBear.png'
+                image.onload = () => {
+                    longtake.addChildren(new Bear(image))
+                }
+            }
+        `
     }
 ]

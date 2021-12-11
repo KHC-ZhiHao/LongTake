@@ -1,8 +1,9 @@
 <template>
     <div class="main-wrapper">
         <div class="main-nav">
-            <div class="main-title" ref="title" :style="`color: ${state.color}`">LongTake</div>
-            <div class="pt2">
+            <div class="main-title" :style="`color: ${state.color}`">LongTake</div>
+            <div class="main-subtitle" :style="`color: ${state.color}`">輕巧、快速的繪製動畫</div>
+            <div class="pt3">
                 <Botton
                     icon="arrow-left-bold"
                     @click="next(-1)"
@@ -60,7 +61,6 @@ export default defineComponent({
     },
     setup() {
 
-        const title = self.ref<HTMLDivElement>()
         const canvas = self.ref<HTMLCanvasElement>()
         const themes = {
             farm: {
@@ -178,7 +178,6 @@ export default defineComponent({
 
         return {
             next,
-            title,
             state,
             canvas,
             toApis,
@@ -206,6 +205,11 @@ export default defineComponent({
             font-family: 'Overpass', sans-serif;
             font-size: 5em;
             font-weight: 900;
+        }
+        .main-subtitle {
+            font-family: 'Overpass', sans-serif;
+            font-size: 2em;
+            font-weight: 300;
         }
         .main-canvas {
             top: 0;
