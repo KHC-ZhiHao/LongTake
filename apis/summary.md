@@ -479,9 +479,11 @@ new LongTake.Loader()
 
 執行載入。
 
-#### add(name: string, src: string)
+#### add(name: string, src: string, replace?: ReplaceCallback)
 
-加入一個等待載入檔案。
+* ReplaceCallback: `(name: string, image: HTMLImageElement) => Promise<HTMLImageElement>`
+
+加入一個等待載入檔案，如果 replace 有值，就可以攔截加載完成的照片。
 
 #### get(name: string): void
 
@@ -544,3 +546,7 @@ new LongTake.Loader()
 #### getRandomColor(): string
 
 隨機獲取顏色。
+
+#### imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement>
+
+依照比例縮小圖片。

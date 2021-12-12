@@ -54,13 +54,14 @@ export declare class LongTake extends Event<Channels> {
         sinByRad(deg: number): number;
         cosByRad(deg: number): number;
         getVector(deg: number, distance: number): {
-            x: number; /** 主要運行的container，由本核心驅動內部精靈的update和event */
+            x: number;
             y: number;
         };
         randInt(min: number, max: number): number;
         getAngle(x: number, y: number, ax: number, ay: number): number;
         getVisibility(): "xs" | "sm" | "md" | "lg" | "xl";
         getRandomColor(): string;
+        imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement>;
     };
     static get renderPack(): {
         colorTo: (sprite: Sprite, options: Partial<{
@@ -84,13 +85,14 @@ export declare class LongTake extends Event<Channels> {
         sinByRad(deg: number): number;
         cosByRad(deg: number): number;
         getVector(deg: number, distance: number): {
-            x: number; /** 主要運行的container，由本核心驅動內部精靈的update和event */
+            x: number;
             y: number;
         };
         randInt(min: number, max: number): number;
         getAngle(x: number, y: number, ax: number, ay: number): number;
         getVisibility(): "xs" | "sm" | "md" | "lg" | "xl";
         getRandomColor(): string;
+        imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement>;
     };
     get stage(): Sprite;
     /** 清空所有精靈 */

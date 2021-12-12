@@ -22,6 +22,7 @@ export declare const helper: {
     getAngle(x: number, y: number, ax: number, ay: number): number;
     getVisibility(): "xs" | "sm" | "md" | "lg" | "xl";
     getRandomColor(): string;
+    imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement>;
 };
 export declare const renderPack: {
     colorTo: (sprite: _Sprite, options: Partial<{

@@ -61,6 +61,7 @@ export declare class Sprite extends Event<Channels> {
         getAngle(x: number, y: number, ax: number, ay: number): number;
         getVisibility(): "xs" | "sm" | "md" | "lg" | "xl";
         getRandomColor(): string;
+        imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement>;
     };
     get children(): Sprite[];
     /** 檢測一個物件是否為精靈 */

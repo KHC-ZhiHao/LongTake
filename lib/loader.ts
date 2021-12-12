@@ -1,10 +1,15 @@
 import { Base } from './base'
 
+type OnloadCallback = (name: string, image: HTMLImageElement) => Promise<HTMLImageElement>
+
 /** 針對圖片預載入的載具 */
 
 export class Loader extends Base {
     private data: Record<string, ImageBitmap | HTMLImageElement> = {}
-    private files: Record<string, string> = {}
+    private files: Record<string, {
+        src: string
+        replace?: OnloadCallback
+    }> = {}
     private completed = 0
     private fileLength = 0
     private isStart = false
@@ -50,7 +55,11 @@ export class Loader extends Base {
         this.isStart = true
         for (let name in this.files) {
             let image = new Image()
-            image.onload = () => {
+            image.onload = async() => {
+                let replace = this.files[name].replace
+                if (replace) {
+                    image = await replace(name, image)
+                }
                 if (window.createImageBitmap) {
                     window.createImageBitmap(image).then(bitmap => {
                         this.data[name] = bitmap
@@ -66,16 +75,19 @@ export class Loader extends Base {
                     this.files = {}
                 }
             }
-            image.src = this.files[name]
+            image.src = this.files[name].src
         }
     }
 
     /** 加入一個等待載入檔案 */
 
-    add(name: string, src: string) {
+    add(name: string, src: string, replace?: OnloadCallback) {
         if (this.files[name] == null) {
             this.fileLength += 1
-            this.files[name] = this.validateFile(src)
+            this.files[name] = {
+                src: this.validateFile(src),
+                replace
+            }
         } else {
             this.systemError('add', 'Name conflict.', name)
         }

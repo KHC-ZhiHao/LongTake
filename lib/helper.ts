@@ -1,3 +1,5 @@
+import { Bitmap } from './bitmap'
+
 const arc = Math.PI / 180
 const rarc = 180 / Math.PI
 const trigonometric: Record<string, {
@@ -114,5 +116,19 @@ export const helper = {
             color += letters[Math.floor(Math.random() * 16)]
         }
         return color
+    },
+
+    imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement> {
+        return new Promise((resolve, reject) => {
+            let canvas = document.createElement('canvas')
+            canvas.width = image.width * scale
+            canvas.height = image.height * scale
+            let context = canvas.getContext('2d')!
+            context.drawImage(image, 0, 0, canvas.width, canvas.height)
+            let newImage = new Image()
+            newImage.onload = () => resolve(newImage)
+            newImage.onerror = (error) => reject(error)
+            newImage.src = canvas.toDataURL()
+        })
     }
 }

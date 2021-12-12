@@ -37,4 +37,5 @@ export declare const helper: {
      * 隨機獲取顏色
      */
     getRandomColor(): string;
+    imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement>;
 };
