@@ -79,7 +79,8 @@ export const basic: DemoAttr[] = [
                             fontSize: 48,
                             backgroundColor: '#FF0000',
                             resolution: 2,
-                            padding: 20
+                            padding: 20,
+                            round: 20
                         })
                         this.x = longtake.width / 2
                         this.y = longtake.height / 2
@@ -117,9 +118,9 @@ export const basic: DemoAttr[] = [
         `
     },
     {
-        name: 'filter',
-        title: 'Image Filter',
-        desc: 'ImageSprite 可以透過 inited 事件在 image cache 之前更改像素資源。',
+        name: 'colorto',
+        title: 'Colot To',
+        desc: 'ImageSprite 可以透過 inited 事件在 image cache 之前搭配 renderPack 更改像素資源。',
         code: /* javascript */ `
             (longtake, LongTake) => {
                 class Bear extends LongTake.ImageSprite {
@@ -129,11 +130,10 @@ export const basic: DemoAttr[] = [
                         this.y = longtake.height / 2
                         this.setAnchor(0.5)
                         this.on('inited', () => {
-                            this.context.globalAlpha = 0.5
-                            this.context.globalCompositeOperation = 'source-atop'
-                            this.context.fillStyle = 'blue'
-                            this.context.fillRect(0, 0, this.width, this.height)
-                            this.context.globalCompositeOperation = 'source-over'
+                            LongTake.renderPack.colorTo(this, {
+                                color: 'blue',
+                                alpha: 255 / 2
+                            })
                         })
                     }
                     update() {

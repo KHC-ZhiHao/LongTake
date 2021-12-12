@@ -5,6 +5,7 @@ import { Animate } from './animate'
 import { Container } from './container'
 import { Sprite, ImageSprite, TextSprite } from './sprite'
 import { ListenerGroup, pointer } from './event'
+import { renderPack } from './render'
 
 /** 核心 */
 
@@ -47,7 +48,7 @@ export class LongTake extends Event<Channels> {
     private listenerGroup: ListenerGroup
     /** 主要運行的container，由本核心驅動內部精靈的update和event */
     private container: Container
-    private bindUpdate = this.update.bind(this)
+    private bindUpdate = () => this.update()
     private interactive = false
     private supportRequestAnimationFrame = !!window.requestAnimationFrame
     private requestAnimationFrame = (callback: any) => {
@@ -94,6 +95,10 @@ export class LongTake extends Event<Channels> {
         return helper
     }
 
+    static get renderPack() {
+        return renderPack
+    }
+
     static get Sprite() {
         return Sprite
     }
@@ -114,6 +119,14 @@ export class LongTake extends Event<Channels> {
         return Loader
     }
 
+    get helper() {
+        return helper
+    }
+
+    get stage() {
+        return this.container.stage
+    }
+
     /** 清空所有精靈 */
 
     clear() {
@@ -123,14 +136,11 @@ export class LongTake extends Event<Channels> {
     /** 關閉這個Longtake */
 
     close() {
-        this.clear()
         this.remove = true
         this.pointerEvent.close()
         this.listenerGroup.close()
         this.listenerWindowGroup.close()
-        this.container.stage.eachChildrenDeep((child) => {
-            child._close()
-        })
+        this.container.stage.eachChildrenDeep(child => child._close())
         if (this.interactive) {
             this.interactive = false
             this.target.style.touchAction = 'auto'

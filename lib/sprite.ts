@@ -2,6 +2,7 @@ import { Event } from './base'
 import { helper } from './helper'
 import { Bitmap } from './bitmap'
 import { Container } from './container'
+import { renderPack } from './render'
 
 /**
  * 合成模式
@@ -91,6 +92,10 @@ export class Sprite extends Event<Channels> {
         return helper
     }
 
+    get children() {
+        return this._children
+    }
+
     /** 檢測一個物件是否為精靈 */
 
     static isSprite(object: any) {
@@ -99,19 +104,21 @@ export class Sprite extends Event<Channels> {
 
     _onClick(screenX: number, screenY: number) {
         let called = false
-        this.eachChildren(child => {
-            let listener = child.on('click', () => {
-                if (called === false) {
-                    called = true
+        if (this.canShow) {
+            this.eachChildren(child => {
+                let listener = child.on('click', () => {
+                    if (called === false) {
+                        called = true
+                        this.emit('click', {})
+                    }
+                })
+                child._onClick(screenX, screenY)
+                listener.off()
+            })
+            if (called === false && this.getChannelListenerSize('click')) {
+                if (this.inRect(screenX, screenY)) {
                     this.emit('click', {})
                 }
-            })
-            child._onClick(screenX, screenY)
-            listener.off()
-        })
-        if (called === false && this.getChannelListenerSize('click')) {
-            if (this.inRect(screenX, screenY)) {
-                this.emit('click', {})
             }
         }
     }
@@ -208,6 +215,14 @@ export class Sprite extends Event<Channels> {
         } else {
             this.systemError('addChildren', 'Object not a sprite', sprite)
         }
+    }
+
+    /** 獲取所有子精靈，包含子精靈的子精靈 */
+
+    getTotalChildren() {
+        let children: Sprite[] = []
+        this.eachChildrenDeep(child => children.push(child))
+        return children
     }
 
     /** 重新排列子精靈，當子精靈有 Z 值改變時會自動觸發 */
@@ -596,6 +611,7 @@ export class ImageSprite extends Sprite {
 
 type TextOptions = {
     color: string
+    round: number
     padding: number
     fontSize: number
     fontFamily: string
@@ -617,16 +633,19 @@ export class TextSprite extends Sprite {
         this.antiAliasing = false
         this.options = {
             color: this.helper.ifEmpty(options.color, '#000'),
+            round: this.helper.ifEmpty(options.round, 0),
             padding: this.helper.ifEmpty(options.padding, 0),
             fontSize: this.helper.ifEmpty(options.fontSize, 18),
-            fontFamily: this.helper.ifEmpty(options.fontFamily, 'Arial'),
+            fontFamily: this.helper.ifEmpty(options.fontFamily, 'serif'),
             backgroundColor: this.helper.ifEmpty(options.backgroundColor, null)
         }
         this.render = () => {
             this.context.clearRect(0, 0, this.width, this.height)
             if (this.options.backgroundColor) {
-                this.context.fillStyle = this.options.backgroundColor
-                this.context.fillRect(0, 0, this.width, this.height)
+                renderPack.fillRoundRect(this, {
+                    color: this.options.backgroundColor,
+                    round: this.options.round
+                })
             }
             let x = this.trim.left * -1 + this.options.padding
             let y = this.trim.top / 2 * -1 + this.options.padding

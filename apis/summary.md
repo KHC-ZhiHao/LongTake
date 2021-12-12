@@ -16,6 +16,8 @@
 
 [helper](#helper)
 
+[helper](#helper)
+
 ## LongTake
 
 ### Constructor
@@ -63,6 +65,22 @@ pointer 相關事件必須啟用 enableInteractive() 才會生效。
 * data: {}
 
 指標或是觸控離開時觸發。
+
+### Properties
+
+#### stage
+
+* readonly
+* type: Sprite
+
+所有精靈的根。
+
+#### helper
+
+* readonly
+* type: Helper
+
+幫助性物件。
 
 ### Methods
 
@@ -124,6 +142,13 @@ new LongTake.Sprite()
 * type: Sprite | null = null
 
 父精靈。
+
+#### children
+
+* readonly
+* type: Sprite[]
+
+子精靈組。
 
 #### context: Context2D
 
@@ -276,6 +301,10 @@ new LongTake.Sprite()
 
 迭代所有子精靈(包含子精靈的子精靈)。
 
+#### getTotalChildren(): Sprite[]
+
+獲取所有子精靈，包含子精靈的子精靈。
+
 #### resize(width: number | { width: number, height: number }, height?: number): void
 
 調整精靈的大小。
@@ -351,6 +380,7 @@ Extends: Sprite
 ```ts
 new LongTake.TextSprite({
     color: '#000'
+    round: 0,
     padding: 4
     fontSize: 24
     fontFamily: 'Arial',

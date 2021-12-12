@@ -62,6 +62,7 @@ export declare class Sprite extends Event<Channels> {
         getVisibility(): "xs" | "sm" | "md" | "lg" | "xl";
         getRandomColor(): string;
     };
+    get children(): Sprite[];
     /** 檢測一個物件是否為精靈 */
     static isSprite(object: any): boolean;
     _onClick(screenX: number, screenY: number): void;
@@ -92,6 +93,8 @@ export declare class Sprite extends Event<Channels> {
     }, height?: number): void;
     /** 加入一個子精靈 */
     addChildren(sprite: Sprite): void;
+    /** 獲取所有子精靈，包含子精靈的子精靈 */
+    getTotalChildren(): Sprite[];
     /** 重新排列子精靈，當子精靈有 Z 值改變時會自動觸發 */
     _sortChildren(): void;
     /** 是否有變形 */
@@ -211,6 +214,7 @@ export declare class ImageSprite extends Sprite {
 }
 declare type TextOptions = {
     color: string;
+    round: number;
     padding: number;
     fontSize: number;
     fontFamily: string;

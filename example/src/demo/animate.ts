@@ -94,7 +94,6 @@ export const animate: DemoAttr[] = [
         desc: '點擊畫面能產生更多高熊。',
         code: /* javascript */ `
             (longtake, LongTake) => {
-                let count = 5
                 let image = new Image()
                 image.src = 'images/KaohBear.png'
                 class Bear extends LongTake.ImageSprite {
@@ -107,11 +106,10 @@ export const animate: DemoAttr[] = [
                         this.vy = vector.y
                         this.setAnchor(0.5)
                         this.on('inited', () => {
-                            this.context.globalAlpha = 0.5
-                            this.context.globalCompositeOperation = 'source-atop'
-                            this.context.fillStyle = this.helper.getRandomColor()
-                            this.context.fillRect(0, 0, this.width, this.height)
-                            this.context.globalCompositeOperation = 'source-over'
+                            LongTake.renderPack.colorTo(this, {
+                                color: this.helper.getRandomColor(),
+                                alpha: 255 / 2
+                            })
                         })
                     }
                     update() {
@@ -148,11 +146,11 @@ export const animate: DemoAttr[] = [
                     }
                     longtake.addChildren(countText)
                     longtake.on('click', ({ x, y }) => {
-                        count += 5
-                        countText.setContent(count.toString())
                         for (let i = 0; i < 5; i++) {
                             longtake.addChildren(new Bear(x, y))
                         }
+                        let total = longtake.stage.getTotalChildren().length - 1
+                        countText.setContent(total.toString())
                     })
                 }
             }

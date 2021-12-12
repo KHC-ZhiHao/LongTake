@@ -54,7 +54,7 @@ export declare class LongTake extends Event<Channels> {
         sinByRad(deg: number): number;
         cosByRad(deg: number): number;
         getVector(deg: number, distance: number): {
-            x: number;
+            x: number; /** 主要運行的container，由本核心驅動內部精靈的update和event */
             y: number;
         };
         randInt(min: number, max: number): number;
@@ -62,11 +62,37 @@ export declare class LongTake extends Event<Channels> {
         getVisibility(): "xs" | "sm" | "md" | "lg" | "xl";
         getRandomColor(): string;
     };
+    static get renderPack(): {
+        colorTo: (sprite: Sprite, options: Partial<{
+            color: string;
+            alpha: number;
+        }>) => void;
+        fillRoundRect: (sprite: Sprite, options?: Partial<{
+            round: number;
+            color: string;
+        }>) => void;
+    };
     static get Sprite(): typeof Sprite;
     static get ImageSprite(): typeof ImageSprite;
     static get TextSprite(): typeof TextSprite;
     static get Animate(): typeof Animate;
     static get Loader(): typeof Loader;
+    get helper(): {
+        arc: number;
+        rarc: number;
+        ifEmpty<T>(data: T | undefined, def: T): T;
+        sinByRad(deg: number): number;
+        cosByRad(deg: number): number;
+        getVector(deg: number, distance: number): {
+            x: number; /** 主要運行的container，由本核心驅動內部精靈的update和event */
+            y: number;
+        };
+        randInt(min: number, max: number): number;
+        getAngle(x: number, y: number, ax: number, ay: number): number;
+        getVisibility(): "xs" | "sm" | "md" | "lg" | "xl";
+        getRandomColor(): string;
+    };
+    get stage(): Sprite;
     /** 清空所有精靈 */
     clear(): void;
     /** 關閉這個Longtake */

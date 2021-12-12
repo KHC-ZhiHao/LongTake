@@ -23,6 +23,16 @@ export declare const helper: {
     getVisibility(): "xs" | "sm" | "md" | "lg" | "xl";
     getRandomColor(): string;
 };
+export declare const renderPack: {
+    colorTo: (sprite: _Sprite, options: Partial<{
+        color: string;
+        alpha: number;
+    }>) => void;
+    fillRoundRect: (sprite: _Sprite, options?: Partial<{
+        round: number;
+        color: string;
+    }>) => void;
+};
 export declare const Sprite: typeof _Sprite;
 export declare const Loader: typeof _Loader;
 export declare const Animate: typeof _Animate;
