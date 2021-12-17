@@ -1,3 +1,4 @@
+import { Debug, DebugOptions } from './debug'
 import { Event } from './base'
 import { Loader } from './loader'
 import { helper } from './helper'
@@ -7,9 +8,10 @@ import { Sprite, ImageSprite, TextSprite } from './sprite'
 import { ListenerGroup, pointer } from './event'
 import { renderPack } from './render'
 
-/** 核心 */
-
 type Channels = {
+    addChild: {
+        sprite: Sprite
+    }
     keydown: {
         key: string
         code: string
@@ -33,11 +35,14 @@ type Channels = {
     pointerup: {}
 }
 
+/** 核心 */
+
 export class LongTake extends Event<Channels> {
     /** 繪製圖的寬 */
     readonly width: number
     /** 繪製圖的高 */
     readonly height: number
+    private debug: Debug | null = null
     private ticker: any = null
     private remove = false
     /** 目前運行的canvas */
@@ -127,6 +132,10 @@ export class LongTake extends Event<Channels> {
         return this.container.stage
     }
 
+    enabledDebugMode(options: DebugOptions) {
+        this.debug = new Debug(this, options)
+    }
+
     /** 清空所有精靈 */
 
     clear() {
@@ -191,5 +200,9 @@ export class LongTake extends Event<Channels> {
         this.container.stageRender()
         this.context.clearRect(0, 0, this.width, this.height)
         this.context.drawImage(this.container.bitmap.canvas, 0, 0, this.width, this.height)
+        if (this.debug) {
+            this.debug.render()
+            this.context.drawImage(this.debug.bitmap.canvas, 0, 0, this.width, this.height)
+        }
     }
 }

@@ -78,5 +78,43 @@ export const interactive: DemoAttr[] = [
                 longtake.addChildren(block)
             }
         `
+    },
+    {
+        name: 'debug',
+        title: 'Debug',
+        desc: '',
+        code: /* javascript */ `
+            (longtake, LongTake) => {
+                class Bear extends LongTake.ImageSprite {
+                    constructor(image, anchor, x, y) {
+                        super(image)
+                        this.x = longtake.width / 2 + x
+                        this.y = longtake.height / 2 + y
+                        this.rotation = 45
+                        this.setAnchor(anchor)
+                    }
+                }
+                let image = new Image()
+                image.src = 'images/KaohBear.png'
+                image.onload = () => {
+                    longtake.enabledDebugMode()
+                    let bear1 = new Bear(image, 0, -200, -125)
+                    let bear2 = new Bear(image, 0.5, 0, -125)
+                    let bear3 = new Bear(image, 1, 200, -125)
+                    let bear4 = new Bear(image, 0, -200, 125)
+                    let bear5 = new Bear(image, 0.5, 0, 125)
+                    let bear6 = new Bear(image, 1, 200, 125)
+                    bear4.update = () => { bear4.rotation += 1 }
+                    bear5.update = () => { bear5.rotation += 1 }
+                    bear6.update = () => { bear6.rotation += 1 }
+                    // longtake.addChildren(bear1)
+                    // longtake.addChildren(bear2)
+                    // longtake.addChildren(bear3)
+                    longtake.addChildren(bear4)
+                    // longtake.addChildren(bear5)
+                    // longtake.addChildren(bear6)
+                }
+            }
+        `
     }
 ]

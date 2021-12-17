@@ -473,8 +473,14 @@ export class Sprite extends Event<Channels> {
     /** 獲取精靈在畫布的準確位置 */
 
     getRealPosition() {
+        let size = this.getRealSize()
+        let s = Math.abs(this.helper.sinByRad(this.rotation))
+        let c = Math.abs(this.helper.cosByRad(this.rotation))
+        console.log(s.toFixed(2))
+        let offsetX = size.width * c - ((size.width) * this.anchorX)
+        let offsetY = size.height * s
         return {
-            x: this.screenX * (this.parent == null ? 1 : this.parent.screenScaleWidth),
+            x: this.screenX * (this.parent == null ? 1 : this.parent.screenScaleWidth) - offsetX,
             y: this.screenY * (this.parent == null ? 1 : this.parent.screenScaleHeight)
         }
     }
@@ -489,6 +495,9 @@ export class Sprite extends Event<Channels> {
         if (this._main == null) {
             if (this.parent && this.parent._main) {
                 this._install(this.parent._main)
+                this.parent._main.core.emit('addChild', {
+                    sprite: this
+                })
             }
         }
         if (this._status.sort) {

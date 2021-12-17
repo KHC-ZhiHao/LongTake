@@ -1,9 +1,12 @@
+import { DebugOptions } from './debug';
 import { Event } from './base';
 import { Loader } from './loader';
 import { Animate } from './animate';
 import { Sprite, ImageSprite, TextSprite } from './sprite';
-/** 核心 */
 declare type Channels = {
+    addChild: {
+        sprite: Sprite;
+    };
     keydown: {
         key: string;
         code: string;
@@ -26,11 +29,13 @@ declare type Channels = {
     };
     pointerup: {};
 };
+/** 核心 */
 export declare class LongTake extends Event<Channels> {
     /** 繪製圖的寬 */
     readonly width: number;
     /** 繪製圖的高 */
     readonly height: number;
+    private debug;
     private ticker;
     private remove;
     /** 目前運行的canvas */
@@ -53,6 +58,7 @@ export declare class LongTake extends Event<Channels> {
         ifEmpty<T>(data: T | undefined, def: T): T;
         sinByRad(deg: number): number;
         cosByRad(deg: number): number;
+        /** 目前運行的canvas */
         getVector(deg: number, distance: number): {
             x: number;
             y: number;
@@ -84,6 +90,7 @@ export declare class LongTake extends Event<Channels> {
         ifEmpty<T>(data: T | undefined, def: T): T;
         sinByRad(deg: number): number;
         cosByRad(deg: number): number;
+        /** 目前運行的canvas */
         getVector(deg: number, distance: number): {
             x: number;
             y: number;
@@ -95,6 +102,7 @@ export declare class LongTake extends Event<Channels> {
         imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement>;
     };
     get stage(): Sprite;
+    enabledDebugMode(options: DebugOptions): void;
     /** 清空所有精靈 */
     clear(): void;
     /** 關閉這個Longtake */

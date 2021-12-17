@@ -6,20 +6,16 @@ import { LongTake } from './longtake'
 /** 一個靜態的精靈容器，負責呈現精靈與位圖的計算結果 */
 
 export class Container extends Base {
-    /** 是否指向LongTakeCore */
-    core: LongTake | null = null
+    /** 指向LongTake */
+    core: LongTake
     /** 主精靈 */
     stage: Sprite
     /** 主位圖 */
     bitmap: Bitmap = {} as any
     context: CanvasRenderingContext2D
-    /** 當此Container指向LongTakeCore時，該值會隨著鼠標或觸碰位置改變 */
-    pointerX = 0
-    /** 當此Container指向LongTakeCore時，該值會隨著鼠標或觸碰位置改變 */
-    pointerY = 0
-    constructor(width: number, height: number, core?: LongTake) {
+    constructor(width: number, height: number, core: LongTake) {
         super('Container')
-        this.core = core || null
+        this.core = core
         this.stage = new Sprite()
         this.bitmap = new Bitmap(width, height)
         this.context = this.bitmap.context
