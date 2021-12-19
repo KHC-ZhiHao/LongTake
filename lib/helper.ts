@@ -1,5 +1,3 @@
-import { Bitmap } from './bitmap'
-
 const arc = Math.PI / 180
 const rarc = 180 / Math.PI
 const trigonometric: Record<string, {

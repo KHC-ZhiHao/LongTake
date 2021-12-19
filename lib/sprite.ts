@@ -181,7 +181,6 @@ export class Sprite extends Event<Channels> {
     get antiAliasing() {
         return this._status.antiAliasing
     }
-
     /** 抗鋸齒 */
     set antiAliasing(val: boolean) {
         this._status.antiAliasing = val
@@ -262,6 +261,7 @@ export class Sprite extends Event<Channels> {
     get scaleWidth() {
         return this._transform.scaleWidth
     }
+
     /** 放大寬 */
     set scaleWidth(val: number) {
         this._transform.scaleWidth = val
@@ -290,6 +290,32 @@ export class Sprite extends Event<Channels> {
             return this.scaleHeight
         }
         return this.scaleHeight * this.parent.screenScaleHeight
+    }
+
+    /** 該精靈在最後顯示的傾斜 */
+    get screenSkewX(): number {
+        if (this.parent == null) {
+            return this.skewX
+        }
+        return this.skewX * this.parent.skewX
+    }
+
+    /** 該精靈在最後顯示的傾斜 */
+    get screenSkewY(): number {
+        if (this.parent == null) {
+            return this.skewY
+        }
+        return this.skewY * this.parent.skewY
+    }
+
+    /** 畫面上呈現的寬 */
+    get screenWidth() {
+        return this._bitmap.width * this.screenScaleWidth + this.screenSkewY * this._bitmap.width * this.screenScaleWidth
+    }
+
+    /** 畫面上呈現的高 */
+    get screenHeight() {
+        return this._bitmap.height * this.screenScaleHeight + this.screenSkewX * this._bitmap.height * this.screenScaleHeight
     }
 
     /** 旋轉 */
@@ -359,18 +385,16 @@ export class Sprite extends Event<Channels> {
     }
     /** 定位點X */
     set x(val: number) {
-        if (typeof val === 'number') {
-            this._position.x = val || 0
-        }
+        this._position.x = val || 0
     }
 
     /** 定位點Y */
-    get y() { return this._position.y }
+    get y() {
+        return this._position.y
+    }
     /** 定位點Y */
     set y(val) {
-        if (typeof val === 'number') {
-            this._position.y = val || 0
-        }
+        this._position.y = val || 0
     }
 
     /** 高度，每次設定會重新排序 */
@@ -379,22 +403,59 @@ export class Sprite extends Event<Channels> {
     }
     /** 高度，每次設定會重新排序 */
     set z(val: number) {
-        if (typeof val === 'number') {
-            this._position.z = val
-            if (this.parent) {
-                this.parent._status.sort = true
-            }
+        this._position.z = val
+        if (this.parent) {
+            this.parent._status.sort = true
         }
     }
 
-    /** 絕對位置X */
+    /** 渲染的位置X */
     get screenX(): number {
         return (this.parent ? this.parent.screenX + this.parent.width * this.parent.anchorX : 0) + this.x - this.width * this.anchorX
     }
 
-    /** 絕對位置Y */
+    /** 渲染的位置Y */
     get screenY(): number {
         return (this.parent ? this.parent.screenY + this.parent.height * this.parent.anchorY : 0) + this.y - this.height * this.anchorY
+    }
+
+    /** 畫面上的位置X */
+    get realScreenX(): number {
+        let parent = this.parent
+        if (parent) {
+            let px = parent.posX
+            let py = parent.posY
+            let x = px + this.x / parent.screenScaleWidth
+            let y = py + this.y / parent.screenScaleHeight
+            let r = this.screenRotation
+            let s = this.helper.sinByRad(r)
+            let c = this.helper.cosByRad(r)
+            return (x) * c - (y) * s
+        } else {
+            return 0
+        }
+    }
+
+    /** 畫面上的位置Y */
+    get realScreenY(): number {
+        let parent = this.parent
+        if (parent) {
+            let px = parent.posX
+            let py = parent.posY
+            let x = px + this.x / parent.screenScaleWidth
+            let y = py + this.y / parent.screenScaleHeight
+            let r = this.screenRotation
+            let s = this.helper.sinByRad(r)
+            let c = this.helper.cosByRad(r)
+            return (x) * s + (y) * c
+        } else {
+            return 0
+        }
+    }
+
+    /** 畫面上的旋轉角度 */
+    get screenRotation() {
+        return ((this.parent ? this.parent.rotation : 0) + this.rotation) % 360
     }
 
     /** 絕對位置的錨點位置X */
@@ -406,10 +467,20 @@ export class Sprite extends Event<Channels> {
         return this.screenY + this.height * this.anchorY
     }
 
+    /** 畫面顯示的錨點位置X */
+    get screenPosX() {
+        return this.realScreenX + this.screenWidth * this.anchorX
+    }
+    /** 畫面顯示的錨點位置Y */
+    get screenPosY() {
+        return this.realScreenY + this.screenHeight * this.anchorY
+    }
+
     /** 錨點X */
     get anchorX() {
         return this._position.anchorX
     }
+
     /** 錨點X */
     set anchorX(val) {
         this._position.anchorX = val
@@ -427,8 +498,19 @@ export class Sprite extends Event<Channels> {
     get canRender() {
         return !this._status.cache
     }
+
     get canShow() {
         return !this._status.hidden
+    }
+
+    moveByScreen(screenX: number, screenY: number) {
+        if (this.parent) {
+            this.x = (screenX - this.parent.screenPosX) / (this.parent.screenScaleWidth || 0.1)
+            this.y = (screenY - this.parent.screenPosY) / (this.parent.screenScaleHeight || 0.1)
+        } else {
+            this.x = screenX
+            this.y = screenY
+        }
     }
 
     /** 快取目前渲染的 Bitmap */
@@ -455,34 +537,6 @@ export class Sprite extends Event<Channels> {
 
     unHidden() {
         this._status.hidden = false
-    }
-
-    /** 獲取該精靈實際呈現的大小 */
-
-    getRealSize() {
-        let width = this.width + this.skewY * this.height
-        let height = this.height + this.skewX * this.width
-        let s = Math.abs(this.helper.sinByRad(this.rotation))
-        let c = Math.abs(this.helper.cosByRad(this.rotation))
-        return {
-            width: (width * c + height * s) * this.screenScaleWidth,
-            height: (height * c + width * s) * this.screenScaleHeight
-        }
-    }
-
-    /** 獲取精靈在畫布的準確位置 */
-
-    getRealPosition() {
-        let size = this.getRealSize()
-        let s = Math.abs(this.helper.sinByRad(this.rotation))
-        let c = Math.abs(this.helper.cosByRad(this.rotation))
-        console.log(s.toFixed(2))
-        let offsetX = size.width * c - ((size.width) * this.anchorX)
-        let offsetY = size.height * s
-        return {
-            x: this.screenX * (this.parent == null ? 1 : this.parent.screenScaleWidth) - offsetX,
-            y: this.screenY * (this.parent == null ? 1 : this.parent.screenScaleHeight)
-        }
     }
 
     /** 每次渲染圖形時執行此函式，目的為精靈的動作 */
@@ -596,13 +650,59 @@ export class Sprite extends Event<Channels> {
         child._mainRender()
     }
 
+    /** 獲取精靈在畫布的準確位置 */
+
+    getRealRect() {
+        let width = this.screenWidth
+        let height = this.screenHeight
+        let r = this.screenRotation
+        let s = this.helper.sinByRad(r)
+        let c = this.helper.cosByRad(r)
+        let px = 0
+        let py = 0
+        let pw = 1
+        let ph = 1
+        if (this.parent) {
+            px = this.parent.screenPosX
+            py = this.parent.screenPosY
+            pw = this.parent.screenScaleWidth
+            ph = this.parent.screenScaleHeight
+        }
+        let ox = width * this.anchorX
+        let oy = height * this.anchorY
+        let sx = px + this.x * pw - ox
+        let sy = py + this.y * ph - oy
+        let rx = sx + width * this.anchorX
+        let ry = sy + height * this.anchorY
+        let p = (dx: number, dy: number) => {
+            let x = sx + dx - rx
+            let y = sy + dy - ry
+            return {
+                x: x * c - y * s + rx,
+                y: x * s + y * c + ry
+            }
+        }
+        return {
+            p0: p(0, 0),
+            p1: p(width, 0),
+            p2: p(width, height),
+            p3: p(0, height)
+        }
+    }
+
     /** 座標是否在精靈的矩形範圍內 */
+    // https://www.codeleading.com/article/9584744528/
 
     inRect(x: number, y: number) {
-        let rect = this.getRealSize()
-        let position = this.getRealPosition()
-        return (x >= position.x && x <= position.x + rect.width)
-            && (y >= position.y && y <= position.y + rect.height)
+        let { p0, p1, p2, p3 } = this.getRealRect()
+        let a = (p1.x - p0.x) * (y - p0.y) - (p1.y - p0.y) * (x - p0.x)
+        let b = (p2.x - p1.x) * (y - p1.y) - (p2.y - p1.y) * (x - p1.x)
+        let c = (p3.x - p2.x) * (y - p2.y) - (p3.y - p2.y) * (x - p2.x)
+        let d = (p0.x - p3.x) * (y - p3.y) - (p0.y - p3.y) * (x - p3.x)
+        if ((a > 0 && b > 0 && c > 0 && d > 0) || (a < 0 && b < 0 && c < 0 && d < 0)) {
+            return true
+        }
+        return false
     }
 }
 

@@ -42,6 +42,7 @@ export class LongTake extends Event<Channels> {
     readonly width: number
     /** 繪製圖的高 */
     readonly height: number
+    private _stop: boolean = false
     private debug: Debug | null = null
     private ticker: any = null
     private remove = false
@@ -53,8 +54,8 @@ export class LongTake extends Event<Channels> {
     private listenerGroup: ListenerGroup
     /** 主要運行的container，由本核心驅動內部精靈的update和event */
     private container: Container
-    private bindUpdate = () => this.update()
     private interactive = false
+    private bindUpdate = () => this.update()
     private supportRequestAnimationFrame = !!window.requestAnimationFrame
     private requestAnimationFrame = (callback: any) => {
         if (this.supportRequestAnimationFrame) {
@@ -132,6 +133,24 @@ export class LongTake extends Event<Channels> {
         return this.container.stage
     }
 
+    get isInteractive() {
+        return this.interactive
+    }
+
+    get playing() {
+        return this._stop === false
+    }
+
+    // 只渲染不觸發 update 鉤子。
+    stop() {
+        this._stop = true
+    }
+
+    // 如果為停止狀態的話繼續運行
+    play() {
+        this._stop = false
+    }
+
     enabledDebugMode(options: DebugOptions) {
         this.debug = new Debug(this, options)
     }
@@ -166,7 +185,6 @@ export class LongTake extends Event<Channels> {
 
     enableInteractive() {
         if (this.interactive) {
-            console.warn(`interactive already enabled.`)
             return null
         }
         this.interactive = true
@@ -187,7 +205,9 @@ export class LongTake extends Event<Channels> {
             }
             return null
         }
-        this.stageUpdate()
+        if (this._stop === false) {
+            this.stageUpdate()
+        }
         this.bitmapUpdate()
         this.ticker = this.requestAnimationFrame(this.bindUpdate)
     }

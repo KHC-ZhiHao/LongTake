@@ -88,31 +88,22 @@ export const interactive: DemoAttr[] = [
                 class Bear extends LongTake.ImageSprite {
                     constructor(image, anchor, x, y) {
                         super(image)
-                        this.x = longtake.width / 2 + x
-                        this.y = longtake.height / 2 + y
-                        this.rotation = 45
+                        this.x = x
+                        this.y = y
                         this.setAnchor(anchor)
+                        this.rotation = 45
                     }
                 }
                 let image = new Image()
                 image.src = 'images/KaohBear.png'
                 image.onload = () => {
                     longtake.enabledDebugMode()
-                    let bear1 = new Bear(image, 0, -200, -125)
-                    let bear2 = new Bear(image, 0.5, 0, -125)
-                    let bear3 = new Bear(image, 1, 200, -125)
-                    let bear4 = new Bear(image, 0, -200, 125)
-                    let bear5 = new Bear(image, 0.5, 0, 125)
-                    let bear6 = new Bear(image, 1, 200, 125)
-                    bear4.update = () => { bear4.rotation += 1 }
-                    bear5.update = () => { bear5.rotation += 1 }
-                    bear6.update = () => { bear6.rotation += 1 }
-                    // longtake.addChildren(bear1)
-                    // longtake.addChildren(bear2)
-                    // longtake.addChildren(bear3)
-                    longtake.addChildren(bear4)
-                    // longtake.addChildren(bear5)
-                    // longtake.addChildren(bear6)
+                    let bear1 = new Bear(image, 0.75, longtake.width / 2, longtake.height / 2)
+                    let bear2 = new Bear(image, 0, 30, 30)
+                    bear1.scale(2, 2)
+                    bear2.scale(0.75, 0.75)
+                    bear1.addChildren(bear2)
+                    longtake.addChildren(bear1)
                 }
             }
         `

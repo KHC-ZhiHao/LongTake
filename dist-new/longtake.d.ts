@@ -35,6 +35,7 @@ export declare class LongTake extends Event<Channels> {
     readonly width: number;
     /** 繪製圖的高 */
     readonly height: number;
+    private _stop;
     private debug;
     private ticker;
     private remove;
@@ -46,8 +47,8 @@ export declare class LongTake extends Event<Channels> {
     private listenerGroup;
     /** 主要運行的container，由本核心驅動內部精靈的update和event */
     private container;
-    private bindUpdate;
     private interactive;
+    private bindUpdate;
     private supportRequestAnimationFrame;
     private requestAnimationFrame;
     constructor(target: string | HTMLCanvasElement, width?: number, height?: number);
@@ -58,7 +59,6 @@ export declare class LongTake extends Event<Channels> {
         ifEmpty<T>(data: T | undefined, def: T): T;
         sinByRad(deg: number): number;
         cosByRad(deg: number): number;
-        /** 目前運行的canvas */
         getVector(deg: number, distance: number): {
             x: number;
             y: number;
@@ -90,7 +90,6 @@ export declare class LongTake extends Event<Channels> {
         ifEmpty<T>(data: T | undefined, def: T): T;
         sinByRad(deg: number): number;
         cosByRad(deg: number): number;
-        /** 目前運行的canvas */
         getVector(deg: number, distance: number): {
             x: number;
             y: number;
@@ -102,6 +101,10 @@ export declare class LongTake extends Event<Channels> {
         imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement>;
     };
     get stage(): Sprite;
+    get isInteractive(): boolean;
+    get playing(): boolean;
+    stop(): void;
+    play(): void;
     enabledDebugMode(options: DebugOptions): void;
     /** 清空所有精靈 */
     clear(): void;

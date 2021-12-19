@@ -114,6 +114,14 @@ export declare class Sprite extends Event<Channels> {
     get screenScaleWidth(): number;
     /** 該精靈在最後顯示的總倍率高 */
     get screenScaleHeight(): number;
+    /** 該精靈在最後顯示的傾斜 */
+    get screenSkewX(): number;
+    /** 該精靈在最後顯示的傾斜 */
+    get screenSkewY(): number;
+    /** 畫面上呈現的寬 */
+    get screenWidth(): number;
+    /** 畫面上呈現的高 */
+    get screenHeight(): number;
     /** 旋轉 */
     get rotation(): number;
     /** 旋轉 */
@@ -148,14 +156,24 @@ export declare class Sprite extends Event<Channels> {
     get z(): number;
     /** 高度，每次設定會重新排序 */
     set z(val: number);
-    /** 絕對位置X */
+    /** 渲染的位置X */
     get screenX(): number;
-    /** 絕對位置Y */
+    /** 渲染的位置Y */
     get screenY(): number;
+    /** 畫面上的位置X */
+    get realScreenX(): number;
+    /** 畫面上的位置Y */
+    get realScreenY(): number;
+    /** 畫面上的旋轉角度 */
+    get screenRotation(): number;
     /** 絕對位置的錨點位置X */
     get posX(): number;
     /** 絕對位置的錨點位置Y */
     get posY(): number;
+    /** 畫面顯示的錨點位置X */
+    get screenPosX(): number;
+    /** 畫面顯示的錨點位置Y */
+    get screenPosY(): number;
     /** 錨點X */
     get anchorX(): number;
     /** 錨點X */
@@ -166,6 +184,7 @@ export declare class Sprite extends Event<Channels> {
     set anchorY(val: number);
     get canRender(): boolean;
     get canShow(): boolean;
+    moveByScreen(screenX: number, screenY: number): void;
     /** 快取目前渲染的 Bitmap */
     cache(): void;
     /** 解除快取狀態 */
@@ -174,16 +193,6 @@ export declare class Sprite extends Event<Channels> {
     hidden(): void;
     /** 解除隱藏 */
     unHidden(): void;
-    /** 獲取該精靈實際呈現的大小 */
-    getRealSize(): {
-        width: number;
-        height: number;
-    };
-    /** 獲取精靈在畫布的準確位置 */
-    getRealPosition(): {
-        x: number;
-        y: number;
-    };
     /** 每次渲染圖形時執行此函式，目的為精靈的動作 */
     update(sprite: this): void;
     /** 每次執行 update 時呼叫此函式，處理 Z 值更動的排序與移除子精靈 */
@@ -206,6 +215,25 @@ export declare class Sprite extends Event<Channels> {
     _mainRender(): void;
     /** 呼叫子精靈渲染 */
     private renderForChild;
+    /** 獲取精靈在畫布的準確位置 */
+    getRealRect(): {
+        p0: {
+            x: number;
+            y: number;
+        };
+        p1: {
+            x: number;
+            y: number;
+        };
+        p2: {
+            x: number;
+            y: number;
+        };
+        p3: {
+            x: number;
+            y: number;
+        };
+    };
     /** 座標是否在精靈的矩形範圍內 */
     inRect(x: number, y: number): boolean;
 }
