@@ -57,6 +57,7 @@ export class Sprite extends Event<Channels> {
         inited: false,
         remove: false,
         hidden: false,
+        isStage: false,
         antiAliasing: true,
         childrenDead: false
     }
@@ -276,48 +277,6 @@ export class Sprite extends Event<Channels> {
         this._transform.scaleHeight = val
     }
 
-    /** 該精靈在最後顯示的總倍率寬 */
-    get screenScaleWidth(): number {
-        if (this.parent == null) {
-            return this.scaleWidth
-        }
-        return this.scaleWidth * this.parent.screenScaleWidth
-    }
-
-    /** 該精靈在最後顯示的總倍率高 */
-    get screenScaleHeight(): number {
-        if (this.parent == null) {
-            return this.scaleHeight
-        }
-        return this.scaleHeight * this.parent.screenScaleHeight
-    }
-
-    /** 該精靈在最後顯示的傾斜 */
-    get screenSkewX(): number {
-        if (this.parent == null) {
-            return this.skewX
-        }
-        return this.skewX * this.parent.skewX
-    }
-
-    /** 該精靈在最後顯示的傾斜 */
-    get screenSkewY(): number {
-        if (this.parent == null) {
-            return this.skewY
-        }
-        return this.skewY * this.parent.skewY
-    }
-
-    /** 畫面上呈現的寬 */
-    get screenWidth() {
-        return this._bitmap.width * this.screenScaleWidth + this.screenSkewY * this._bitmap.width * this.screenScaleWidth
-    }
-
-    /** 畫面上呈現的高 */
-    get screenHeight() {
-        return this._bitmap.height * this.screenScaleHeight + this.screenSkewX * this._bitmap.height * this.screenScaleHeight
-    }
-
     /** 旋轉 */
     get rotation() {
         return this._transform.rotation
@@ -419,45 +378,6 @@ export class Sprite extends Event<Channels> {
         return (this.parent ? this.parent.screenY + this.parent.height * this.parent.anchorY : 0) + this.y - this.height * this.anchorY
     }
 
-    /** 畫面上的位置X */
-    get realScreenX(): number {
-        let parent = this.parent
-        if (parent) {
-            let px = parent.posX
-            let py = parent.posY
-            let x = px + this.x / parent.screenScaleWidth
-            let y = py + this.y / parent.screenScaleHeight
-            let r = this.screenRotation
-            let s = this.helper.sinByRad(r)
-            let c = this.helper.cosByRad(r)
-            return (x) * c - (y) * s
-        } else {
-            return 0
-        }
-    }
-
-    /** 畫面上的位置Y */
-    get realScreenY(): number {
-        let parent = this.parent
-        if (parent) {
-            let px = parent.posX
-            let py = parent.posY
-            let x = px + this.x / parent.screenScaleWidth
-            let y = py + this.y / parent.screenScaleHeight
-            let r = this.screenRotation
-            let s = this.helper.sinByRad(r)
-            let c = this.helper.cosByRad(r)
-            return (x) * s + (y) * c
-        } else {
-            return 0
-        }
-    }
-
-    /** 畫面上的旋轉角度 */
-    get screenRotation() {
-        return ((this.parent ? this.parent.rotation : 0) + this.rotation) % 360
-    }
-
     /** 絕對位置的錨點位置X */
     get posX() {
         return this.screenX + this.width * this.anchorX
@@ -465,15 +385,6 @@ export class Sprite extends Event<Channels> {
     /** 絕對位置的錨點位置Y */
     get posY() {
         return this.screenY + this.height * this.anchorY
-    }
-
-    /** 畫面顯示的錨點位置X */
-    get screenPosX() {
-        return this.realScreenX + this.screenWidth * this.anchorX
-    }
-    /** 畫面顯示的錨點位置Y */
-    get screenPosY() {
-        return this.realScreenY + this.screenHeight * this.anchorY
     }
 
     /** 錨點X */
@@ -501,16 +412,6 @@ export class Sprite extends Event<Channels> {
 
     get canShow() {
         return !this._status.hidden
-    }
-
-    moveByScreen(screenX: number, screenY: number) {
-        if (this.parent) {
-            this.x = (screenX - this.parent.screenPosX) / (this.parent.screenScaleWidth || 0.1)
-            this.y = (screenY - this.parent.screenPosY) / (this.parent.screenScaleHeight || 0.1)
-        } else {
-            this.x = screenX
-            this.y = screenY
-        }
     }
 
     /** 快取目前渲染的 Bitmap */
@@ -650,43 +551,84 @@ export class Sprite extends Event<Channels> {
         child._mainRender()
     }
 
+    // ==================
+    //
+    // 精準計算
+    //
+
+    getScreenStatus() {
+        let parent = this.parent && this.parent._status.isStage === false ? this.parent : null
+        // let screenX = (this.parent ? this.parent.screenX + this.parent.width * this.parent.anchorX : 0) + this.x - this.width * this.anchorX
+        // let screenY = (this.parent ? this.parent.screenY + this.parent.height * this.parent.anchorY : 0) + this.y - this.height * this.anchorY
+        // let posX = this.screenX + this.width * this.anchorX
+        // let posY = this.screenY + this.height * this.anchorY
+        let output = {
+            width: 0,
+            height: 0,
+            skewY: this.skewY,
+            skewX: this.skewX,
+            rotation: this.rotation,
+            scaleWidth: this.scaleWidth,
+            scaleHeight: this.scaleHeight
+        }
+        if (parent) {
+            let ps = parent.getScreenStatus()
+            output.skewX *= ps.skewX
+            output.skewY *= ps.skewY
+            output.scaleWidth *= ps.scaleWidth
+            output.scaleHeight *= ps.scaleHeight
+            output.rotation = (ps.rotation + output.rotation) % 360
+        }
+        let width = this._bitmap.width
+        let height = this._bitmap.height
+        output.width = width * output.scaleWidth + output.skewY * width * output.scaleWidth
+        output.height = height * output.scaleHeight + output.skewX * height * output.scaleHeight
+        return output
+    }
+
+    moveByScreen(screenX: number, screenY: number) {
+        // if (this.parent) {
+        //     this.x = (screenX - this.parent.screenPosX) / (this.parent.screenScaleWidth || 0.1)
+        //     this.y = (screenY - this.parent.screenPosY) / (this.parent.screenScaleHeight || 0.1)
+        // } else {
+        //     this.x = screenX
+        //     this.y = screenY
+        // }
+    }
+
     /** 獲取精靈在畫布的準確位置 */
 
     getRealRect() {
-        let width = this.screenWidth
-        let height = this.screenHeight
-        let r = this.screenRotation
-        let s = this.helper.sinByRad(r)
-        let c = this.helper.cosByRad(r)
-        let px = 0
-        let py = 0
-        let pw = 1
-        let ph = 1
-        if (this.parent) {
-            px = this.parent.screenPosX
-            py = this.parent.screenPosY
-            pw = this.parent.screenScaleWidth
-            ph = this.parent.screenScaleHeight
+        let parent = this.parent && this.parent._status.isStage === false ? this.parent : null
+        let status = this.getScreenStatus()
+        let sx = this.screenX
+        let sy = this.screenY
+        let posX = this.posX
+        let posY = this.posY
+        let s = this.helper.sinByRad(status.rotation)
+        let c = this.helper.cosByRad(status.rotation)
+        let ps = parent ? this.helper.sinByRad(parent.rotation) : s
+        let pc = parent ? this.helper.cosByRad(parent.rotation) : c
+        let parX = parent ? parent.posX : posX
+        let parY = parent ? parent.posY : posY
+        let anchor = {
+            x: (posX - parX) * pc - (posY - parY) * ps + parX,
+            y: (posX - parX) * ps + (posY - parY) * pc + parY
         }
-        let ox = width * this.anchorX
-        let oy = height * this.anchorY
-        let sx = px + this.x * pw - ox
-        let sy = py + this.y * ph - oy
-        let rx = sx + width * this.anchorX
-        let ry = sy + height * this.anchorY
         let p = (dx: number, dy: number) => {
-            let x = sx + dx - rx
-            let y = sy + dy - ry
+            let x = sx + dx
+            let y = sy + dy
             return {
-                x: x * c - y * s + rx,
-                y: x * s + y * c + ry
+                x: (x - posX) * c - (y - posY) * s + anchor.x,
+                y: (x - posX) * s + (y - posY) * c + anchor.y
             }
         }
         return {
             p0: p(0, 0),
-            p1: p(width, 0),
-            p2: p(width, height),
-            p3: p(0, height)
+            p1: p(status.width, 0),
+            p2: p(status.width, status.height),
+            p3: p(0, status.height),
+            anchor
         }
     }
 

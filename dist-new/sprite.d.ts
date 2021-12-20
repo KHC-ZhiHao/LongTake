@@ -23,6 +23,7 @@ export declare class Sprite extends Event<Channels> {
         inited: boolean;
         remove: boolean;
         hidden: boolean;
+        isStage: boolean;
         antiAliasing: boolean;
         childrenDead: boolean;
     };
@@ -110,18 +111,6 @@ export declare class Sprite extends Event<Channels> {
     get scaleHeight(): number;
     /** 放大高 */
     set scaleHeight(val: number);
-    /** 該精靈在最後顯示的總倍率寬 */
-    get screenScaleWidth(): number;
-    /** 該精靈在最後顯示的總倍率高 */
-    get screenScaleHeight(): number;
-    /** 該精靈在最後顯示的傾斜 */
-    get screenSkewX(): number;
-    /** 該精靈在最後顯示的傾斜 */
-    get screenSkewY(): number;
-    /** 畫面上呈現的寬 */
-    get screenWidth(): number;
-    /** 畫面上呈現的高 */
-    get screenHeight(): number;
     /** 旋轉 */
     get rotation(): number;
     /** 旋轉 */
@@ -160,20 +149,10 @@ export declare class Sprite extends Event<Channels> {
     get screenX(): number;
     /** 渲染的位置Y */
     get screenY(): number;
-    /** 畫面上的位置X */
-    get realScreenX(): number;
-    /** 畫面上的位置Y */
-    get realScreenY(): number;
-    /** 畫面上的旋轉角度 */
-    get screenRotation(): number;
     /** 絕對位置的錨點位置X */
     get posX(): number;
     /** 絕對位置的錨點位置Y */
     get posY(): number;
-    /** 畫面顯示的錨點位置X */
-    get screenPosX(): number;
-    /** 畫面顯示的錨點位置Y */
-    get screenPosY(): number;
     /** 錨點X */
     get anchorX(): number;
     /** 錨點X */
@@ -184,7 +163,6 @@ export declare class Sprite extends Event<Channels> {
     set anchorY(val: number);
     get canRender(): boolean;
     get canShow(): boolean;
-    moveByScreen(screenX: number, screenY: number): void;
     /** 快取目前渲染的 Bitmap */
     cache(): void;
     /** 解除快取狀態 */
@@ -215,6 +193,16 @@ export declare class Sprite extends Event<Channels> {
     _mainRender(): void;
     /** 呼叫子精靈渲染 */
     private renderForChild;
+    getScreenStatus(): {
+        width: number;
+        height: number;
+        skewY: number;
+        skewX: number;
+        rotation: number;
+        scaleWidth: number;
+        scaleHeight: number;
+    };
+    moveByScreen(screenX: number, screenY: number): void;
     /** 獲取精靈在畫布的準確位置 */
     getRealRect(): {
         p0: {
@@ -230,6 +218,10 @@ export declare class Sprite extends Event<Channels> {
             y: number;
         };
         p3: {
+            x: number;
+            y: number;
+        };
+        anchor: {
             x: number;
             y: number;
         };

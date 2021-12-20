@@ -100,11 +100,11 @@ export declare class LongTake extends Event<Channels> {
         getRandomColor(): string;
         imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement>;
     };
-    get stage(): Sprite;
     get isInteractive(): boolean;
     get playing(): boolean;
     stop(): void;
     play(): void;
+    getAllChildren(): Sprite[];
     enabledDebugMode(options: DebugOptions): void;
     /** 清空所有精靈 */
     clear(): void;

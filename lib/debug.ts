@@ -48,7 +48,7 @@ export class Debug extends Base {
             }
         })
         this.core.on('pointermove', ({ x, y }) => {
-            let sprites = this.core.stage.getTotalChildren().reverse()
+            let sprites = this.core.getAllChildren().reverse()
             this.selectSprite = null
             for (let sprite of sprites) {
                 if (sprite.inRect(x, y)) {
@@ -78,10 +78,8 @@ export class Debug extends Base {
     }
     renderSprite(sprite: Sprite) {
         let context = this.context
-        let posX = sprite.screenPosX
-        let posY = sprite.screenPosY
-        let { p0, p1, p2, p3 } = sprite.getRealRect()
-        context.drawImage(this.positionBitmap.getRenderTarget(), posX - 10, posY - 10)
+        let { anchor, p0, p1, p2, p3 } = sprite.getRealRect()
+        context.drawImage(this.positionBitmap.getRenderTarget(), anchor.x - 10, anchor.y - 10)
         context.beginPath()
         context.moveTo(p0.x, p0.y)
         context.lineTo(p1.x, p1.y)
@@ -94,22 +92,24 @@ export class Debug extends Base {
         let sprite = this.selectSprite
         if (sprite) {
             let context = this.context
-            let line = 9
+            let line = 11
             let textBaseLine = 85
-            let posX = sprite.screenPosX
-            let posY = sprite.screenPosY
+            let posX = sprite.posX
+            let posY = sprite.posY
             context.fillStyle = '#000'
             context.fillRect(5, 67, 120, 13 * line + 15)
             context.fillStyle = '#fff'
             context.fillText(`X: ${sprite.x.toFixed(0)}, ${posX.toFixed(0)}`, 15, textBaseLine)
             context.fillText(`Y: ${sprite.y.toFixed(0)}, ${posY.toFixed(0)}`, 15, textBaseLine + 13 * 1)
-            context.fillText(`W: ${sprite.width.toFixed(0)}, ${sprite.screenWidth.toFixed(0)}`, 15, textBaseLine + 13 * 2)
-            context.fillText(`H: ${sprite.height.toFixed(0)}, ${sprite.screenHeight.toFixed(0)}`, 15, textBaseLine + 13 * 3)
-            context.fillText(`A: ${sprite.anchorX.toFixed(2)}, ${sprite.anchorY.toFixed(2)}`, 15, textBaseLine + 13 * 4)
-            context.fillText(`O: ${sprite.opacity.toFixed(2)}`, 15, textBaseLine + 13 * 5)
-            context.fillText(`SX: ${sprite.skewX.toFixed(2)}, ${sprite.screenSkewX.toFixed(2)}`, 15, textBaseLine + 13 * 6)
-            context.fillText(`SY: ${sprite.skewY.toFixed(2)}, ${sprite.screenSkewY.toFixed(2)}`, 15, textBaseLine + 13 * 7)
-            context.fillText(`R: ${sprite.rotation.toFixed(2)}, ${sprite.screenRotation.toFixed(2)}`, 15, textBaseLine + 13 * 8)
+            context.fillText(`W: ${sprite.width.toFixed(0)}`, 15, textBaseLine + 13 * 2)
+            context.fillText(`H: ${sprite.height.toFixed(0)}`, 15, textBaseLine + 13 * 3)
+            context.fillText(`SW: ${sprite.scaleWidth.toFixed(2)}`, 15, textBaseLine + 13 * 4)
+            context.fillText(`SH: ${sprite.scaleHeight.toFixed(2)}`, 15, textBaseLine + 13 * 5)
+            context.fillText(`A: ${sprite.anchorX.toFixed(2)}, ${sprite.anchorY.toFixed(2)}`, 15, textBaseLine + 13 * 6)
+            context.fillText(`O: ${sprite.opacity.toFixed(2)}`, 15, textBaseLine + 13 * 7)
+            context.fillText(`SX: ${sprite.skewX.toFixed(2)}`, 15, textBaseLine + 13 * 8)
+            context.fillText(`SY: ${sprite.skewY.toFixed(2)}`, 15, textBaseLine + 13 * 9)
+            context.fillText(`R: ${sprite.rotation.toFixed(2)}`, 15, textBaseLine + 13 * 10)
         }
     }
     render() {
@@ -120,7 +120,7 @@ export class Debug extends Base {
         this.now = now
         if (this.selectSprite) {
             this.renderSprite(this.selectSprite)
-            if (this.selectSprite.parent && this.selectSprite.parent !== this.core.stage) {
+            if (this.selectSprite.parent && this.selectSprite.parent._status.isStage === false) {
                 this.renderSprite(this.selectSprite.parent)
             }
             this.selectSprite.eachChildrenDeep(sprite => this.renderSprite(sprite))
@@ -132,6 +132,6 @@ export class Debug extends Base {
         context.fillRect(5, 25, 70, 38)
         context.fillStyle = '#fff'
         context.fillText('FPS:' + fps.toFixed(1), 15, 42)
-        context.fillText('SC:' + this.core.stage.getTotalChildren().length, 15, 54)
+        context.fillText('SC:' + this.core.getAllChildren().length, 15, 54)
     }
 }

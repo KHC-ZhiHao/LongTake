@@ -20,6 +20,7 @@ export class Container extends Base {
         this.bitmap = new Bitmap(width, height)
         this.context = this.bitmap.context
         this.stage._install(this)
+        this.stage._status.isStage = true
         this.stage.resize(0, 0)
         this.stage.blendMode = 'source-over'
         this.stage.render = () => this.stage.cache()

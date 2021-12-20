@@ -129,10 +129,6 @@ export class LongTake extends Event<Channels> {
         return helper
     }
 
-    get stage() {
-        return this.container.stage
-    }
-
     get isInteractive() {
         return this.interactive
     }
@@ -149,6 +145,10 @@ export class LongTake extends Event<Channels> {
     // 如果為停止狀態的話繼續運行
     play() {
         this._stop = false
+    }
+
+    getAllChildren() {
+        return this.container.stage.getTotalChildren()
     }
 
     enabledDebugMode(options: DebugOptions) {
