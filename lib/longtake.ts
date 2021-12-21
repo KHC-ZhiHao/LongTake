@@ -137,22 +137,35 @@ export class LongTake extends Event<Channels> {
         return this._stop === false
     }
 
-    // 只渲染不觸發 update 鉤子。
+    /** 只渲染不觸發 update 鉤子 */
+
     stop() {
         this._stop = true
     }
 
-    // 如果為停止狀態的話繼續運行
+    /** 如果為停止狀態的話繼續運行 */
+
     play() {
         this._stop = false
     }
+
+    /** 獲取所有子精靈 */
 
     getAllChildren() {
         return this.container.stage.getTotalChildren()
     }
 
-    enabledDebugMode(options: DebugOptions) {
-        this.debug = new Debug(this, options)
+    /** 啟用開發者模式 */
+
+    enabledDebugMode(active = true, options: DebugOptions = {}) {
+        if (active) {
+            this.debug = new Debug(this, options)
+        } else {
+            if (this.debug) {
+                this.debug.close()
+            }
+            this.debug = null
+        }
     }
 
     /** 清空所有精靈 */
@@ -175,7 +188,7 @@ export class LongTake extends Event<Channels> {
         }
     }
 
-    /** 加入一個精靈至 container 底下 */
+    /** 加入一個精靈至 Container 底下 */
 
     addChildren(sprite: Sprite) {
         this.container.addChildren(sprite)

@@ -551,12 +551,9 @@ export class Sprite extends Event<Channels> {
         child._mainRender()
     }
 
-    // ==================
-    //
-    // 精準計算
-    //
+    /** 獲取精靈在畫布的準確位置與狀態 */
 
-    private getScreenStatus() {
+    getRealStatus() {
         let parent = this.parent && this.parent._status.isStage === false ? this.parent : null
         let output = {
             width: 0,
@@ -572,7 +569,7 @@ export class Sprite extends Event<Channels> {
             scaleHeight: this.scaleHeight
         }
         if (parent) {
-            let ps = parent.getScreenStatus()
+            let ps = parent.getRealStatus()
             output.x *= ps.scaleWidth
             output.y *= ps.scaleHeight
             output.x += ps.x + ps.width * parent.anchorX
@@ -597,34 +594,29 @@ export class Sprite extends Event<Channels> {
         return output
     }
 
-    /** 獲取精靈在畫布的準確位置 */
+    /** 獲取精靈在畫布的準確範圍 */
 
     getRealRect() {
-        let status = this.getScreenStatus()
+        let status = this.getRealStatus()
         let sx = status.x
         let sy = status.y
         let posX = status.posX
         let posY = status.posY
         let s = this.helper.sinByRad(status.rotation)
         let c = this.helper.cosByRad(status.rotation)
-        let anchor = {
-            x: posX,
-            y: posY
-        }
         let p = (dx: number, dy: number) => {
             let x = sx + dx
             let y = sy + dy
             return {
-                x: (x - posX) * c - (y - posY) * s + anchor.x,
-                y: (x - posX) * s + (y - posY) * c + anchor.y
+                x: (x - posX) * c - (y - posY) * s + posX,
+                y: (x - posX) * s + (y - posY) * c + posY
             }
         }
         return {
             p0: p(0, 0),
             p1: p(status.width, 0),
             p2: p(status.width, status.height),
-            p3: p(0, status.height),
-            anchor
+            p3: p(0, status.height)
         }
     }
 

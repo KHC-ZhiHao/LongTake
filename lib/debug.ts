@@ -29,6 +29,7 @@ export class Debug extends Base {
     options: DebugOptions
     context: CanvasRenderingContext2D
     selectSprite: Sprite | null = null
+    listeners: any[] = []
     positionBitmap = new PositionBitmap()
     constructor(core: LongTake, options: DebugOptions) {
         super('Debug')
@@ -36,22 +37,24 @@ export class Debug extends Base {
         this.bitmap = new Bitmap(core.width, core.height)
         this.options = options
         this.context = this.bitmap.context
-        this.bindEvent()
         this.bindDrag()
+    }
+    close() {
+        this.listeners.forEach(listener => listener.off())
     }
     private bindDrag() {
         let dragging = false
         let dragX = 0
         let dragY = 0
         this.core.enableInteractive()
-        this.core.on('pointerdown', ({ x, y }) => {
+        this.listeners.push(this.core.on('pointerdown', ({ x, y }) => {
             if (this.core.playing === false && this.selectSprite && this.selectSprite.inRect(x, y)) {
                 dragX = x
                 dragY = y
                 dragging = true
             }
-        })
-        this.core.on('pointermove', ({ x, y }) => {
+        }))
+        this.listeners.push(this.core.on('pointermove', ({ x, y }) => {
             let sprites = this.core.getAllChildren().reverse()
             this.selectSprite = null
             for (let sprite of sprites) {
@@ -65,15 +68,13 @@ export class Debug extends Base {
                 dragX = x
                 dragY = y
             }
-        })
-        this.core.on('pointerup', () => {
+        }))
+        this.listeners.push(this.core.on('pointerup', () => {
             if (dragging) {
                 dragging = false
             }
-        })
-    }
-    private bindEvent() {
-        this.core.on('click', ({ x, y }) => {
+        }))
+        this.listeners.push(this.core.on('click', ({ x, y }) => {
             if (x > 5 && y > 5 && x < 70 && y < 20) {
                 if (this.core.playing) {
                     this.core.stop()
@@ -81,23 +82,24 @@ export class Debug extends Base {
                     this.core.play()
                 }
             }
-        })
+        }))
     }
     renderSprite(sprite: Sprite, color: string) {
         let context = this.context
-        let { anchor, p0, p1, p2, p3 } = sprite.getRealRect()
+        let { posX, posY } = sprite.getRealStatus()
+        let { p0, p1, p2, p3 } = sprite.getRealRect()
         context.save()
         context.strokeStyle = color
         context.beginPath()
-        context.arc(anchor.x, anchor.y, 6, 0, Math.PI * 2)
+        context.arc(posX, posY, 6, 0, Math.PI * 2)
         context.stroke()
         context.beginPath()
-        context.moveTo(anchor.x - 10, anchor.y)
-        context.lineTo(anchor.x + 10, anchor.y)
+        context.moveTo(posX - 10, posY)
+        context.lineTo(posX + 10, posY)
         context.stroke()
         context.beginPath()
-        context.moveTo(anchor.x, anchor.y - 10)
-        context.lineTo(anchor.x, anchor.y + 10)
+        context.moveTo(posX, posY - 10)
+        context.lineTo(posX, posY + 10)
         context.stroke()
         context.beginPath()
         context.moveTo(p0.x, p0.y)

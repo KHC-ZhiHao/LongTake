@@ -48,6 +48,12 @@ pointer 相關事件必須啟用 enableInteractive() 才會生效。
 
 鍵盤釋放時觸發。
 
+#### addChild
+
+* data: { sprite: Sprite }
+
+加入一組子精靈後觸發。
+
 #### pointerdown
 
 * data: { x: number, y: number }
@@ -68,13 +74,6 @@ pointer 相關事件必須啟用 enableInteractive() 才會生效。
 
 ### Properties
 
-#### stage
-
-* readonly
-* type: Sprite
-
-所有精靈的根。
-
 #### helper
 
 * readonly
@@ -83,6 +82,22 @@ pointer 相關事件必須啟用 enableInteractive() 才會生效。
 幫助性物件。
 
 ### Methods
+
+#### stop(): void
+
+只渲染不觸發 update 鉤子。
+
+#### play(): void
+
+如果為停止狀態的話繼續運行。
+
+#### getAllChildren(): Sprite[]
+
+獲取所有子精靈。
+
+#### enabledDebugMode(active = true, options: DebugOptions = {}): void
+
+啟用開發者模式。
 
 #### clear(): void
 
@@ -345,11 +360,11 @@ new LongTake.Sprite()
 
 解除隱藏。
 
-#### getRealSize(): { width: number, height: number }
+#### getRealStatus(): { width..., height... }
 
-獲取該精靈實際呈現的大小。
+獲取該精靈實際呈現在畫布上的狀態數據。
 
-#### getRealPosition(): { x: number, y: number }
+#### getRealRect(): { p0, p1, p2, p3 }
 
 獲取精靈在畫布的準確位置。
 
@@ -550,3 +565,7 @@ new LongTake.Loader()
 #### imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement>
 
 依照比例縮小圖片。
+
+#### getRotationPosition(px: number, py: number, x: number, y: number, angle: number)
+
+獲取指定點旋轉後角度的新座標。

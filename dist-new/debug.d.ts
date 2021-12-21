@@ -13,10 +13,11 @@ export declare class Debug extends Base {
     options: DebugOptions;
     context: CanvasRenderingContext2D;
     selectSprite: Sprite | null;
+    listeners: any[];
     positionBitmap: PositionBitmap;
     constructor(core: LongTake, options: DebugOptions);
+    close(): void;
     private bindDrag;
-    private bindEvent;
     renderSprite(sprite: Sprite, color: string): void;
     renderSpriteInfo(): void;
     render(): void;

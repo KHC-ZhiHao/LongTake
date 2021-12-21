@@ -197,8 +197,21 @@ export declare class Sprite extends Event<Channels> {
     _mainRender(): void;
     /** 呼叫子精靈渲染 */
     private renderForChild;
-    private getScreenStatus;
-    /** 獲取精靈在畫布的準確位置 */
+    /** 獲取精靈在畫布的準確位置與狀態 */
+    getRealStatus(): {
+        width: number;
+        height: number;
+        x: number;
+        y: number;
+        posX: number;
+        posY: number;
+        skewY: number;
+        skewX: number;
+        rotation: number;
+        scaleWidth: number;
+        scaleHeight: number;
+    };
+    /** 獲取精靈在畫布的準確範圍 */
     getRealRect(): {
         p0: {
             x: number;
@@ -213,10 +226,6 @@ export declare class Sprite extends Event<Channels> {
             y: number;
         };
         p3: {
-            x: number;
-            y: number;
-        };
-        anchor: {
             x: number;
             y: number;
         };

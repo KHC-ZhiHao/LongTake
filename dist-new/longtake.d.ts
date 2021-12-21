@@ -110,15 +110,19 @@ export declare class LongTake extends Event<Channels> {
     };
     get isInteractive(): boolean;
     get playing(): boolean;
+    /** 只渲染不觸發 update 鉤子 */
     stop(): void;
+    /** 如果為停止狀態的話繼續運行 */
     play(): void;
+    /** 獲取所有子精靈 */
     getAllChildren(): Sprite[];
-    enabledDebugMode(options: DebugOptions): void;
+    /** 啟用開發者模式 */
+    enabledDebugMode(active?: boolean, options?: DebugOptions): void;
     /** 清空所有精靈 */
     clear(): void;
     /** 關閉這個Longtake */
     close(): void;
-    /** 加入一個精靈至 container 底下 */
+    /** 加入一個精靈至 Container 底下 */
     addChildren(sprite: Sprite): void;
     /** 啟動互動模式 */
     enableInteractive(): null | undefined;
