@@ -118,6 +118,38 @@ export const basic: DemoAttr[] = [
         `
     },
     {
+        name: 'blur',
+        title: 'Blur',
+        desc: '',
+        code: /* javascript */ `
+            (longtake, LongTake) => {
+                class Bear extends LongTake.ImageSprite {
+                    constructor(image) {
+                        super(image, {
+                            padding: 30
+                        })
+                        this.x = longtake.width / 2
+                        this.y = longtake.height / 2
+                        this.setAnchor(0.5)
+                        this.on('inited', () => {
+                            LongTake.renderPack.blur(this, {
+                                iterations: 10
+                            })
+                        })
+                    }
+                    update() {
+                        this.rotation += 1
+                    }
+                }
+                let image = new Image()
+                image.src = 'images/KaohBear.png'
+                image.onload = () => {
+                    longtake.addChildren(new Bear(image))
+                }
+            }
+        `
+    },
+    {
         name: 'colorto',
         title: 'Colot To',
         desc: 'ImageSprite 可以透過 inited 事件在 image cache 之前搭配 renderPack 更改像素資源。',

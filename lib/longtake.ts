@@ -152,7 +152,7 @@ export class LongTake extends Event<Channels> {
     /** 獲取所有子精靈 */
 
     getAllChildren() {
-        return this.container.stage.getTotalChildren()
+        return this.container.stage.getAllChildren()
     }
 
     /** 啟用開發者模式 */

@@ -219,7 +219,7 @@ export class Sprite extends Event<Channels> {
 
     /** 獲取所有子精靈，包含子精靈的子精靈 */
 
-    getTotalChildren() {
+    getAllChildren() {
         let children: Sprite[] = []
         this.eachChildrenDeep(child => children.push(child))
         return children
@@ -636,14 +636,22 @@ export class Sprite extends Event<Channels> {
     }
 }
 
+type ImageOptions = {
+    padding: number
+}
+
 export class ImageSprite extends Sprite {
     readonly render: any = null
-    constructor(image: HTMLImageElement | ImageBitmap) {
+    private options: ImageOptions
+    constructor(image: HTMLImageElement | ImageBitmap, options: Partial<ImageOptions> = {}) {
         super()
+        this.options = {
+            padding: this.helper.ifEmpty(options.padding, 0)
+        }
         this.on('inited', () => this.cache())
-        this.resize(image)
+        this.resize(image.width + this.options.padding * 2, image.height + this.options.padding * 2)
         this.render = () => {
-            this.context.drawImage(image, 0, 0)
+            this.context.drawImage(image, this.options.padding, this.options.padding)
         }
     }
 }

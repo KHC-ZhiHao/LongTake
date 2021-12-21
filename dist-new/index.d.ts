@@ -29,7 +29,10 @@ export declare const helper: {
     imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement>;
 };
 export declare const renderPack: {
-    colorTo: (sprite: _Sprite, options: Partial<{
+    blur(sprite: _Sprite, options?: Partial<{
+        iterations: number;
+    }>): void;
+    colorTo: (sprite: _Sprite, options?: Partial<{
         color: string;
         alpha: number;
     }>) => void;

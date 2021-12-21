@@ -74,7 +74,10 @@ export declare class LongTake extends Event<Channels> {
         imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement>;
     };
     static get renderPack(): {
-        colorTo: (sprite: Sprite, options: Partial<{
+        blur(sprite: Sprite, options?: Partial<{
+            iterations: number;
+        }>): void;
+        colorTo: (sprite: Sprite, options?: Partial<{
             color: string;
             alpha: number;
         }>) => void;

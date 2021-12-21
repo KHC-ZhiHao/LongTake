@@ -316,7 +316,7 @@ new LongTake.Sprite()
 
 迭代所有子精靈(包含子精靈的子精靈)。
 
-#### getTotalChildren(): Sprite[]
+#### getAllChildren(): Sprite[]
 
 獲取所有子精靈，包含子精靈的子精靈。
 

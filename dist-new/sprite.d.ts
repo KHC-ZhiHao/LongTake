@@ -100,7 +100,7 @@ export declare class Sprite extends Event<Channels> {
     /** 加入一個子精靈 */
     addChildren(sprite: Sprite): void;
     /** 獲取所有子精靈，包含子精靈的子精靈 */
-    getTotalChildren(): Sprite[];
+    getAllChildren(): Sprite[];
     /** 重新排列子精靈，當子精靈有 Z 值改變時會自動觸發 */
     _sortChildren(): void;
     /** 是否有變形 */
@@ -233,9 +233,13 @@ export declare class Sprite extends Event<Channels> {
     /** 座標是否在精靈的矩形範圍內 */
     inRect(x: number, y: number): boolean;
 }
+declare type ImageOptions = {
+    padding: number;
+};
 export declare class ImageSprite extends Sprite {
     readonly render: any;
-    constructor(image: HTMLImageElement | ImageBitmap);
+    private options;
+    constructor(image: HTMLImageElement | ImageBitmap, options?: Partial<ImageOptions>);
 }
 declare type TextOptions = {
     color: string;

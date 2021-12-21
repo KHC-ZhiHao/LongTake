@@ -115,11 +115,11 @@ export const animate: DemoAttr[] = [
                     update() {
                         this.x += this.vx
                         this.y += this.vy
-                        let size = this.getRealSize()
-                        if (this.x + size.width / 2 > longtake.width || this.x - size.width / 2 < 0) {
+                        let { width, height } = this.getRealStatus()
+                        if (this.x + width / 2 > longtake.width || this.x - width / 2 < 0) {
                             this.vx *= -1
                         }
-                        if (this.y + size.height / 2 > longtake.height || this.y - size.height / 2 < 0) {
+                        if (this.y + height / 2 > longtake.height || this.y - height / 2 < 0) {
                             this.vy *= -1
                         }
                     }
@@ -149,7 +149,7 @@ export const animate: DemoAttr[] = [
                         for (let i = 0; i < 5; i++) {
                             longtake.addChildren(new Bear(x, y))
                         }
-                        let total = longtake.stage.getTotalChildren().length - 1
+                        let total = longtake.getAllChildren().length - 1
                         countText.setContent(total.toString())
                     })
                 }
@@ -158,7 +158,7 @@ export const animate: DemoAttr[] = [
     },
     {
         name: 'live',
-        title: 'Live2D',
+        title: 'Live',
         desc: '複雜元件組合的示範。',
         code: /* javascript */ `
             (longtake, LongTake) => {
