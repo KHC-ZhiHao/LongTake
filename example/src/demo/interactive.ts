@@ -98,17 +98,26 @@ export const interactive: DemoAttr[] = [
                 image.src = 'images/KaohBear.png'
                 image.onload = () => {
                     longtake.enabledDebugMode()
-                    let bear1 = new Bear(image, 0.75, longtake.width / 2, longtake.height / 2)
-                    let bear2 = new Bear(image, 0, 30, 30)
-                    let bear3 = new Bear(image, 0, 0, 0)
-                    let bear4 = new Bear(image, 0, 0, 0)
+                    let bear1 = new Bear(image, 0, longtake.width / 2, longtake.height / 2)
+                    let bear2 = new Bear(image, 0, 10, 10)
+                    let bear3 = new Bear(image, 0, 10, 10)
+                    let bear4 = new Bear(image, 0, 10, 10)
+                    let bear5 = new Bear(image, 0, 10, 10)
+                    let bear6 = new Bear(image, 0, 10, 10)
+                    let bear7 = new Bear(image, 0, 10, 10)
                     bear1.scale(1.25, 1.25)
                     bear2.scale(1.25, 1.25)
                     bear3.scale(1.25, 1.25)
                     bear4.scale(1.25, 1.25)
-                    bear2.update = () => {
-                        bear2.rotation += 1
+                    bear5.scale(1.25, 1.25)
+                    bear6.scale(1.25, 1.25)
+                    bear1.update = () => {
+                        bear1.rotation += 2
                     }
+                    bear7.rotation = 0
+                    bear5.addChildren(bear7)
+                    bear5.addChildren(bear6)
+                    bear4.addChildren(bear5)
                     bear3.addChildren(bear4)
                     bear2.addChildren(bear3)
                     bear1.addChildren(bear2)

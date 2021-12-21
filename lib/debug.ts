@@ -1,5 +1,5 @@
 import { Base } from './base'
-import { Sprite, TextSprite } from './sprite'
+import { Sprite } from './sprite'
 import { Bitmap } from './bitmap'
 import { LongTake } from './longtake'
 
@@ -31,7 +31,7 @@ export class Debug extends Base {
     selectSprite: Sprite | null = null
     positionBitmap = new PositionBitmap()
     constructor(core: LongTake, options: DebugOptions) {
-        super('Container')
+        super('Debug')
         this.core = core
         this.bitmap = new Bitmap(core.width, core.height)
         this.options = options
@@ -74,7 +74,7 @@ export class Debug extends Base {
     }
     private bindEvent() {
         this.core.on('click', ({ x, y }) => {
-            if (x > 5 && y > 5 && x < 70 && y < 15) {
+            if (x > 5 && y > 5 && x < 70 && y < 20) {
                 if (this.core.playing) {
                     this.core.stop()
                 } else {
@@ -83,10 +83,22 @@ export class Debug extends Base {
             }
         })
     }
-    renderSprite(sprite: Sprite) {
+    renderSprite(sprite: Sprite, color: string) {
         let context = this.context
         let { anchor, p0, p1, p2, p3 } = sprite.getRealRect()
-        context.drawImage(this.positionBitmap.getRenderTarget(), anchor.x - 10, anchor.y - 10)
+        context.save()
+        context.strokeStyle = color
+        context.beginPath()
+        context.arc(anchor.x, anchor.y, 6, 0, Math.PI * 2)
+        context.stroke()
+        context.beginPath()
+        context.moveTo(anchor.x - 10, anchor.y)
+        context.lineTo(anchor.x + 10, anchor.y)
+        context.stroke()
+        context.beginPath()
+        context.moveTo(anchor.x, anchor.y - 10)
+        context.lineTo(anchor.x, anchor.y + 10)
+        context.stroke()
         context.beginPath()
         context.moveTo(p0.x, p0.y)
         context.lineTo(p1.x, p1.y)
@@ -94,6 +106,7 @@ export class Debug extends Base {
         context.lineTo(p3.x, p3.y)
         context.closePath()
         context.stroke()
+        context.restore()
     }
     renderSpriteInfo() {
         let sprite = this.selectSprite
@@ -126,11 +139,11 @@ export class Debug extends Base {
         this.bitmap.clear()
         this.now = now
         if (this.selectSprite) {
-            this.renderSprite(this.selectSprite)
+            this.renderSprite(this.selectSprite, 'blue')
             if (this.selectSprite.parent && this.selectSprite.parent._status.isStage === false) {
-                this.renderSprite(this.selectSprite.parent)
+                this.renderSprite(this.selectSprite.parent, 'red')
             }
-            this.selectSprite.eachChildrenDeep(sprite => this.renderSprite(sprite))
+            this.selectSprite.eachChildrenDeep(sprite => this.renderSprite(sprite, 'green'))
             this.renderSpriteInfo()
         }
         context.fillStyle = this.core.playing ? 'green' : 'red'

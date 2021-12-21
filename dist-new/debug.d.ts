@@ -17,7 +17,7 @@ export declare class Debug extends Base {
     constructor(core: LongTake, options: DebugOptions);
     private bindDrag;
     private bindEvent;
-    renderSprite(sprite: Sprite): void;
+    renderSprite(sprite: Sprite, color: string): void;
     renderSpriteInfo(): void;
     render(): void;
 }
