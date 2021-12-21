@@ -41,9 +41,13 @@ export class Debug extends Base {
     }
     private bindDrag() {
         let dragging = false
+        let dragX = 0
+        let dragY = 0
         this.core.enableInteractive()
         this.core.on('pointerdown', ({ x, y }) => {
-            if (this.selectSprite && this.selectSprite.inRect(x, y)) {
+            if (this.core.playing === false && this.selectSprite && this.selectSprite.inRect(x, y)) {
+                dragX = x
+                dragY = y
                 dragging = true
             }
         })
@@ -56,7 +60,10 @@ export class Debug extends Base {
                 }
             }
             if (this.selectSprite && dragging) {
-                this.selectSprite.moveByScreen(x, y)
+                this.selectSprite.x += x - dragX
+                this.selectSprite.y += y - dragY
+                dragX = x
+                dragY = y
             }
         })
         this.core.on('pointerup', () => {

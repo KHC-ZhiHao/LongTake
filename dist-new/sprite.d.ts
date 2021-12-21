@@ -60,6 +60,10 @@ export declare class Sprite extends Event<Channels> {
         };
         randInt(min: number, max: number): number;
         getAngle(x: number, y: number, ax: number, ay: number): number;
+        getRotationPosition(px: number, py: number, x: number, y: number, angle: number): {
+            x: number;
+            y: number;
+        };
         getVisibility(): "xs" | "sm" | "md" | "lg" | "xl";
         getRandomColor(): string;
         imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement>;
@@ -193,16 +197,7 @@ export declare class Sprite extends Event<Channels> {
     _mainRender(): void;
     /** 呼叫子精靈渲染 */
     private renderForChild;
-    getScreenStatus(): {
-        width: number;
-        height: number;
-        skewY: number;
-        skewX: number;
-        rotation: number;
-        scaleWidth: number;
-        scaleHeight: number;
-    };
-    moveByScreen(screenX: number, screenY: number): void;
+    private getScreenStatus;
     /** 獲取精靈在畫布的準確位置 */
     getRealRect(): {
         p0: {

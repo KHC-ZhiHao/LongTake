@@ -30,6 +30,13 @@ export declare const helper: {
      */
     getAngle(x: number, y: number, ax: number, ay: number): number;
     /**
+     * 獲取指定點旋轉後角度的新座標
+     */
+    getRotationPosition(px: number, py: number, x: number, y: number, angle: number): {
+        x: number;
+        y: number;
+    };
+    /**
      * 檢測目前螢幕裝置大小
      */
     getVisibility(): "xs" | "sm" | "md" | "lg" | "xl";
@@ -37,5 +44,6 @@ export declare const helper: {
      * 隨機獲取顏色
      */
     getRandomColor(): string;
+    /** 重新調整圖片大小 */
     imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement>;
 };

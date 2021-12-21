@@ -556,15 +556,15 @@ export class Sprite extends Event<Channels> {
     // 精準計算
     //
 
-    getScreenStatus() {
+    private getScreenStatus() {
         let parent = this.parent && this.parent._status.isStage === false ? this.parent : null
-        // let screenX = (this.parent ? this.parent.screenX + this.parent.width * this.parent.anchorX : 0) + this.x - this.width * this.anchorX
-        // let screenY = (this.parent ? this.parent.screenY + this.parent.height * this.parent.anchorY : 0) + this.y - this.height * this.anchorY
-        // let posX = this.screenX + this.width * this.anchorX
-        // let posY = this.screenY + this.height * this.anchorY
         let output = {
             width: 0,
             height: 0,
+            x: this.x,
+            y: this.y,
+            posX: 0,
+            posY: 0,
             skewY: this.skewY,
             skewX: this.skewX,
             rotation: this.rotation,
@@ -573,6 +573,13 @@ export class Sprite extends Event<Channels> {
         }
         if (parent) {
             let ps = parent.getScreenStatus()
+            output.x *= ps.scaleWidth
+            output.y *= ps.scaleHeight
+            output.x += ps.x + ps.width * parent.anchorX
+            output.y += ps.y + ps.height * parent.anchorY
+            let { x, y } = this.helper.getRotationPosition(ps.posX, ps.posY, output.x, output.y, ps.rotation)
+            output.x = x
+            output.y = y
             output.skewX *= ps.skewX
             output.skewY *= ps.skewY
             output.scaleWidth *= ps.scaleWidth
@@ -583,37 +590,26 @@ export class Sprite extends Event<Channels> {
         let height = this._bitmap.height
         output.width = width * output.scaleWidth + output.skewY * width * output.scaleWidth
         output.height = height * output.scaleHeight + output.skewX * height * output.scaleHeight
+        output.posX = output.x
+        output.posY = output.y
+        output.x -= output.width * this.anchorX
+        output.y -= output.height * this.anchorY
         return output
-    }
-
-    moveByScreen(screenX: number, screenY: number) {
-        // if (this.parent) {
-        //     this.x = (screenX - this.parent.screenPosX) / (this.parent.screenScaleWidth || 0.1)
-        //     this.y = (screenY - this.parent.screenPosY) / (this.parent.screenScaleHeight || 0.1)
-        // } else {
-        //     this.x = screenX
-        //     this.y = screenY
-        // }
     }
 
     /** 獲取精靈在畫布的準確位置 */
 
     getRealRect() {
-        let parent = this.parent && this.parent._status.isStage === false ? this.parent : null
         let status = this.getScreenStatus()
-        let sx = this.screenX
-        let sy = this.screenY
-        let posX = this.posX
-        let posY = this.posY
+        let sx = status.x
+        let sy = status.y
+        let posX = status.posX
+        let posY = status.posY
         let s = this.helper.sinByRad(status.rotation)
         let c = this.helper.cosByRad(status.rotation)
-        let ps = parent ? this.helper.sinByRad(parent.rotation) : s
-        let pc = parent ? this.helper.cosByRad(parent.rotation) : c
-        let parX = parent ? parent.posX : posX
-        let parY = parent ? parent.posY : posY
         let anchor = {
-            x: (posX - parX) * pc - (posY - parY) * ps + parX,
-            y: (posX - parX) * ps + (posY - parY) * pc + parY
+            x: posX,
+            y: posY
         }
         let p = (dx: number, dy: number) => {
             let x = sx + dx

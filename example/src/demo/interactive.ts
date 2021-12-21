@@ -100,11 +100,17 @@ export const interactive: DemoAttr[] = [
                     longtake.enabledDebugMode()
                     let bear1 = new Bear(image, 0.75, longtake.width / 2, longtake.height / 2)
                     let bear2 = new Bear(image, 0, 30, 30)
-                    // bear1.scale(2, 2)
-                    // bear2.scale(0.75, 0.75)
+                    let bear3 = new Bear(image, 0, 0, 0)
+                    let bear4 = new Bear(image, 0, 0, 0)
+                    bear1.scale(1.25, 1.25)
+                    bear2.scale(1.25, 1.25)
+                    bear3.scale(1.25, 1.25)
+                    bear4.scale(1.25, 1.25)
                     bear2.update = () => {
                         bear2.rotation += 1
                     }
+                    bear3.addChildren(bear4)
+                    bear2.addChildren(bear3)
                     bear1.addChildren(bear2)
                     longtake.addChildren(bear1)
                 }

@@ -83,6 +83,19 @@ export const helper = {
     },
 
     /**
+     * 獲取指定點旋轉後角度的新座標
+     */
+
+    getRotationPosition(px: number, py: number, x: number, y: number, angle: number) {
+        let s = helper.sinByRad(angle)
+        let c = helper.cosByRad(angle)
+        return {
+            x: (x - px) * c - (y - py) * s + px,
+            y: (x - px) * s + (y - py) * c + py
+        }
+    },
+
+    /**
      * 檢測目前螢幕裝置大小
      */
 
@@ -115,6 +128,8 @@ export const helper = {
         }
         return color
     },
+
+    /** 重新調整圖片大小 */
 
     imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement> {
         return new Promise((resolve, reject) => {

@@ -65,6 +65,10 @@ export declare class LongTake extends Event<Channels> {
         };
         randInt(min: number, max: number): number;
         getAngle(x: number, y: number, ax: number, ay: number): number;
+        getRotationPosition(px: number, py: number, x: number, y: number, angle: number): {
+            x: number;
+            y: number;
+        };
         getVisibility(): "xs" | "sm" | "md" | "lg" | "xl";
         getRandomColor(): string;
         imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement>;
@@ -96,6 +100,10 @@ export declare class LongTake extends Event<Channels> {
         };
         randInt(min: number, max: number): number;
         getAngle(x: number, y: number, ax: number, ay: number): number;
+        getRotationPosition(px: number, py: number, x: number, y: number, angle: number): {
+            x: number;
+            y: number;
+        };
         getVisibility(): "xs" | "sm" | "md" | "lg" | "xl";
         getRandomColor(): string;
         imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement>;
