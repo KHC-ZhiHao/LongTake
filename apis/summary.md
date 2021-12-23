@@ -462,9 +462,14 @@ new LongTake.Animate({
      */
     alternate: false,
     /**
+     * 等待幾幀後執行
+     * @default 0
+     */
+    delay: number
+    /**
      * 執行動作
      */
-    action: (t: number) => void
+    action: (t: number, d: number) => void
 })
 ```
 

@@ -34,8 +34,13 @@ type AnimateOptions = {
      * @default false
      */
     alternate: boolean
+    /**
+     * 等待幾幀後執行
+     * @default 0
+     */
+    delay: number
     /** 執行動作 */
-    action: (t: number) => void
+    action: (t: number, d: number) => void
 }
 
 /**
@@ -46,6 +51,7 @@ type AnimateOptions = {
 export class Animate extends Base {
     /** 執行結束 */
     over = false
+    delay = 0
     private time = 0
     private options: AnimateOptions
     readonly actionEasing: any
@@ -54,6 +60,7 @@ export class Animate extends Base {
         super('Animate')
         this.options = {
             push: helper.ifEmpty(options.push, 60),
+            delay: helper.ifEmpty(options.push, 0),
             begin: helper.ifEmpty(options.begin, 0),
             duration: helper.ifEmpty(options.duration, 1),
             easing: helper.ifEmpty<Easings>(options.easing, 'linear'),
@@ -65,6 +72,7 @@ export class Animate extends Base {
         this.actionEasing = easings[this.options.easing]
         this.pace = 1000 / this.options.push
         this.time = this.options.begin
+        this.delay = this.options.delay
     }
 
     /**
@@ -75,9 +83,13 @@ export class Animate extends Base {
         let { push, reverse, duration, action, alternate } = this.options
         let pace = 1000 / push
         if (this.over === false) {
+            if (this.delay > 0) {
+                this.delay -= 1
+                return null
+            }
             this.time += reverse ? -pace : pace
             let time = this.actionEasing(this.time, duration)
-            action(time)
+            action(time, 1 - time)
             if (alternate) {
                 if (this.time >= duration) {
                     this.options.reverse = true

@@ -32,8 +32,13 @@ declare type AnimateOptions = {
      * @default false
      */
     alternate: boolean;
+    /**
+     * 等待幾幀後執行
+     * @default 0
+     */
+    delay: number;
     /** 執行動作 */
-    action: (t: number) => void;
+    action: (t: number, d: number) => void;
 };
 /**
  * @desc 動畫執行的載具
@@ -42,6 +47,7 @@ declare type AnimateOptions = {
 export declare class Animate extends Base {
     /** 執行結束 */
     over: boolean;
+    delay: number;
     private time;
     private options;
     readonly actionEasing: any;
