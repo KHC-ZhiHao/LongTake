@@ -33,7 +33,7 @@ declare type AnimateOptions = {
      */
     alternate: boolean;
     /**
-     * 等待幾幀後執行
+     * 等待指定毫秒後執行
      * @default 0
      */
     delay: number;

@@ -75,7 +75,7 @@ export declare class LongTake extends Event<Channels> {
     };
     static get renderPack(): {
         blur(sprite: Sprite, options?: Partial<{
-            iterations: number;
+            radius: number;
         }>): void;
         colorTo: (sprite: Sprite, options?: Partial<{
             color: string;

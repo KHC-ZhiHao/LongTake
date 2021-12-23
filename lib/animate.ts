@@ -35,7 +35,7 @@ type AnimateOptions = {
      */
     alternate: boolean
     /**
-     * 等待幾幀後執行
+     * 等待指定毫秒後執行
      * @default 0
      */
     delay: number
@@ -60,7 +60,7 @@ export class Animate extends Base {
         super('Animate')
         this.options = {
             push: helper.ifEmpty(options.push, 60),
-            delay: helper.ifEmpty(options.push, 0),
+            delay: helper.ifEmpty(options.delay, 0),
             begin: helper.ifEmpty(options.begin, 0),
             duration: helper.ifEmpty(options.duration, 1),
             easing: helper.ifEmpty<Easings>(options.easing, 'linear'),
@@ -84,7 +84,7 @@ export class Animate extends Base {
         let pace = 1000 / push
         if (this.over === false) {
             if (this.delay > 0) {
-                this.delay -= 1
+                this.delay -= pace
                 return null
             }
             this.time += reverse ? -pace : pace
