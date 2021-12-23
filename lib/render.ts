@@ -68,7 +68,6 @@ export const renderPack = {
                 imgData.data.set([r, g, b, a].map(v => v / gaussSum), i)
             }
         }
-        console.log('123')
         sprite.context.putImageData(imgData, 0, 0)
         sprite.context.restore()
     },
