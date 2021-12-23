@@ -2,7 +2,7 @@ import { Sprite } from './sprite'
 import { helper } from './helper'
 
 export const renderPack = {
-    /** 高速簡易的模糊模式 */
+    /** 高斯模糊 */
     blur(sprite: Sprite, options: Partial<{
         radius: number
     }> = {}) {

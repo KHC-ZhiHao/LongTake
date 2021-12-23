@@ -133,7 +133,7 @@ export const basic: DemoAttr[] = [
                         this.setAnchor(0.5)
                         this.on('inited', () => {
                             LongTake.renderPack.blur(this, {
-                                iterations: 10
+                                radius: 10
                             })
                         })
                     }

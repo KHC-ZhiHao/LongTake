@@ -541,6 +541,7 @@ export class Sprite extends Event<Channels> {
             this._bitmap.clearCache()
         }
         if (this._status.inited === false) {
+            this._status.inited = true
             this.emit('inited', {})
         }
     }
