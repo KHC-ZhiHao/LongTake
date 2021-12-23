@@ -30,7 +30,7 @@ export declare const helper: {
 };
 export declare const renderPack: {
     blur(sprite: _Sprite, options?: Partial<{
-        iterations: number;
+        radius: number;
     }>): void;
     colorTo: (sprite: _Sprite, options?: Partial<{
         color: string;

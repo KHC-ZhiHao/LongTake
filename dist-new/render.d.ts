@@ -1,7 +1,8 @@
 import { Sprite } from './sprite';
 export declare const renderPack: {
+    /** 高速簡易的模糊模式 */
     blur(sprite: Sprite, options?: Partial<{
-        iterations: number;
+        radius: number;
     }>): void;
     /** 將精靈覆蓋上指定顏色 */
     colorTo: (sprite: Sprite, options?: Partial<{
