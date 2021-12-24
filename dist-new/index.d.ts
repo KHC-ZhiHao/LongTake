@@ -29,6 +29,10 @@ export declare const helper: {
     imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement>;
 };
 export declare const renderPack: {
+    feather(sprite: _Sprite, options?: Partial<{
+        radius: number;
+        strength: number;
+    }>): void;
     blur(sprite: _Sprite, options?: Partial<{
         radius: number;
     }>): void;

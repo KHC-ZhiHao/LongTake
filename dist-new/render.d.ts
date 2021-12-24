@@ -1,5 +1,10 @@
 import { Sprite } from './sprite';
 export declare const renderPack: {
+    /** 邊緣羽化 */
+    feather(sprite: Sprite, options?: Partial<{
+        radius: number;
+        strength: number;
+    }>): void;
     /** 高斯模糊 */
     blur(sprite: Sprite, options?: Partial<{
         radius: number;

@@ -18,7 +18,7 @@ export declare class Bitmap extends Base {
     get height(): number;
     set height(val: number);
     /** 獲取渲染目標 */
-    getRenderTarget(): HTMLImageElement | ImageBitmap | HTMLCanvasElement;
+    getRenderTarget(): HTMLImageElement | HTMLCanvasElement | ImageBitmap;
     /** 調整畫布大小 */
     resize(width: number, height: number): void;
     /** 清空畫布 */

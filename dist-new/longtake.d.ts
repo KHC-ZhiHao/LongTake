@@ -74,6 +74,10 @@ export declare class LongTake extends Event<Channels> {
         imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement>;
     };
     static get renderPack(): {
+        feather(sprite: Sprite, options?: Partial<{
+            radius: number;
+            strength: number;
+        }>): void;
         blur(sprite: Sprite, options?: Partial<{
             radius: number;
         }>): void;
@@ -81,6 +85,7 @@ export declare class LongTake extends Event<Channels> {
             color: string;
             alpha: number;
         }>) => void;
+        /** 關閉這個Longtake */
         fillRoundRect: (sprite: Sprite, options?: Partial<{
             round: number;
             color: string;

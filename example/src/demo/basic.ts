@@ -179,5 +179,36 @@ export const basic: DemoAttr[] = [
                 }
             }
         `
+    },
+    {
+        name: 'feather',
+        title: 'Feather',
+        desc: '',
+        code: /* javascript */ `
+            (longtake, LongTake) => {
+                class Bear extends LongTake.ImageSprite {
+                    constructor(image) {
+                        super(image)
+                        this.x = longtake.width / 2
+                        this.y = longtake.height / 2
+                        this.setAnchor(0.5)
+                        this.on('inited', () => {
+                            LongTake.renderPack.feather(this, {
+                                radius: 5,
+                                strength: 5
+                            })
+                        })
+                    }
+                    update() {
+                        this.rotation += 1
+                    }
+                }
+                let image = new Image()
+                image.src = 'images/KaohBear.png'
+                image.onload = () => {
+                    longtake.addChildren(new Bear(image))
+                }
+            }
+        `
     }
 ]

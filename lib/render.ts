@@ -2,6 +2,38 @@ import { Sprite } from './sprite'
 import { helper } from './helper'
 
 export const renderPack = {
+    /** 邊緣羽化 */
+    feather(sprite: Sprite, options: Partial<{
+        radius: number
+        strength: number
+    }> = {}) {
+        let radius = Math.floor(helper.ifEmpty(options.radius, 3))
+        let strength = Math.floor(helper.ifEmpty(options.strength, 3))
+        let canvas = sprite._bitmap.canvas
+        let context = sprite.context
+        let copy = document.createElement('canvas')
+        copy.width = sprite._bitmap.width
+        copy.height = sprite._bitmap.height
+        let copyContext = copy.getContext('2d')
+        copyContext?.drawImage(canvas, 0, 0)
+        context.save()
+        context.fillStyle = '#000'
+        context.fillRect(0, 0, sprite.width, sprite.height)
+        context.globalCompositeOperation = 'destination-out'
+        context.drawImage(copy, 0, 0)
+        context.globalCompositeOperation = 'source-over'
+        context.shadowColor = '#000'
+        context.shadowOffsetX = 0
+        context.shadowOffsetY = 0
+        context.shadowBlur = radius
+        for (let i = 0; i < strength; i++) {
+            context.drawImage(canvas, 0, 0)
+        }
+        context.shadowBlur = 0
+        context.globalCompositeOperation = 'source-out'
+        context.drawImage(copy, 0, 0)
+        context.restore()
+    },
     /** 高斯模糊 */
     blur(sprite: Sprite, options: Partial<{
         radius: number
