@@ -48,7 +48,7 @@ export declare class LongTake extends Event<Channels> {
     /** 主要運行的container，由本核心驅動內部精靈的update和event */
     private container;
     private interactive;
-    private bindUpdate;
+    private update;
     private supportRequestAnimationFrame;
     private requestAnimationFrame;
     constructor(target: string | HTMLCanvasElement, width?: number, height?: number);
@@ -85,7 +85,6 @@ export declare class LongTake extends Event<Channels> {
             color: string;
             alpha: number;
         }>) => void;
-        /** 關閉這個Longtake */
         fillRoundRect: (sprite: Sprite, options?: Partial<{
             round: number;
             color: string;
@@ -134,7 +133,6 @@ export declare class LongTake extends Event<Channels> {
     addChildren(sprite: Sprite): void;
     /** 啟動互動模式 */
     enableInteractive(): null | undefined;
-    private update;
     private stageUpdate;
     private bitmapUpdate;
 }

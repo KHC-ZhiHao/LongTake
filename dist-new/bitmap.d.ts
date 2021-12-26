@@ -23,7 +23,7 @@ export declare class Bitmap extends Base {
     resize(width: number, height: number): void;
     /** 清空畫布 */
     clear(): void;
-    /** 當此位圖快取時，將 render target 轉換成 img or imagebitmap 加速渲染 */
+    /** 當此位圖快取時，將 render target 轉換成 img or imagebitmap 加速渲染，如果環境不支援則會採用 canvas */
     cacheImageBitmap(): void;
     /** 解除並清除圖片資料快取 */
     clearCache(): void;

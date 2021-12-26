@@ -53,12 +53,8 @@ export class Bitmap extends Base {
     getRenderTarget() {
         if (this.imgBitmap && this.cache === true) {
             return this.imgBitmap
-        } else if (this.cache === false) {
-            return this.canvas
-        } else {
-            this.cacheImageBitmap()
-            return this.canvas
         }
+        return this.canvas
     }
 
     /** 調整畫布大小 */
@@ -74,19 +70,24 @@ export class Bitmap extends Base {
         this.context.clearRect(0, 0, this.width, this.height)
     }
 
-    /** 當此位圖快取時，將 render target 轉換成 img or imagebitmap 加速渲染 */
+    /** 當此位圖快取時，將 render target 轉換成 img or imagebitmap 加速渲染，如果環境不支援則會採用 canvas */
 
     cacheImageBitmap() {
-        if (typeof window.createImageBitmap !== 'undefined') {
-            createImageBitmap(this.canvas).then(ImageBitmap => {
-                this.imgBitmap = ImageBitmap
-            })
-        } else {
-            let img = new Image()
-            img.onload = () => {
-                this.imgBitmap = img
+        try {
+            if (typeof window.createImageBitmap !== 'undefined') {
+                createImageBitmap(this.canvas).then(ImageBitmap => {
+                    this.imgBitmap = ImageBitmap
+                })
+            } else {
+                let img = new Image()
+                img.onload = () => {
+                    this.imgBitmap = img
+                }
+                img.src = this.canvas.toDataURL()
             }
-            img.src = this.canvas.toDataURL()
+        } catch (error) {
+            console.warn(error)
+            this.imgBitmap = null
         }
     }
 

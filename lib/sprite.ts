@@ -370,21 +370,32 @@ export class Sprite extends Event<Channels> {
 
     /** 渲染的位置X */
     get screenX(): number {
-        return (this.parent ? this.parent.screenX + this.parent.width * this.parent.anchorX : 0) + this.x - this.width * this.anchorX
+        return this.posX - this.width * this.anchorX
     }
 
     /** 渲染的位置Y */
     get screenY(): number {
-        return (this.parent ? this.parent.screenY + this.parent.height * this.parent.anchorY : 0) + this.y - this.height * this.anchorY
+        return this.posY - this.height * this.anchorY
     }
 
     /** 絕對位置的錨點位置X */
-    get posX() {
-        return this.screenX + this.width * this.anchorX
+    get posX(): number {
+        let parent: Sprite | null = this.parent && this.parent._status.isStage === false ? this.parent : null
+        if (parent) {
+            return parent.posX + this.x
+        } else {
+            return this.x
+        }
     }
+
     /** 絕對位置的錨點位置Y */
-    get posY() {
-        return this.screenY + this.height * this.anchorY
+    get posY(): number {
+        let parent: Sprite | null = this.parent && this.parent._status.isStage === false ? this.parent : null
+        if (parent) {
+            return parent.posY + this.y
+        } else {
+            return this.y
+        }
     }
 
     /** 錨點X */
@@ -419,6 +430,7 @@ export class Sprite extends Event<Channels> {
     cache() {
         this._status.cache = true
         this._bitmap.cache = true
+        this._bitmap.cacheImageBitmap()
     }
 
     /** 解除快取狀態 */
@@ -644,7 +656,7 @@ type ImageOptions = {
 export class ImageSprite extends Sprite {
     readonly render: any = null
     private options: ImageOptions
-    constructor(image: HTMLImageElement | ImageBitmap, options: Partial<ImageOptions> = {}) {
+    constructor(image: HTMLImageElement, options: Partial<ImageOptions> = {}) {
         super()
         this.options = {
             padding: this.helper.ifEmpty(options.padding, 0)

@@ -65,8 +65,8 @@ export class Container extends Base {
             }
             if (needSave) {
                 this.context.save()
+                this.transform(sprite)
             }
-            this.transform(sprite)
             this.context.drawImage(sprite._bitmap.getRenderTarget(), screenX, screenY, sprite.width, sprite.height)
             if (sprite.antiAliasing === false) {
                 this.context.imageSmoothingEnabled = true

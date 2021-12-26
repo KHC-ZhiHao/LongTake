@@ -115,7 +115,7 @@ export const animate: DemoAttr[] = [
                     update() {
                         this.x += this.vx
                         this.y += this.vy
-                        let { width, height } = this.getRealStatus()
+                        let { width, height } = this
                         if (this.x + width / 2 > longtake.width || this.x - width / 2 < 0) {
                             this.vx *= -1
                         }
@@ -146,7 +146,7 @@ export const animate: DemoAttr[] = [
                     }
                     longtake.addChildren(countText)
                     longtake.on('click', ({ x, y }) => {
-                        for (let i = 0; i < 5; i++) {
+                        for (let i = 0; i < 500; i++) {
                             longtake.addChildren(new Bear(x, y))
                         }
                         let total = longtake.getAllChildren().length - 1

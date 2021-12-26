@@ -55,7 +55,21 @@ export class LongTake extends Event<Channels> {
     /** 主要運行的container，由本核心驅動內部精靈的update和event */
     private container: Container
     private interactive = false
-    private bindUpdate = () => this.update()
+    private update = () => {
+        if (this.remove === true) {
+            if (this.supportRequestAnimationFrame) {
+                window.cancelAnimationFrame(this.ticker)
+            } else {
+                window.clearTimeout(this.ticker)
+            }
+            return null
+        }
+        if (this._stop === false) {
+            this.stageUpdate()
+        }
+        this.bitmapUpdate()
+        this.ticker = this.requestAnimationFrame(this.update)
+    }
     private supportRequestAnimationFrame = !!window.requestAnimationFrame
     private requestAnimationFrame = (callback: any) => {
         if (this.supportRequestAnimationFrame) {
@@ -207,22 +221,6 @@ export class LongTake extends Event<Channels> {
             start: ({ x, y }) => this.emit('pointerdown', { x, y })
         })
         this.target.style.touchAction = 'none'
-    }
-
-    private update() {
-        if (this.remove === true) {
-            if (this.supportRequestAnimationFrame) {
-                window.cancelAnimationFrame(this.ticker)
-            } else {
-                window.clearTimeout(this.ticker)
-            }
-            return null
-        }
-        if (this._stop === false) {
-            this.stageUpdate()
-        }
-        this.bitmapUpdate()
-        this.ticker = this.requestAnimationFrame(this.bindUpdate)
     }
 
     private stageUpdate() {

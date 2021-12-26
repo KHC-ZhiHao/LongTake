@@ -5,7 +5,7 @@ type OnloadCallback = (name: string, image: HTMLImageElement) => Promise<HTMLIma
 /** 針對圖片預載入的載具 */
 
 export class Loader extends Base {
-    private data: Record<string, ImageBitmap | HTMLImageElement> = {}
+    private data: Record<string, HTMLImageElement> = {}
     private files: Record<string, {
         src: string
         replace?: OnloadCallback
@@ -60,13 +60,7 @@ export class Loader extends Base {
                 if (replace) {
                     image = await replace(name, image)
                 }
-                if (window.createImageBitmap) {
-                    window.createImageBitmap(image).then(bitmap => {
-                        this.data[name] = bitmap
-                    })
-                } else {
-                    this.data[name] = image
-                }
+                this.data[name] = image
                 this.completed += 1
                 if (typeof loading === 'function') {
                     loading(this.completed, this.fileLength)

@@ -17,7 +17,7 @@ export declare class Loader extends Base {
     /** 加入一個等待載入檔案 */
     add(name: string, src: string, replace?: OnloadCallback): void;
     /** 取得一個載入完畢的檔案 */
-    get(name: string): HTMLImageElement | ImageBitmap | undefined;
+    get(name: string): HTMLImageElement | undefined;
     /** 清除指定資料 */
     remove(name: string): void;
     /** 清除所有快取 */

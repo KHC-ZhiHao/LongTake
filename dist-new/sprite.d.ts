@@ -239,7 +239,7 @@ declare type ImageOptions = {
 export declare class ImageSprite extends Sprite {
     readonly render: any;
     private options;
-    constructor(image: HTMLImageElement | ImageBitmap, options?: Partial<ImageOptions>);
+    constructor(image: HTMLImageElement, options?: Partial<ImageOptions>);
 }
 declare type TextOptions = {
     color: string;
