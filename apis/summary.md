@@ -16,7 +16,7 @@
 
 [helper](#helper)
 
-[helper](#helper)
+[renderPack](#renderpack)
 
 ## LongTake
 
@@ -574,3 +574,25 @@ new LongTake.Loader()
 #### getRotationPosition(px: number, py: number, x: number, y: number, angle: number)
 
 獲取指定點旋轉後角度的新座標。
+
+## renderPack
+
+一串複雜 context 操作的 API。
+
+### Methods
+
+#### feather(sprite: Sprite, options?: { radius?: number, strength?: number }): void
+
+邊緣羽化。
+
+#### blur(sprite: Sprite, options?: { radius?: number }): void
+
+高斯模糊。
+
+#### colorTo(sprite: Sprite, options?: { color?: string, alpha?: number }): void
+
+將精靈覆蓋上指定顏色。
+
+#### fillRoundRect(sprite: Sprite, options?: { color?: string, round?: number }): void
+
+繪製填滿的圓角矩形。
