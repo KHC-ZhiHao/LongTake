@@ -45,7 +45,7 @@ export declare class Sprite extends Event<Channels> {
         anchorX: number;
         anchorY: number;
     };
-    private bindUpdateForChild;
+    private updateForChild;
     constructor();
     get context(): CanvasRenderingContext2D;
     get helper(): {
@@ -165,7 +165,9 @@ export declare class Sprite extends Event<Channels> {
     get anchorY(): number;
     /** 錨點Y */
     set anchorY(val: number);
+    /** 是否允許渲染 */
     get canRender(): boolean;
+    /** 是否允許顯示 */
     get canShow(): boolean;
     /** 快取目前渲染的 Bitmap */
     cache(): void;
@@ -177,11 +179,7 @@ export declare class Sprite extends Event<Channels> {
     unHidden(): void;
     /** 每次渲染圖形時執行此函式，目的為精靈的動作 */
     update(sprite: this): void;
-    /** 每次執行 update 時呼叫此函式，處理 Z 值更動的排序與移除子精靈 */
     _mainUpdate(): void;
-    /** 呼叫子精靈更新 */
-    private updateForChild;
-    /** 移除自身的綁定資訊(容易出錯，請使用remove讓精靈在迭代過程中被移除) */
     _close(): void;
     /** 移除自己於父精靈下 */
     remove(): void;
@@ -193,9 +191,7 @@ export declare class Sprite extends Event<Channels> {
     removeChildrenByIndex(index: number): void;
     /** 渲染 bitmap 的方法 */
     render(sprite: this): void;
-    /** 主要渲染程序，包含渲染與濾鏡 */
     _mainRender(): void;
-    /** 呼叫子精靈渲染 */
     private renderForChild;
     /** 獲取精靈在畫布的準確位置與狀態 */
     getRealStatus(): {

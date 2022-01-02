@@ -151,7 +151,7 @@ export const basic: DemoAttr[] = [
     },
     {
         name: 'colorto',
-        title: 'Colot To',
+        title: 'Color To',
         desc: 'ImageSprite 可以透過 inited 事件在 image cache 之前搭配 renderPack 更改像素資源。',
         code: /* javascript */ `
             (longtake, LongTake) => {

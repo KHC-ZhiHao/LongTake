@@ -2,9 +2,11 @@
 
 LongTake 是個輕巧、快速的繪製動畫的函式庫。
 
-[Demos](https://khc-zhihao.github.io/LongTake/#/)
+[Demos](https://khc-zhihao.github.io/LongTake)
 
 [APIs](https://github.com/KHC-ZhiHao/LongTake/blob/master/apis/summary.md)
+
+[0.4以下版本文件](https://khc-zhihao.github.io/LongTake/old)
 
 ### 輕便、簡單建立、快速擴展
 
@@ -61,15 +63,12 @@ Loader 將協助您在呈現動畫之前先將圖片載入完成，讓主題圖�
 ```ts
 let loader = new LongTake.Loader()
 loader.add('bear', './img/HighBear.png')
-//start為執行載入，你可以在這建立讀取畫面的呈現
-loader.start((onload: number, finish: number) => {
-    //onload 為載入完成的數量
-    //finish 為載入總目標數量
-})
-//onload為載入完畢執行，你可以隨意使用onload，如果圖片已經載入完成即執行
+// start為執行載入，你可以在這建立讀取畫面的呈現
+loader.start()
+// onload為載入完畢執行，你可以隨意使用onload，如果圖片已經載入完成即執行
 loader.onload(() => {
     const app = new LongTake(document.getElementById('app'), 800, 600)
-    //do something...
+    // do something...
 })
 ```
 

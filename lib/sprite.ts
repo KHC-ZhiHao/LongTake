@@ -79,10 +79,17 @@ export class Sprite extends Event<Channels> {
         anchorX: 0,
         anchorY: 0
     }
-    private bindUpdateForChild = this.updateForChild.bind(this)
+
+    private updateForChild = (child: Sprite) => {
+        if (child._status.remove === false) {
+            child._mainUpdate()
+        } else {
+            this._status.childrenDead = true
+        }
+    }
+
     constructor() {
         super('Sprite')
-        this.bindUpdateForChild = this.updateForChild.bind(this)
     }
 
     get context() {
@@ -98,7 +105,6 @@ export class Sprite extends Event<Channels> {
     }
 
     /** 檢測一個物件是否為精靈 */
-
     static isSprite(object: any) {
         return object instanceof this
     }
@@ -125,7 +131,6 @@ export class Sprite extends Event<Channels> {
     }
 
     /** 迭代所有子精靈 */
-
     eachChildren(callback: (child: Sprite) => void) {
         let len = this._children.length
         for (let i = 0; i < len; i++) {
@@ -134,7 +139,6 @@ export class Sprite extends Event<Channels> {
     }
 
     /** 迭代所有子精靈(包含子精靈的子精靈) */
-
     eachChildrenDeep(callback: (child: Sprite) => void) {
         let each = function(sprite: Sprite) {
             sprite.eachChildren(children => {
@@ -146,7 +150,6 @@ export class Sprite extends Event<Channels> {
     }
 
     /** 被加入 LongTake 時執行，並載入 LongTake */
-
     _install(main: Container) {
         if (this._main == null) {
             this._main = main
@@ -157,7 +160,6 @@ export class Sprite extends Event<Channels> {
     }
 
     /** 當被加入 stage 時呼叫該函式 */
-
     create(sprite: this) { /* user set */ }
 
     /** 精靈寬 */
@@ -188,7 +190,6 @@ export class Sprite extends Event<Channels> {
     }
 
     /** 調整精靈的大小 */
-
     resize(width: number | { width: number, height: number }, height?: number) {
         if (typeof width === 'object') {
             if (width.width != null && width.height != null) {
@@ -202,7 +203,6 @@ export class Sprite extends Event<Channels> {
     }
 
     /** 加入一個子精靈 */
-
     addChildren(sprite: Sprite) {
         if (Sprite.isSprite(sprite)) {
             if (sprite.parent == null) {
@@ -218,7 +218,6 @@ export class Sprite extends Event<Channels> {
     }
 
     /** 獲取所有子精靈，包含子精靈的子精靈 */
-
     getAllChildren() {
         let children: Sprite[] = []
         this.eachChildrenDeep(child => children.push(child))
@@ -226,7 +225,6 @@ export class Sprite extends Event<Channels> {
     }
 
     /** 重新排列子精靈，當子精靈有 Z 值改變時會自動觸發 */
-
     _sortChildren() {
         let newData: any[] = []
         let childList: any[] = []
@@ -245,14 +243,12 @@ export class Sprite extends Event<Channels> {
     }
 
     /** 是否有變形 */
-
     isTransform() {
         let t = this._transform
         return !(t.skewX === 0 && t.skewY === 0 && t.scaleWidth === 1 && t.scaleHeight === 1 && t.rotation === 0)
     }
 
     /** 設定放大倍率 */
-
     scale(width: number, height: number) {
         this.scaleWidth = width
         this.scaleHeight = height == null ? width : height
@@ -417,10 +413,12 @@ export class Sprite extends Event<Channels> {
         this._position.anchorY = val
     }
 
+    /** 是否允許渲染 */
     get canRender() {
         return !this._status.cache
     }
 
+    /** 是否允許顯示 */
     get canShow() {
         return !this._status.hidden
     }
@@ -456,8 +454,6 @@ export class Sprite extends Event<Channels> {
 
     update(sprite: this) { /* module set */ }
 
-    /** 每次執行 update 時呼叫此函式，處理 Z 值更動的排序與移除子精靈 */
-
     _mainUpdate() {
         if (this._main == null) {
             if (this.parent && this.parent._main) {
@@ -472,7 +468,7 @@ export class Sprite extends Event<Channels> {
             this._sortChildren()
         }
         this.update(this)
-        this.eachChildren(this.bindUpdateForChild)
+        this.eachChildren(this.updateForChild)
         if (this._status.childrenDead) {
             const removeChild: Sprite[] = []
             this._status.childrenDead = false
@@ -486,18 +482,6 @@ export class Sprite extends Event<Channels> {
             removeChild.forEach(child => child.emit('remove', {}))
         }
     }
-
-    /** 呼叫子精靈更新 */
-
-    private updateForChild(child: Sprite) {
-        if (child._status.remove === false) {
-            child._mainUpdate()
-        } else {
-            this._status.childrenDead = true
-        }
-    }
-
-    /** 移除自身的綁定資訊(容易出錯，請使用remove讓精靈在迭代過程中被移除) */
 
     _close() {
         this._main = null
@@ -544,8 +528,6 @@ export class Sprite extends Event<Channels> {
 
     render(sprite: this) { /* module set */ }
 
-    /** 主要渲染程序，包含渲染與濾鏡 */
-
     _mainRender() {
         this.eachChildren(this.renderForChild)
         if (this.canRender) {
@@ -557,8 +539,6 @@ export class Sprite extends Event<Channels> {
             this.emit('inited', {})
         }
     }
-
-    /** 呼叫子精靈渲染 */
 
     private renderForChild(child: Sprite) {
         child._mainRender()

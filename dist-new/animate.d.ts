@@ -45,14 +45,15 @@ declare type AnimateOptions = {
  * @see {easing} https://easings.net/zh-tw
  */
 export declare class Animate extends Base {
-    /** 執行結束 */
-    over: boolean;
-    delay: number;
+    private isOver;
     private time;
+    private delay;
     private options;
     readonly actionEasing: any;
     readonly pace: number;
     constructor(options: Partial<AnimateOptions>);
+    /** 執行是否結束 */
+    get over(): boolean;
     /**
      * 往前推動一偵
      */

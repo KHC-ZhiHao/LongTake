@@ -1,0 +1,516 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Document</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1.0">
+    <link rel="stylesheet" href="./app/style/githubmakrerdowm.css">
+</head>
+<style>
+    body {
+        background-color: #1e1e1e;
+        color: #FFF;
+        padding: 16px;
+    }
+
+    h2 {
+        color: #4ec9a6;
+        border-bottom: none;
+    }
+
+    h4 {
+        color: #dad7a2;
+        margin-bottom: 3px;
+    }
+
+    a {
+        color: lightblue;
+    }
+</style>
+
+<body>
+    <div class="view-readme markdown-body">
+        <h1 id="remd-me--">目錄 :</h1>
+        <p><a href="#remd-me-modulebase">ModuleBase
+            </a></p>
+        <p><a href="#remd-me-helpermodule">HelperModule
+            </a></p>
+        <p><a href="#remd-me-loader">Loader
+            </a></p>
+        <p><a href="#remd-me-easing">Easing
+            </a></p>
+        <p><a href="#remd-me-bitmap">Bitmap
+            </a></p>
+        <p><a href="#remd-me-container-width-height-">Container(width,height)
+            </a></p>
+        <p><a href="#remd-me-longtake-canvasdom-width-height-">LongTake(canvasDom,width,height)
+            </a></p>
+        <p><a href="#remd-me-animate-options-">Animate(options)
+            </a></p>
+        <p><a href="#remd-me-sprite-name-">Sprite(name)
+            </a></p>
+        <h2 id="remd-me-modulebase">ModuleBase</h2>
+        <p><span style="width:100%; display:inline-block;">所有的模塊父類
+            </span></p>
+        <hr>
+        <h3 id="remd-me-function">Function</h3>
+        <h4 id="remd-me-each-array-object-callback-">each(array|object,callback)</h4>
+        <p><span style="width:100%; display:inline-block;">跑一個迴圈
+            </span></p>
+        <h4 id="remd-me-systemerror-functionname-maessage-object-">systemError(functionName,maessage,object)</h4>
+        <p><span style="width:100%; display:inline-block;">於console呼叫錯誤，中斷程序並顯示錯誤的物件
+            </span></p>
+        <h2 id="remd-me-helpermodule">HelperModule</h2>
+        <p><span style="width:100%; display:inline-block;">具擴展性的多元物件
+            </span></p>
+        <hr>
+        <h3 id="remd-me-function">Function</h3>
+        <h4 id="remd-me-sinbyrad-deg-">sinByRad(deg)</h4>
+        <p><span style="width:100%; display:inline-block;">獲取角度轉換弧度後的sin值
+            </span></p>
+        <p><span style="color:pink">return</span> : {number}</p>
+        <h4 id="remd-me-cosbyrad-deg-">cosByRad(deg)</h4>
+        <p><span style="width:100%; display:inline-block;">獲取角度轉換弧度後的cos值
+            </span></p>
+        <p><span style="color:pink">return</span> : {number}</p>
+        <h4 id="remd-me-getvector-deg-distance-">getVector(deg,distance)</h4>
+        <p><span style="width:100%; display:inline-block;">獲取向量
+            </span></p>
+        <p><span style="color:pink">return</span> : {x,y}</p>
+        <h4 id="remd-me-randint-min-max-">randInt(min,max)</h4>
+        <p><span style="width:100%; display:inline-block;">求整數範圍內的隨機值
+            </span></p>
+        <p><span style="color:pink">return</span> : {number}</p>
+        <h4 id="remd-me-getangle-x-y-ax-ay-">getAngle(x,y,ax,ay)</h4>
+        <p><span style="width:100%; display:inline-block;">求兩點角度
+            </span></p>
+        <p><span style="color:pink">return</span> : {number}</p>
+        <h4 id="remd-me-getvisibility-view-">getVisibility(view)</h4>
+        <p><span style="width:100%; display:inline-block;">檢測目前螢幕裝置大小
+            </span></p>
+        <p><span style="color:lightblue">@param</span> : <span style="padding:3px; display:inline-block; color:#8c83af">string</span>
+            <font color="#e30090">view</font> xs, sm, md, le, xl
+        </p>
+        <p><span style="color:pink">return</span> : {boolean}</p>
+        <h2 id="remd-me-loader">Loader</h2>
+        <p><span style="width:100%; display:inline-block;">針對圖片預載入的載具
+            </span></p>
+        <hr>
+        <h3 id="remd-me-function">Function</h3>
+        <h4 id="remd-me-onload-callback-">onload(callback)</h4>
+        <p><span style="width:100%; display:inline-block;">等待載入完成，若載入已完成，直接執行callback
+            </span></p>
+        <p><span style="color:lightblue">@param</span> : <span style="padding:3px; display:inline-block; color:#8c83af">function</span>
+            <font color="#e30090">callback</font> 載入完成時執行
+        </p>
+        <h4 id="remd-me-start-loading-">start(loading)</h4>
+        <p><span style="border-radius:3px; background-color:#687489; color:#FFF; padding:2px 6px; text-align:center">async</span></p>
+        <p><span style="width:100%; display:inline-block;">執行載入
+            </span></p>
+        <p><span style="color:lightblue">@param</span> : <span style="padding:3px; display:inline-block; color:#8c83af">function(completed,length)</span>
+            <font color="#e30090">loading</font> 載入時觸發的事件
+        </p>
+        <h4 id="remd-me-add-name-src-">add(name,src)</h4>
+        <p><span style="width:100%; display:inline-block;">加入一個等待載入檔案
+            </span></p>
+        <h4 id="remd-me-get-name-">get(name)</h4>
+        <p><span style="width:100%; display:inline-block;">取得一個載入完畢的檔案
+            </span></p>
+        <h4 id="remd-me-close-name-">close(name)</h4>
+        <p><span style="width:100%; display:inline-block;">清除快取釋放記憶體
+            </span></p>
+        <p><span style="color:lightblue">@param</span> : <span style="padding:3px; display:inline-block; color:#8c83af">string</span>
+            <font color="#e30090">name</font> 當此值沒有輸入，將清空全部
+        </p>
+        <h2 id="remd-me-easing">Easing</h2>
+        <p><span style="border-radius:3px; background-color:#687489; color:#FFF; padding:2px 6px; text-align:center">static</span></p>
+        <p><span style="width:100%; display:inline-block;">取得緩動函數的靜態物件
+            </span></p>
+        <p><span style="color : yellow">link</span> : <a href="https://easings.net/zh-tw">{支援表}</a></p>
+        <hr>
+        <h3 id="remd-me-function">Function</h3>
+        <h4 id="remd-me-get-name-">get(name)</h4>
+        <p><span style="width:100%; display:inline-block;">獲取相對應的緩動函數
+            </span></p>
+        <h2 id="remd-me-bitmap">Bitmap</h2>
+        <p><span style="width:100%; display:inline-block;">為掌管位圖的物件
+            </span></p>
+        <hr>
+        <h3 id="remd-me-member">Member</h3>
+        <p>
+            <font color="#e30090">offscreenCanvasSupport</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>boolean</strong></span>
+        </p>
+        <p> 是否支援離屏渲染</p>
+        <p>
+            <font color="#e30090">canvas</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>element</strong></span>
+        </p>
+        <p> 內部指向的離屏canvas</p>
+        <p>
+            <font color="#e30090">context</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>object</strong></span>
+        </p>
+        <p> cavnas 2d context</p>
+        <p>
+            <font color="#e30090">cache</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>boolean</strong></span>
+        </p>
+        <p> 是否為快取狀態</p>
+        <p>
+            <font color="#e30090">imgData</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>object</strong></span>
+        </p>
+        <p> 由context.getImageData取得的int8Array位圖元素</p>
+        <p>
+            <font color="#e30090">imgBitmap</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>object</strong></span>
+        </p>
+        <p> 由快取產生的圖片buffer</p>
+        <h3 id="remd-me-function">Function</h3>
+        <h4 id="remd-me-resize-width-height-">resize(width,height)</h4>
+        <p><span style="width:100%; display:inline-block;">調整畫布大小
+            </span></p>
+        <h4 id="remd-me-clear-">clear()</h4>
+        <p><span style="width:100%; display:inline-block;">清空畫布
+            </span></p>
+        <h4 id="remd-me-clearcache-">clearCache()</h4>
+        <p><span style="width:100%; display:inline-block;">解除並清除圖片資料快取
+            </span></p>
+        <h4 id="remd-me-getpixel-x-y-">getPixel(x,y)</h4>
+        <p><span style="width:100%; display:inline-block;">取得位元位置的像素元素
+            </span></p>
+        <h2 id="remd-me-container-width-height-">Container(width,height)</h2>
+        <p><span style="width:100%; display:inline-block;">一個靜態的精靈容器，負責呈現精靈與位圖的計算結果
+            </span></p>
+        <hr>
+        <h3 id="remd-me-member">Member</h3>
+        <p>
+            <font color="#e30090">core</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>LongTake</strong></span>
+        </p>
+        <p> 是否指向LongTakeCore</p>
+        <p>
+            <font color="#e30090">stage</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>Sprite</strong></span>
+        </p>
+        <p> 主精靈</p>
+        <p>
+            <font color="#e30090">bitmap</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>Bitmap</strong></span>
+        </p>
+        <p> 主位圖</p>
+        <p>
+            <font color="#e30090">width</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 位圖寬(與位圖同步)</p>
+        <p>
+            <font color="#e30090">height</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 位圖高(與位圖同步)</p>
+        <p>
+            <font color="#e30090">pointerX</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 當此Container指向LongTakeCore時，該值會隨著鼠標或觸碰位置改變</p>
+        <p>
+            <font color="#e30090">pointerY</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 當此Container指向LongTakeCore時，該值會隨著鼠標或觸碰位置改變</p>
+        <h3 id="remd-me-function">Function</h3>
+        <h4 id="remd-me-register-sprite-">register(sprite)</h4>
+        <p><span style="width:100%; display:inline-block;">當sprite優先註冊過事件，在 install container 的時候回補註冊至LongTake
+            </span></p>
+        <h4 id="remd-me-post-data-">post(data)</h4>
+        <p><span style="width:100%; display:inline-block;">發送一個data給Container並觸發重渲染
+            </span></p>
+        <h4 id="remd-me-getimagebitmap-callback-">getImageBitmap(callback)</h4>
+        <p><span style="width:100%; display:inline-block;">獲取該Container的ImageBitmap
+            </span></p>
+        <p><span style="color:wheat">callback</span> : <code>(ImageBitmap)
+=&gt; { do something... }</code></p>
+        <h4 id="remd-me-addchildren-sprite-">addChildren(sprite)</h4>
+        <p><span style="width:100%; display:inline-block;">加入一個子精靈
+            </span></p>
+        <h2 id="remd-me-longtake-canvasdom-width-height-">LongTake(canvasDom,width,height)</h2>
+        <p><span style="width:100%; display:inline-block;">核心
+            </span></p>
+        <hr>
+        <h3 id="remd-me-member">Member</h3>
+        <p>
+            <font color="#e30090">width</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 繪製圖的寬</p>
+        <p>
+            <font color="#e30090">height</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 繪製圖的高</p>
+        <p>
+            <font color="#e30090">ticker</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 目前運行的偵數</p>
+        <p>
+            <font color="#e30090">framePerSecond</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 最大FPS數</p>
+        <p>
+            <font color="#e30090">baseFps</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 目前實際運行的fps</p>
+        <p>
+            <font color="#e30090">viewScale</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 整體視圖倍率</p>
+        <p>
+            <font color="#e30090">target</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>object</strong></span>
+        </p>
+        <p> 目前運行的canvas</p>
+        <p>
+            <font color="#e30090">targetRect</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>object</strong></span>
+        </p>
+        <p> 目前運行的canvas實際大小</p>
+        <p>
+            <font color="#e30090">container</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>Container</strong></span>
+        </p>
+        <p> 主要運行的container，由本核心驅動內部精靈的update和event</p>
+        <p>
+            <font color="#e30090">camera</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>object</strong></span>
+        </p>
+        <p> 鏡頭物件</p>
+        <h3 id="remd-me-function">Function</h3>
+        <h4 id="remd-me-setfps-fps-">setFPS(fps)</h4>
+        <p><span style="width:100%; display:inline-block;">設置動畫的FPS
+            </span></p>
+        <h4 id="remd-me-close-">close()</h4>
+        <p><span style="width:100%; display:inline-block;">關閉這個Longtake
+            </span></p>
+        <h4 id="remd-me-setcamera-x-y-">setCamera(x,y)</h4>
+        <p><span style="width:100%; display:inline-block;">移動鏡頭至x,y
+            </span></p>
+        <h4 id="remd-me-addevent-eventname-callback-">addEvent(eventName,callback)</h4>
+        <p><span style="width:100%; display:inline-block;">監聽一個事件
+            </span></p>
+        <p><span style="color:lightblue">@param</span> : <span style="padding:3px; display:inline-block; color:#8c83af">function</span>
+            <font color="#e30090">callback</font> 觸發事件
+        </p>
+        <h4 id="remd-me-targetresize-width-height-">targetResize(width,height)</h4>
+        <p><span style="width:100%; display:inline-block;">調整視圖canvas的大小
+            </span></p>
+        <h4 id="remd-me-onwindowresize-">onWindowResize()</h4>
+        <p><span style="width:100%; display:inline-block;">當畫面旋轉或縮放時觸發該function(自定義)
+            </span></p>
+        <h4 id="remd-me-forelementresize-element-scale-">forElementResize(element,scale)</h4>
+        <p><span style="width:100%; display:inline-block;">縮放視圖倍率至指定element大小(cover縮放模式)
+            </span></p>
+        <h4 id="remd-me-addchildren-sprite-">addChildren(sprite)</h4>
+        <p><span style="width:100%; display:inline-block;">加入一個精靈至container底下
+            </span></p>
+        <h2 id="remd-me-animate-options-">Animate(options)</h2>
+        <p><span style="width:100%; display:inline-block;">一個動畫的載具
+            </span></p>
+        <p><span style="color : yellow">link</span> : <a href="https://easings.net/zh-tw">{easing}</a></p>
+        <h3 id="remd-me--span-style-color-cyan-options-span-"><span style="color:cyan">options</span></h3>
+        <p> 動畫選項</p>
+        <p><span style="color:lightblue">@param</span> : <span style="padding:3px; display:inline-block; color:#8c83af">number</span>
+            <font color="#e30090">push</font> 每次前進的偵數
+        </p>
+        <p><span style="color:lightblue">@param</span> : <span style="padding:3px; display:inline-block; color:#8c83af">number</span>
+            <font color="#e30090">begin</font> 起始時間
+        </p>
+        <p><span style="color:lightblue">@param</span> : <span style="padding:3px; display:inline-block; color:#8c83af">number</span>
+            <font color="#e30090">duration</font> 持續時間
+        </p>
+        <p><span style="color:lightblue">@param</span> : <span style="padding:3px; display:inline-block; color:#8c83af">string</span>
+            <font color="#e30090">easing</font> 緩動函數
+        </p>
+        <p><span style="color:lightblue">@param</span> : <span style="padding:3px; display:inline-block; color:#8c83af">boolean</span>
+            <font color="#e30090">reverse</font> 反轉前進
+        </p>
+        <p><span style="color:lightblue">@param</span> : <span style="padding:3px; display:inline-block; color:#8c83af">boolean</span>
+            <font color="#e30090">alternate</font> 巡迴播放
+        </p>
+        <p><span style="color:lightblue">@param</span> : <span style="padding:3px; display:inline-block; color:#8c83af">function</span>
+            <font color="#e30090">action</font> 執行動作
+        </p>
+        <hr>
+        <h3 id="remd-me-function">Function</h3>
+        <h4 id="remd-me-validate-data-">validate(data)</h4>
+        <p><span style="width:100%; display:inline-block;">驗證正確並賦予資料
+            </span></p>
+        <h4 id="remd-me-move-">move()</h4>
+        <p><span style="width:100%; display:inline-block;">往前推動一偵
+            </span></p>
+        <h4 id="remd-me-restart-">restart()</h4>
+        <p><span style="width:100%; display:inline-block;">重起計算
+            </span></p>
+        <h2 id="remd-me-sprite-name-">Sprite(name)</h2>
+        <p><span style="width:100%; display:inline-block;">建立一個動畫精靈，為LongTake的驅動核心
+            </span></p>
+        <hr>
+        <h3 id="remd-me-member">Member</h3>
+        <p>
+            <font color="#e30090">width</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 精靈寬(和Bitmap同步)</p>
+        <p>
+            <font color="#e30090">height</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 精靈高(和Bitmap同步)</p>
+        <p>
+            <font color="#e30090">parent</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>Sprite</strong></span>
+        </p>
+        <p> 父精靈</p>
+        <p>
+            <font color="#e30090">children</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>array</strong></span>
+        </p>
+        <p> 子精靈組</p>
+        <p>
+            <font color="#e30090">skewX</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 傾斜X</p>
+        <p>
+            <font color="#e30090">skewY</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 傾斜Y</p>
+        <p>
+            <font color="#e30090">scaleWidth</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 放大寬</p>
+        <p>
+            <font color="#e30090">scaleHeight</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 放大高</p>
+        <p>
+            <font color="#e30090">rotation</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 旋轉</p>
+        <p>
+            <font color="#e30090">opacity</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 透明度</p>
+        <p>
+            <font color="#e30090">blendMode</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 合成模式</p>
+        <p>
+            <font color="#e30090">screenScaleWidth</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 該精靈在最後顯示的總倍率寬</p>
+        <p>
+            <font color="#e30090">screenScaleHeight</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 該精靈在最後顯示的總倍率高</p>
+        <p>
+            <font color="#e30090">x</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 定位點X</p>
+        <p>
+            <font color="#e30090">y</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 定位點Y</p>
+        <p>
+            <font color="#e30090">z</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 高度，每次設定會重新排序</p>
+        <p>
+            <font color="#e30090">anchorX</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 錨點X</p>
+        <p>
+            <font color="#e30090">anchorY</font> - <span style="padding:3px; display:inline-block; color:#8c83af"><strong>number</strong></span>
+        </p>
+        <p> 錨點Y</p>
+        <h3 id="remd-me-function">Function</h3>
+        <h4 id="remd-me-issprite-target-">isSprite(target)</h4>
+        <p><span style="border-radius:3px; background-color:#687489; color:#FFF; padding:2px 6px; text-align:center">static</span></p>
+        <p><span style="width:100%; display:inline-block;">檢測一個物件是否為精靈
+            </span></p>
+        <h4 id="remd-me-eachchildren-callback-">eachChildren(callback)</h4>
+        <p><span style="width:100%; display:inline-block;">迭代所有子精靈
+            </span></p>
+        <h4 id="remd-me-eachchildrendeep-callback-">eachChildrenDeep(callback)</h4>
+        <p><span style="width:100%; display:inline-block;">迭代所有子精靈(包含子精靈的子精靈)
+            </span></p>
+        <h4 id="remd-me-super-name-">super(name)</h4>
+        <p><span style="width:100%; display:inline-block;">當實體化該精靈後，可以使用super呼叫實體化前的函式
+            </span></p>
+        <p><span style="color:lightblue">@param</span> : <span style="padding:3px; display:inline-block; color:#8c83af">string</span>
+            <font color="#e30090">name</font> 呼叫函式名稱
+        </p>
+        <h4 id="remd-me-create-">create()</h4>
+        <p><span style="width:100%; display:inline-block;">當被加入stage時呼叫該函式
+            </span></p>
+        <h4 id="remd-me-resize-width-height-">resize(width,height)</h4>
+        <p><span style="width:100%; display:inline-block;">調整精靈的bitmap大小
+            </span></p>
+        <p><span style="color:lightblue">@param</span> : <span style="padding:3px; display:inline-block; color:#8c83af">object|number</span>
+            <font color="#e30090">width</font> 當傳入為具有width和height的物件，會調整成該大小
+        </p>
+        <h4 id="remd-me-addchildren-sprite-">addChildren(sprite)</h4>
+        <p><span style="width:100%; display:inline-block;">加入一個子精靈
+            </span></p>
+        <h4 id="remd-me-sortchildren-">sortChildren()</h4>
+        <p><span style="width:100%; display:inline-block;">重新排列子精靈，當子精靈有Z值改變時會自動觸發
+            </span></p>
+        <h4 id="remd-me-on-name-event-callback-">on(name,event,callback)</h4>
+        <p><span style="width:100%; display:inline-block;">監聽一個事件
+            </span></p>
+        <h4 id="remd-me-unon-name-">unon(name)</h4>
+        <p><span style="width:100%; display:inline-block;">移除監聽的事件
+            </span></p>
+        <h4 id="remd-me-istransform-">isTransform()</h4>
+        <p><span style="width:100%; display:inline-block;">是否有變形
+            </span></p>
+        <h4 id="remd-me-scale-width-height-">scale(width,height)</h4>
+        <p><span style="width:100%; display:inline-block;">設定放大倍率
+            </span></p>
+        <h4 id="remd-me-setanchor-x-y-">setAnchor(x,y)</h4>
+        <p><span style="width:100%; display:inline-block;">設定錨點
+            </span></p>
+        <h4 id="remd-me-cache-">cache()</h4>
+        <p><span style="width:100%; display:inline-block;">快取目前渲染的bitmap
+            </span></p>
+        <h4 id="remd-me-uncache-">unCache()</h4>
+        <p><span style="width:100%; display:inline-block;">手動解除快取狀態
+            </span></p>
+        <h4 id="remd-me-hidden-">hidden()</h4>
+        <p><span style="width:100%; display:inline-block;">隱藏
+            </span></p>
+        <h4 id="remd-me-unhidden-">unHidden()</h4>
+        <p><span style="width:100%; display:inline-block;">解除隱藏
+            </span></p>
+        <h4 id="remd-me-getrealsize-">getRealSize()</h4>
+        <p><span style="width:100%; display:inline-block;">獲取該精靈實際呈現的大小
+            </span></p>
+        <h4 id="remd-me-getrealposition-">getRealPosition()</h4>
+        <p><span style="width:100%; display:inline-block;">獲取精靈在畫布的準確位置
+            </span></p>
+        <h4 id="remd-me-update-">update()</h4>
+        <p><span style="width:100%; display:inline-block;">每次渲染圖形時執行此函式，目的為精靈的動作
+            </span></p>
+        <h4 id="remd-me-remove-">remove()</h4>
+        <p><span style="width:100%; display:inline-block;">移除自己於父精靈下
+            </span></p>
+        <h4 id="remd-me-removechild-sprite-">removeChild(sprite)</h4>
+        <p><span style="width:100%; display:inline-block;">移除指定的子精靈
+            </span></p>
+        <h4 id="remd-me-clearchildren-">clearChildren()</h4>
+        <p><span style="width:100%; display:inline-block;">移除全部的子精靈
+            </span></p>
+        <h4 id="remd-me-removechildrenbyname-name-">removeChildrenByName(name)</h4>
+        <p><span style="width:100%; display:inline-block;">移除指定name的精靈
+            </span></p>
+        <h4 id="remd-me-removechildrenbyindex-index-">removeChildrenByIndex(index)</h4>
+        <p><span style="width:100%; display:inline-block;">移除指定index的精靈
+            </span></p>
+        <h4 id="remd-me-filter-imgdata-">filter(imgData)</h4>
+        <p><span style="color:pink">default</span> : null</p>
+        <p><span style="width:100%; display:inline-block;">渲染濾鏡的函式
+            </span></p>
+        <h4 id="remd-me-render-">render()</h4>
+        <p><span style="width:100%; display:inline-block;">渲染bitmap的方法
+            </span></p>
+        <h4 id="remd-me-fromimage-img-">fromImage(img)</h4>
+        <p><span style="width:100%; display:inline-block;">將精靈設置成img檔案的解析度，並將render宣告成渲染該圖片並快取
+            </span></p>
+        <h4 id="remd-me-eachimgdata-imgdata-callback-">eachImgData(imgData,callback)</h4>
+        <p><span style="width:100%; display:inline-block;">迭代像素
+            </span></p>
+        <p><span style="color:wheat">callback</span> : <code>(pixel:object,render:function)
+=&gt; { do something... }</code></p>
+        <h4 id="remd-me-inrect-x-y-">inRect(x,y)</h4>
+        <p><span style="width:100%; display:inline-block;">座標是否在精靈的矩形範圍內
+            </span></p>
+    </div>
+</body>
