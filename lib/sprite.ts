@@ -236,11 +236,9 @@ export class Sprite extends Event<Channels> {
             }
             childList[child.z].push(child)
         })
-        this.each(childList, (list) => {
-            if (Array.isArray(list)) {
-                newData = newData.concat(list)
-            }
-        })
+        for (let list of childList) {
+            newData = newData.concat(list)
+        }
         this._children = newData
     }
 

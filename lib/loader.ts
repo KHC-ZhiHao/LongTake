@@ -107,6 +107,8 @@ export class Loader extends Base {
     /** 清除所有快取 */
 
     clear() {
-        this.each(this.data, (data, key) => this.remove(key))
+        for (let key in this.data) {
+            this.remove(key)
+        }
     }
 }

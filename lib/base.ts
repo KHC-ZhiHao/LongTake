@@ -4,40 +4,10 @@ export class Base {
     private moduleBase = {
         name: 'No module base name.'
     }
+
     constructor(name: string) {
         if (name) {
             this.moduleBase.name = name
-        }
-    }
-
-    /** 跑一個迴圈 */
-
-    each(target: Array<any> | Record<string, any>, callback: (data: any, index: any) => '_break' | '_continue' | void) {
-        if (typeof target === 'object') {
-            if (Array.isArray(target)) {
-                let len = target.length
-                for (let i = 0; i < len; i++) {
-                    let br = callback(target[i], i)
-                    if (br === '_break') {
-                        break
-                    }
-                    if (br === '_continue') {
-                        continue
-                    }
-                }
-            } else {
-                for (let key in target) {
-                    let br = callback(target[key], key)
-                    if (br === '_break') {
-                        break
-                    }
-                    if (br === '_continue') {
-                        continue
-                    }
-                }
-            }
-        } else {
-            this.systemError('each', 'Not a object or array.', target)
         }
     }
 
