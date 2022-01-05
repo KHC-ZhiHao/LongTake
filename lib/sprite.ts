@@ -234,8 +234,11 @@ export class Sprite extends Event<Channels> {
             }
             childList[child.z].push(child)
         })
+        childList = childList.filter(e => !!e)
         for (let list of childList) {
-            newData = newData.concat(list)
+            for (let child of list) {
+                newData.push(child)
+            }
         }
         this._children = newData
     }
