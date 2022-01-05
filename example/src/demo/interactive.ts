@@ -82,7 +82,7 @@ export const interactive: DemoAttr[] = [
     {
         name: 'debug',
         title: 'Debug',
-        desc: '',
+        desc: '啟用測試模式可以進行初步的系統調教。',
         code: /* javascript */ `
             (longtake, LongTake) => {
                 class Bear extends LongTake.ImageSprite {

@@ -3,7 +3,7 @@ module.exports = {
     productionSourceMap: false,
     configureWebpack: {
         resolve: {
-            extensions: ['*', '.mjs', '.js', '.vue', '.json', '.gif']
+            extensions: ['*', '.mjs', '.vue', '.json', '.gif']
         }
     }
 }

@@ -9,7 +9,10 @@ module.exports = {
         '@vue/typescript/recommended'
     ],
     parserOptions: {
-        ecmaVersion: 2020
+        ecmaVersion: 2020,
+        ecmaFeatures: {
+            experimentalObjectRestSpread: true
+        }
     },
     rules: {
         'quote-props': 'off',
@@ -28,6 +31,7 @@ module.exports = {
         'no-use-before-define': 'off',
         'standard/no-callback-literal': 'off',
         'no-async-promise-executor': 'off',
+        'vue/multi-word-component-names': 'off',
         'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
         'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off'
     }

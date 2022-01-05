@@ -1,4 +1,21 @@
-# LongTake
+
+<p align="center"><img style="max-width: 300px" src="./logo.png"></p>
+
+<h1 align="center">LongTake</h1>
+<h3 align="center">Web Canvas Animate Library</h3>
+
+<p align="center">
+    <a href="https://www.npmjs.com/package/longtake">
+        <img src="https://img.shields.io/npm/v/longtake.svg">
+    </a>
+    <a href="https://standardjs.com/">
+        <img src="https://img.shields.io/badge/code_style-standard-brightgreen.svg" style="max-width:100%;">
+    </a>
+    <a href="https://github.com/KHC-ZhiHao/LongTake">
+        <img src="https://img.shields.io/github/stars/KHC-ZhiHao/LongTake.svg?style=social">
+    </a>
+    <br>
+</p>
 
 LongTake 是個輕巧、快速的繪製動畫的函式庫。
 
@@ -6,7 +23,7 @@ LongTake 是個輕巧、快速的繪製動畫的函式庫。
 
 [APIs](https://github.com/KHC-ZhiHao/LongTake/blob/master/apis/summary.md)
 
-[0.4以下版本文件](https://khc-zhihao.github.io/LongTake/old)
+[v0.4 以下版本文件](https://khc-zhihao.github.io/LongTake/old)
 
 ### 輕便、簡單建立、快速擴展
 

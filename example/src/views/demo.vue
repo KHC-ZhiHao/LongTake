@@ -25,6 +25,12 @@
                         {{ item.title }}
                     </Botton>
                 </div>
+                <div class="pa2">Render</div>
+                <div class="pa2 pt1 pb1" v-for="item of render" :key="item.name">
+                    <Botton block @click="load(item.name)">
+                        {{ item.title }}
+                    </Botton>
+                </div>
                 <div class="pa2">Animate</div>
                 <div class="pa2 pt1 pb1" v-for="item of animate" :key="item.name">
                     <Botton block @click="load(item.name)">
@@ -56,10 +62,11 @@
 import Editer from '@/components/editer.vue'
 import Botton from '@/components/botton.vue'
 import { self } from '@/self'
+import { basic } from '@/demo/basic'
+import { render } from '@/demo/render'
+import { animate } from '@/demo/animate'
 import { LongTake } from 'longtake'
 import { DemoAttr } from '@/demo'
-import { basic } from '@/demo/basic'
-import { animate } from '@/demo/animate'
 import { interactive } from '@/demo/interactive'
 import { defineComponent, onMounted, onUnmounted, watch } from 'vue'
 export default defineComponent({
@@ -119,7 +126,7 @@ export default defineComponent({
         //
 
         const load = (name: string) => {
-            let items = [...basic, ...interactive, ...animate]
+            let items = [...basic, ...interactive, ...animate, ...render]
             state.demo = items.find(e => e.name === name)
             if (state.demo) {
                 state.desc = state.demo.desc
@@ -174,6 +181,7 @@ export default defineComponent({
             load,
             basic,
             goBack,
+            render,
             animate,
             interactive,
             state,

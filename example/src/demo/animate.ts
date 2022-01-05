@@ -146,7 +146,7 @@ export const animate: DemoAttr[] = [
                     }
                     longtake.addChildren(countText)
                     longtake.on('click', ({ x, y }) => {
-                        for (let i = 0; i < 500; i++) {
+                        for (let i = 0; i < 50; i++) {
                             longtake.addChildren(new Bear(x, y))
                         }
                         let total = longtake.getAllChildren().length - 1
