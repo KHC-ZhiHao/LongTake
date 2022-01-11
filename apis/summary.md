@@ -581,6 +581,10 @@ new LongTake.Loader()
 
 ### Methods
 
+#### insetShadow(sprite: Sprite, options?: { blur?: number, color?: string, spread: number }): void
+
+內陰影。
+
 #### feather(sprite: Sprite, options?: { radius?: number, strength?: number }): void
 
 邊緣羽化。

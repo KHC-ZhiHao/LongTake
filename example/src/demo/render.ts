@@ -65,6 +65,35 @@ export const render: DemoAttr[] = [
         `
     },
     {
+        name: 'insetShadow',
+        title: 'Inset Shadow',
+        desc: '內陰影。',
+        code: /* javascript */ `
+            (longtake, LongTake) => {
+                class Bear extends LongTake.ImageSprite {
+                    constructor(image) {
+                        super(image)
+                        this.x = longtake.width / 2
+                        this.y = longtake.height / 2
+                        this.setAnchor(0.5)
+                        this.on('inited', () => {
+                            LongTake.renderPack.insetShadow(this, {
+                                blur: 15,
+                                color: 'red',
+                                spread: 1
+                            })
+                        })
+                    }
+                }
+                let image = new Image()
+                image.src = 'images/KaohBear.png'
+                image.onload = () => {
+                    longtake.addChildren(new Bear(image))
+                }
+            }
+        `
+    },
+    {
         name: 'feather',
         title: 'Feather',
         desc: '羽化圖像邊緣。',

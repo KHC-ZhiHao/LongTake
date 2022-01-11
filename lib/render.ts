@@ -1,7 +1,52 @@
 import { Sprite } from './sprite'
 import { helper } from './helper'
 
+const copyCanvas = (sprite: Sprite) => {
+    let canvas = sprite._bitmap.canvas
+    let copy = document.createElement('canvas')
+    copy.width = sprite._bitmap.width
+    copy.height = sprite._bitmap.height
+    let copyContext = copy.getContext('2d')
+    copyContext?.drawImage(canvas, 0, 0)
+    return copy
+}
+
 export const renderPack = {
+    /** 內陰影 */
+    insetShadow(sprite: Sprite, options: Partial<{
+        blur: number
+        color: string
+        spread: number
+    }> = {}) {
+        let blur = helper.ifEmpty(options.blur, 0)
+        let color = helper.ifEmpty(options.color, '#000')
+        let spread = helper.ifEmpty(options.spread, 1)
+        let canvas = sprite._bitmap.canvas
+        let context = sprite.context
+        let copy = copyCanvas(sprite)
+        context.save()
+        context.fillStyle = '#fff'
+        context.fillRect(0, 0, sprite.width, sprite.height)
+        context.globalCompositeOperation = 'destination-out'
+        context.drawImage(copy, 0, 0)
+        context.globalCompositeOperation = 'source-over'
+        context.shadowColor = color
+        context.shadowOffsetX = 0
+        context.shadowOffsetY = 0
+        context.shadowBlur = blur
+        for (let i = 0; i < spread; i++) {
+            context.drawImage(canvas, 0, 0)
+        }
+        context.shadowBlur = 0
+        context.globalCompositeOperation = 'destination-in'
+        context.drawImage(copy, 0, 0)
+        context.globalCompositeOperation = 'source-over'
+        let shadow = copyCanvas(sprite)
+        sprite._bitmap.clear()
+        context.drawImage(copy, 0, 0)
+        context.drawImage(shadow, 0, 0)
+        context.restore()
+    },
     /** 邊緣羽化 */
     feather(sprite: Sprite, options: Partial<{
         radius: number
@@ -11,11 +56,7 @@ export const renderPack = {
         let strength = Math.floor(helper.ifEmpty(options.strength, 3))
         let canvas = sprite._bitmap.canvas
         let context = sprite.context
-        let copy = document.createElement('canvas')
-        copy.width = sprite._bitmap.width
-        copy.height = sprite._bitmap.height
-        let copyContext = copy.getContext('2d')
-        copyContext?.drawImage(canvas, 0, 0)
+        let copy = copyCanvas(sprite)
         context.save()
         context.fillStyle = '#000'
         context.fillRect(0, 0, sprite.width, sprite.height)

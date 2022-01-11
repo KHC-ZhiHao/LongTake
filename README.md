@@ -24,7 +24,7 @@ LongTake 是個輕巧、快速的繪製動畫的函式庫。
 
 [APIs](https://github.com/KHC-ZhiHao/LongTake/blob/master/apis/summary.md)
 
-[v0.4 以下版本文件](https://khc-zhihao.github.io/LongTake/old)
+[v0.4 以下版本文件請看](https://khc-zhihao.github.io/LongTake/old)
 
 ### 輕便、簡單建立、快速擴展
 

@@ -74,6 +74,11 @@ export declare class LongTake extends Event<Channels> {
         imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement>;
     };
     static get renderPack(): {
+        insetShadow(sprite: Sprite, options?: Partial<{
+            blur: number;
+            color: string;
+            spread: number;
+        }>): void;
         feather(sprite: Sprite, options?: Partial<{
             radius: number;
             strength: number;

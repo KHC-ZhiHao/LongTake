@@ -1,5 +1,11 @@
 import { Sprite } from './sprite';
 export declare const renderPack: {
+    /** 內陰影 */
+    insetShadow(sprite: Sprite, options?: Partial<{
+        blur: number;
+        color: string;
+        spread: number;
+    }>): void;
     /** 邊緣羽化 */
     feather(sprite: Sprite, options?: Partial<{
         radius: number;
