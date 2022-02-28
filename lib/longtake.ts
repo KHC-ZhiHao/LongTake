@@ -58,11 +58,7 @@ export class LongTake extends Event<Channels> {
     private interactive = false
     private update = () => {
         if (this.remove === true) {
-            if (this.supportRequestAnimationFrame) {
-                window.cancelAnimationFrame(this.ticker)
-            } else {
-                window.clearTimeout(this.ticker)
-            }
+            window.clearTimeout(this.ticker)
             return null
         }
         if (this._stop === false) {
@@ -71,14 +67,7 @@ export class LongTake extends Event<Channels> {
         this.bitmapUpdate()
         this.ticker = this.requestAnimationFrame(this.update)
     }
-    private supportRequestAnimationFrame = !!window.requestAnimationFrame
-    private requestAnimationFrame = (callback: any) => {
-        if (this.supportRequestAnimationFrame) {
-            return setTimeout(() => window.requestAnimationFrame(callback), this.frame)
-        } else {
-            return setTimeout(callback, this.frame)
-        }
-    }
+    private requestAnimationFrame = (callback: any) => setTimeout(callback, this.frame)
     constructor(target: string | HTMLCanvasElement, width?: number, height?: number) {
         super('Main')
         this.target = typeof target === 'string' ? document.getElementById(target) as any : target

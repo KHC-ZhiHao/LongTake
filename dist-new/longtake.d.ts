@@ -50,7 +50,6 @@ export declare class LongTake extends Event<Channels> {
     private container;
     private interactive;
     private update;
-    private supportRequestAnimationFrame;
     private requestAnimationFrame;
     constructor(target: string | HTMLCanvasElement, width?: number, height?: number);
     static get version(): string;
