@@ -46,6 +46,7 @@ export class LongTake extends Event<Channels> {
     private debug: Debug | null = null
     private ticker: any = null
     private remove = false
+    private frame = 1000 / 60
     /** 目前運行的canvas */
     private target: HTMLCanvasElement
     private context: CanvasRenderingContext2D
@@ -73,9 +74,9 @@ export class LongTake extends Event<Channels> {
     private supportRequestAnimationFrame = !!window.requestAnimationFrame
     private requestAnimationFrame = (callback: any) => {
         if (this.supportRequestAnimationFrame) {
-            return window.requestAnimationFrame(callback)
+            return setTimeout(() => window.requestAnimationFrame(callback), this.frame)
         } else {
-            return setTimeout(callback, 1000 / 60)
+            return setTimeout(callback, this.frame)
         }
     }
     constructor(target: string | HTMLCanvasElement, width?: number, height?: number) {
@@ -149,6 +150,12 @@ export class LongTake extends Event<Channels> {
 
     get playing() {
         return this._stop === false
+    }
+
+    /** 指定渲染幀率 */
+
+    setFrame(frame: number) {
+        this.frame = 1000 / frame
     }
 
     /** 只渲染不觸發 update 鉤子 */

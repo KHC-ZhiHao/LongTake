@@ -83,6 +83,10 @@ pointer 相關事件必須啟用 enableInteractive() 才會生效。
 
 ### Methods
 
+#### setFrame(frame: number): void
+
+設置每次渲染的間隔。
+
 #### stop(): void
 
 只渲染不觸發 update 鉤子。

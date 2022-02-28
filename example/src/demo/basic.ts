@@ -116,5 +116,31 @@ export const basic: DemoAttr[] = [
                 }
             }
         `
+    },
+    {
+        name: 'refresh frame',
+        title: 'Set Frame',
+        desc: '控制渲染幀率，如果顯示目標是超過60hz螢幕時可以設定，否則固定每 1000/60 毫秒刷新一次。',
+        code: /* javascript */ `
+            (longtake, LongTake) => {
+                longtake.setFrame(24)
+                class Bear extends LongTake.ImageSprite {
+                    constructor(image) {
+                        super(image)
+                        this.x = longtake.width / 2
+                        this.y = longtake.height / 2
+                        this.setAnchor(0.5)
+                    }
+                    update() {
+                        this.rotation += 1
+                    }
+                }
+                let image = new Image()
+                image.src = 'images/KaohBear.png'
+                image.onload = () => {
+                    longtake.addChildren(new Bear(image))
+                }
+            }
+        `
     }
 ]

@@ -39,6 +39,7 @@ export declare class LongTake extends Event<Channels> {
     private debug;
     private ticker;
     private remove;
+    private frame;
     /** 目前運行的canvas */
     private target;
     private context;
@@ -122,6 +123,8 @@ export declare class LongTake extends Event<Channels> {
     };
     get isInteractive(): boolean;
     get playing(): boolean;
+    /** 指定渲染幀率 */
+    setFrame(frame: number): void;
     /** 只渲染不觸發 update 鉤子 */
     stop(): void;
     /** 如果為停止狀態的話繼續運行 */
