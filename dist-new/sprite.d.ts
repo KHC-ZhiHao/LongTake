@@ -66,9 +66,14 @@ export declare class Sprite extends Event<Channels> {
         };
         getVisibility(): "xs" | "sm" | "md" | "lg" | "xl";
         getRandomColor(): string;
+        twoPointDistance(x: number, y: number, x2: number, y2: number): number;
         imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement>;
     };
     get children(): Sprite[];
+    /** 獲取核心實例總運行時間 */
+    getCoreRunningTime(): number;
+    /** 是否到達允許實行時間(毫秒)，time 只允許為 10 的倍數 */
+    waitOf(time: number, cb: () => void): void;
     /** 檢測一個物件是否為精靈 */
     static isSprite(object: any): boolean;
     _onClick(screenX: number, screenY: number): void;

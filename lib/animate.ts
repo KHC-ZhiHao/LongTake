@@ -4,8 +4,8 @@ import { Easings, easings } from './easing'
 
 type AnimateOptions = {
     /**
-     * 每次前進的偵數
-     * @default 0
+     * 每次執行 move 時推動多少毫秒
+     * @default 1000/60
      */
     push: number
     /**
@@ -58,7 +58,7 @@ export class Animate extends Base {
     constructor(options: Partial<AnimateOptions>) {
         super('Animate')
         this.options = {
-            push: helper.ifEmpty(options.push, 60),
+            push: helper.ifEmpty(options.push, 1000 / 60),
             delay: helper.ifEmpty(options.delay, 0),
             begin: helper.ifEmpty(options.begin, 0),
             duration: helper.ifEmpty(options.duration, 1),
@@ -80,12 +80,12 @@ export class Animate extends Base {
     }
 
     /**
-     * 往前推動一偵
+     * 往前推動一幀
      */
 
     move() {
         let { push, reverse, duration, action, alternate } = this.options
-        let pace = 1000 / push
+        let pace = push
         if (this.isOver === false) {
             if (this.delay > 0) {
                 this.delay -= pace

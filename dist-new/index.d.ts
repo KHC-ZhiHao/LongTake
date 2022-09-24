@@ -26,6 +26,7 @@ export declare const helper: {
     };
     getVisibility(): "xs" | "sm" | "md" | "lg" | "xl";
     getRandomColor(): string;
+    twoPointDistance(x: number, y: number, x2: number, y2: number): number;
     imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement>;
 };
 export declare const renderPack: {

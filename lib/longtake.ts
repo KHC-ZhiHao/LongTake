@@ -1,12 +1,12 @@
-import { Debug, DebugOptions } from './debug'
 import { Event } from './base'
 import { Loader } from './loader'
 import { helper } from './helper'
 import { Animate } from './animate'
 import { Container } from './container'
-import { Sprite, ImageSprite, TextSprite } from './sprite'
-import { ListenerGroup, pointer } from './event'
 import { renderPack } from './render'
+import { Debug, DebugOptions } from './debug'
+import { ListenerGroup, pointer } from './event'
+import { Sprite, ImageSprite, TextSprite } from './sprite'
 
 type Channels = {
     addChild: {
@@ -33,6 +33,10 @@ type Channels = {
         y: number
     }
     pointerup: {}
+    update: {
+        timeTick: number
+        runningTime: number
+    }
 }
 
 /** 核心 */
@@ -43,10 +47,15 @@ export class LongTake extends Event<Channels> {
     /** 繪製圖的高 */
     readonly height: number
     private _stop: boolean = false
+    private timeTick = 0
+    private runningTime = 0
     private debug: Debug | null = null
     private ticker: any = null
     private remove = false
     private frame = 1000 / 60
+    private frameTime = 0
+    private frameTimeBuffer = 0
+    private updateFrequency = 1000 / 60
     /** 目前運行的canvas */
     private target: HTMLCanvasElement
     private context: CanvasRenderingContext2D
@@ -56,6 +65,10 @@ export class LongTake extends Event<Channels> {
     /** 主要運行的container，由本核心驅動內部精靈的update和event */
     private container: Container
     private interactive = false
+    private requestUpdate = (callback: any) => setTimeout(callback, this.updateFrequency)
+    private computedRunningTime = setInterval(() => {
+        this.runningTime += 10
+    }, 10)
     private update = () => {
         if (this.remove === true) {
             window.clearTimeout(this.ticker)
@@ -64,10 +77,25 @@ export class LongTake extends Event<Channels> {
         if (this._stop === false) {
             this.stageUpdate()
         }
-        this.bitmapUpdate()
-        this.ticker = this.requestAnimationFrame(this.update)
+        this.timeTick += 1
+        this.emit('update', {
+            timeTick: this.timeTick,
+            runningTime: this.runningTime
+        })
+        this.ticker = this.requestUpdate(this.update)
     }
-    private requestAnimationFrame = (callback: any) => setTimeout(callback, this.frame)
+    private renderFrame = (time: number) => {
+        if (this.remove === false) {
+            let diff = time - this.frameTime
+            this.frameTime = time
+            this.frameTimeBuffer += diff
+            if (this.frameTimeBuffer + 0.01 >= this.frame) {
+                this.frameTimeBuffer = 0
+                this.bitmapUpdate()
+            }
+            requestAnimationFrame(this.renderFrame)
+        }
+    }
     constructor(target: string | HTMLCanvasElement, width?: number, height?: number) {
         super('Main')
         this.target = typeof target === 'string' ? document.getElementById(target) as any : target
@@ -95,10 +123,42 @@ export class LongTake extends Event<Channels> {
             this.container.stage.eachChildren(child => child._onClick(data.x, data.y))
         })
         this.update()
+        this.renderFrame(0)
+    }
+
+    static async getDeviceFrameRate(accuracy = 3) {
+        if (window.requestAnimationFrame) {
+            let count = accuracy
+            let rates: number[] = []
+            let handler = (): Promise<number> => {
+                return new Promise((resolve) => {
+                    window.requestAnimationFrame(t1 => {
+                        window.requestAnimationFrame(t2 => {
+                            resolve(1000 / (t2 - t1))
+                        })
+                    })
+                })
+            }
+            while (true) {
+                if (count === 0) {
+                    break
+                }
+                rates.push(await handler())
+                count -= 1
+            }
+            let valid = rates.slice(1)
+            if (valid.length >= 1) {
+                return Math.round(valid.reduce((a, b) => a + b, 0) / (valid.length))
+            } else {
+                return 60
+            }
+        } else {
+            return 60
+        }
     }
 
     static get version() {
-        return '0.5.1'
+        return '0.6.0'
     }
 
     static get helper() {
@@ -147,6 +207,12 @@ export class LongTake extends Event<Channels> {
         this.frame = 1000 / frame
     }
 
+    /** 指定更新率 */
+
+    setUpdateFrequency(frequency: number) {
+        this.updateFrequency = frequency
+    }
+
     /** 只渲染不觸發 update 鉤子 */
 
     stop() {
@@ -192,6 +258,7 @@ export class LongTake extends Event<Channels> {
         this.listenerGroup.close()
         this.listenerWindowGroup.close()
         this.container.stage.eachChildrenDeep(child => child._close())
+        clearInterval(this.computedRunningTime)
         if (this.interactive) {
             this.interactive = false
             this.target.style.touchAction = 'auto'
@@ -202,6 +269,12 @@ export class LongTake extends Event<Channels> {
 
     addChildren(sprite: Sprite) {
         this.container.addChildren(sprite)
+    }
+
+    /** 獲取運行時間(毫秒)，只會得到 10 的倍數結果 */
+
+    getRunningTime() {
+        return this.runningTime
     }
 
     /** 啟動互動模式 */

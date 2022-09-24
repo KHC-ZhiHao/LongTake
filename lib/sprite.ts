@@ -104,6 +104,20 @@ export class Sprite extends Event<Channels> {
         return this._children
     }
 
+    /** 獲取核心實例總運行時間 */
+
+    getCoreRunningTime() {
+        return this._main ? this._main.core.getRunningTime() : 0
+    }
+
+    /** 是否到達允許實行時間(毫秒)，time 只允許為 10 的倍數 */
+
+    waitOf(time: number, cb: () => void) {
+        if (this.getCoreRunningTime() % time === 0) {
+            cb()
+        }
+    }
+
     /** 檢測一個物件是否為精靈 */
     static isSprite(object: any) {
         return object instanceof this

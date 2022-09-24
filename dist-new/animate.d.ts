@@ -2,8 +2,8 @@ import { Base } from './base';
 import { Easings } from './easing';
 declare type AnimateOptions = {
     /**
-     * 每次前進的偵數
-     * @default 0
+     * 每次執行 move 時推動多少毫秒
+     * @default 1000/60
      */
     push: number;
     /**
@@ -55,7 +55,7 @@ export declare class Animate extends Base {
     /** 執行是否結束 */
     get over(): boolean;
     /**
-     * 往前推動一偵
+     * 往前推動一幀
      */
     move(): any;
     /** 重起計算 */

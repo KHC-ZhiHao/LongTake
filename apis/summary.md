@@ -6,17 +6,17 @@
 
 [Sprite](#sprite)
 
-[TextSprite](#textsprite)
+[Text Sprite](#textsprite)
 
-[ImageSprite](#imagesprite)
+[Image Sprite](#imagesprite)
 
 [Animate](#animate)
 
 [Loader](#loader)
 
-[helper](#helper)
+[Unit Helper](#unithelper)
 
-[renderPack](#renderpack)
+[Render Pack](#renderpack)
 
 ## LongTake
 
@@ -26,9 +26,21 @@
 new LongTake(target: string | HTMLCanvasElement, width?: number, height?: number)
 ```
 
+### Static
+
+#### getDeviceFrameRate(accuracy = 3): number
+
+獲取裝置的螢幕刷新率。
+
 ### Events
 
 pointer 相關事件必須啟用 enableInteractive() 才會生效。
+
+#### update
+
+* data: { timeTick: number, runningTime: number }
+
+每次更新時觸發。
 
 #### click
 
@@ -85,7 +97,15 @@ pointer 相關事件必須啟用 enableInteractive() 才會生效。
 
 #### setFrame(frame: number): void
 
-設置每次渲染的間隔。
+設置每次渲染的間隔(幀數)。
+
+#### setUpdateFrequency(frequency: number): void
+
+設置每次觸發 update 的隔間，單位：毫秒，預設值為 1000 / 60。
+
+#### getRunningTime(): number
+
+獲取運行時間(毫秒)，只會得到 10 的倍數結果。
 
 #### stop(): void
 
@@ -312,6 +332,14 @@ new LongTake.Sprite()
 
 ### Methods
 
+#### getCoreRunningTime(): number
+
+獲取核心實例總運行時間。
+
+#### waitOf(time: number, cb: () => void): void
+
+是否到達允許實行時間(毫秒)，time 只允許為 10 的倍數。
+
 #### eachChildren(callback: (child: Sprite) => void): void
 
 迭代所有子精靈。
@@ -436,10 +464,10 @@ img.src = '/myimage.png'
 ```ts
 new LongTake.Animate({
     /**
-     * 每次前進的偵數
-     * @default 0
+     * 每次執行 move 時推動多少毫秒
+     * @default 1000/60
      */
-    push: 0,
+    push: 1000 / 60,
     /**
      * 起始時間
      * @default 0
@@ -521,7 +549,7 @@ new LongTake.Loader()
 
 清除所有快取。
 
-## helper
+## unit helper
 
 小工具組。
 
@@ -575,9 +603,13 @@ new LongTake.Loader()
 
 依照比例縮小圖片。
 
-#### getRotationPosition(px: number, py: number, x: number, y: number, angle: number)
+#### getRotationPosition(px: number, py: number, x: number, y: number, angle: number): { x: number, y: number }
 
 獲取指定點旋轉後角度的新座標。
+
+#### twoPointDistance(x: number, y: number, x2: number, y2: number): number
+
+獲取兩點距離。
 
 ## renderPack
 

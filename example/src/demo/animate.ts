@@ -157,6 +157,116 @@ export const animate: DemoAttr[] = [
         `
     },
     {
+        name: 'sparkler',
+        title: 'Sparkler',
+        desc: '點擊畫面可以繪製仙女棒。',
+        code: /* javascript */ `
+            (longtake, LongTake) => {
+                class Trail extends LongTake.Sprite {
+                    constructor(color, x, y, tx, ty) {
+                        super()
+                        this.tx = Math.abs(x - tx)
+                        this.ty = Math.abs(y - ty)
+                        this.live = 100
+                        this.x = x
+                        this.y = y
+                        this.reverseX = x - tx < 0
+                        this.reverseY = y - ty < 0
+                        const width = this.tx > 5 ? this.tx : 5
+                        const height = this.ty > 5 ? this.ty : 5
+                        this.resize(width, height)
+                        this.setAnchor(0.5)
+                        this.context.strokeStyle = color || 'yellow'
+                        this.opacityLadder = 255 / this.live
+                    }
+
+                    update() {
+                        this.live -= 1
+                        this.opacity -= this.opacityLadder
+                        if (this.live <= 0) {
+                            this.remove()
+                        }
+                    }
+
+                    render() {
+                        this.context.lineWidth = 4
+                        this.context.moveTo(this.reverseX ? this.tx : 0, this.reverseY ? this.ty : 0)
+                        this.context.lineTo(!this.reverseX ? this.tx : 0, !this.reverseY ? this.ty : 0)
+                        this.context.stroke()
+                        this.cache()
+                    }
+                }
+
+                class Fire extends LongTake.Sprite {
+                    constructor(color, x, y) {
+                        super()
+                        this.live = this.helper.randInt(10, 20)
+                        this.speed = this.helper.randInt(2, 4)
+                        this.ladder = 255 / this.live
+                        this.x = x
+                        this.y = y
+                        this.color = color || 'yellow'
+                        this.rotation = this.helper.randInt(0, 360)
+                        this.resize(4, 12)
+                        this.setAnchor(0.5)
+                    }
+
+                    update() {
+                        let vector = this.helper.getVector(this.rotation + 90, this.speed)
+                        this.x += vector.x
+                        this.y += vector.y
+                        this.live -= 1
+                        this.opacity -= this.ladder
+                        if (this.live <= 0) {
+                            this.remove()
+                        }
+                    }
+
+                    render() {
+                        this.context.fillStyle = this.color
+                        this.context.fillRect(0, 0, this.width, this.height)
+                        this.cache()
+                    }
+                }
+                let posX = 0
+                let posY = 0
+                let oldPosX = 0
+                let oldPosY = 0
+                let starting = false
+                longtake.enableInteractive()
+                longtake.on('pointerdown', ({ x, y }) => {
+                    if (starting === false) {
+                        posX = x
+                        posY = y
+                        oldPosX = x
+                        oldPosY = y
+                        starting = true
+                    }
+                })
+                longtake.on('pointerup', () => {
+                    if (starting) {
+                        starting = false
+                    }
+                })
+                longtake.on('pointermove', ({ x, y }) => {
+                    posX = x
+                    posY = y
+                })
+                longtake.on('update', () => {
+                    if (starting) {
+                        let color = longtake.helper.getRandomColor()
+                        longtake.addChildren(new Fire(color, posX, posY))
+                        longtake.addChildren(new Fire(color, posX, posY))
+                        longtake.addChildren(new Fire(color, posX, posY))
+                        longtake.addChildren(new Trail(color, posX, posY, oldPosX, oldPosY))
+                        oldPosX = posX
+                        oldPosY = posY
+                    }
+                }) 
+            }
+        `
+    },
+    {
         name: 'live',
         title: 'Live',
         desc: '複雜元件組合的示範。',

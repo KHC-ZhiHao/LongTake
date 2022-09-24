@@ -44,6 +44,8 @@ export declare const helper: {
      * 隨機獲取顏色
      */
     getRandomColor(): string;
+    /** 獲取兩點距離 */
+    twoPointDistance(x: number, y: number, x2: number, y2: number): number;
     /** 重新調整圖片大小 */
     imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement>;
 };

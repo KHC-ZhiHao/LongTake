@@ -96,7 +96,7 @@ export class Container extends Base {
             context.globalAlpha = context.globalAlpha * (sprite.opacity / 255)
         }
         if (blendMode !== this.context.globalCompositeOperation) {
-            context.globalCompositeOperation = blendMode
+            context.globalCompositeOperation = blendMode as any
         }
         if (sprite.isTransform()) {
             let posX = sprite.posX

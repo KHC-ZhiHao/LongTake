@@ -129,6 +129,12 @@ export const helper = {
         return color
     },
 
+    /** 獲取兩點距離 */
+
+    twoPointDistance(x: number, y: number, x2: number, y2: number){
+        return Math.sqrt(Math.pow((x - x2), 2) + Math.pow((y - y2), 2))
+    },
+
     /** 重新調整圖片大小 */
 
     imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement> {

@@ -1,7 +1,7 @@
-import { DebugOptions } from './debug';
 import { Event } from './base';
 import { Loader } from './loader';
 import { Animate } from './animate';
+import { DebugOptions } from './debug';
 import { Sprite, ImageSprite, TextSprite } from './sprite';
 declare type Channels = {
     addChild: {
@@ -28,6 +28,10 @@ declare type Channels = {
         y: number;
     };
     pointerup: {};
+    update: {
+        timeTick: number;
+        runningTime: number;
+    };
 };
 /** 核心 */
 export declare class LongTake extends Event<Channels> {
@@ -36,10 +40,15 @@ export declare class LongTake extends Event<Channels> {
     /** 繪製圖的高 */
     readonly height: number;
     private _stop;
+    private timeTick;
+    private runningTime;
     private debug;
     private ticker;
     private remove;
     private frame;
+    private frameTime;
+    private frameTimeBuffer;
+    private updateFrequency;
     /** 目前運行的canvas */
     private target;
     private context;
@@ -49,9 +58,12 @@ export declare class LongTake extends Event<Channels> {
     /** 主要運行的container，由本核心驅動內部精靈的update和event */
     private container;
     private interactive;
+    private requestUpdate;
+    private computedRunningTime;
     private update;
-    private requestAnimationFrame;
+    private renderFrame;
     constructor(target: string | HTMLCanvasElement, width?: number, height?: number);
+    static getDeviceFrameRate(accuracy?: number): Promise<number>;
     static get version(): string;
     static get helper(): {
         arc: number;
@@ -71,6 +83,7 @@ export declare class LongTake extends Event<Channels> {
         };
         getVisibility(): "xs" | "sm" | "md" | "lg" | "xl";
         getRandomColor(): string;
+        twoPointDistance(x: number, y: number, x2: number, y2: number): number;
         imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement>;
     };
     static get renderPack(): {
@@ -118,12 +131,15 @@ export declare class LongTake extends Event<Channels> {
         };
         getVisibility(): "xs" | "sm" | "md" | "lg" | "xl";
         getRandomColor(): string;
+        twoPointDistance(x: number, y: number, x2: number, y2: number): number;
         imageResize(image: HTMLImageElement, scale: number): Promise<HTMLImageElement>;
     };
     get isInteractive(): boolean;
     get playing(): boolean;
     /** 指定渲染幀率 */
     setFrame(frame: number): void;
+    /** 指定更新率 */
+    setUpdateFrequency(frequency: number): void;
     /** 只渲染不觸發 update 鉤子 */
     stop(): void;
     /** 如果為停止狀態的話繼續運行 */
@@ -138,6 +154,8 @@ export declare class LongTake extends Event<Channels> {
     close(): void;
     /** 加入一個精靈至 Container 底下 */
     addChildren(sprite: Sprite): void;
+    /** 獲取運行時間(毫秒)，只會得到 10 的倍數結果 */
+    getRunningTime(): number;
     /** 啟動互動模式 */
     enableInteractive(): null | undefined;
     private stageUpdate;

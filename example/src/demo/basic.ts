@@ -52,7 +52,7 @@ export const basic: DemoAttr[] = [
                             this.rotation += 1
                         }
                     }
-                    render = () => {
+                    render() {
                         let context = this.context
                         context.fillRect(0, 0, this.width, this.height)
                     }
@@ -118,28 +118,62 @@ export const basic: DemoAttr[] = [
         `
     },
     {
-        name: 'refresh frame',
-        title: 'Set Frame',
-        desc: '控制渲染幀率，如果顯示目標是超過60hz螢幕時可以設定，否則固定每 1000/60 毫秒刷新一次。',
+        name: 'high_refresh_rate',
+        title: 'Height Refresh Rate',
+        desc: '由於 Longtake 本意是讓人無腦建立簡單動畫，所以所有刷新率都是基於 60 fps 出發的，但也可以透過一些手段開啟高刷新率動畫。',
         code: /* javascript */ `
             (longtake, LongTake) => {
-                longtake.setFrame(24)
+                const status = {
+                    fps: 60
+                }
+                class Text extends LongTake.TextSprite {
+                    constructor(content) {
+                        super({
+                            fontSize: 48,
+                            resolution: 2,
+                            padding: 20,
+                            round: 20
+                        })
+                        this.x = longtake.width / 2
+                        this.y = longtake.height / 2 - 150
+                        this.setAnchor(0.5)
+                        this.setContent(content)
+                    }
+                }
                 class Bear extends LongTake.ImageSprite {
                     constructor(image) {
                         super(image)
-                        this.x = longtake.width / 2
+                        this.x = longtake.width / 2 - 100
                         this.y = longtake.height / 2
                         this.setAnchor(0.5)
+                        // 每個動畫的推動也要配合現在的 fps
+                        this.animate = new LongTake.Animate({
+                            push: 1000 / status.fps,
+                            duration: 2000,
+                            alternate: true,
+                            easing: 'easeInOutQuint',
+                            action: (t) => {
+                                this.x = (longtake.width / 2 - 100) + (200 * t)
+                                this.rotation = 360 * t
+                            }
+                        })
                     }
                     update() {
-                        this.rotation += 1
+                        this.animate.move()
                     }
                 }
-                let image = new Image()
-                image.src = 'images/KaohBear.png'
-                image.onload = () => {
-                    longtake.addChildren(new Bear(image))
-                }
+                LongTake.getDeviceFrameRate().then(rate => {
+                    // 將刷新率等同於裝置最大刷新率
+                    longtake.setFrame(rate)
+                    longtake.setUpdateFrequency(1000 / rate)
+                    status.fps = rate
+                    const image = new Image()
+                    image.src = 'images/KaohBear.png'
+                    image.onload = () => {
+                        longtake.addChildren(new Text(rate + ' FPS'))
+                        longtake.addChildren(new Bear(image))
+                    }
+                })
             }
         `
     }
