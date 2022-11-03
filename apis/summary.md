@@ -432,6 +432,12 @@ new LongTake.TextSprite({
     fontSize: 24
     fontFamily: 'Arial',
     backgroundColor: '#DDD'
+    weight: null | 100 ~ 900 | 'bold' | 'normal',
+    stroke: null | {
+        color: '#fff',
+        lineJoin: 'bevel' | 'round' | 'miter',
+        lineWidth: 10
+    }
 })
 ```
 

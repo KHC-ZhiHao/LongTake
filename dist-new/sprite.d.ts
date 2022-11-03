@@ -245,10 +245,16 @@ export declare class ImageSprite extends Sprite {
 declare type TextOptions = {
     color: string;
     round: number;
+    weight: null | number | 'bold' | 'normal';
     padding: number;
     fontSize: number;
     fontFamily: string;
     backgroundColor: string | null;
+    stroke: null | {
+        color: string;
+        lineJoin: 'bevel' | 'round' | 'miter';
+        lineWidth: number;
+    };
 };
 export declare class TextSprite extends Sprite {
     private text;

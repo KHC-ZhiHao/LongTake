@@ -667,10 +667,16 @@ export class ImageSprite extends Sprite {
 type TextOptions = {
     color: string
     round: number
+    weight: null | number | 'bold' | 'normal'
     padding: number
     fontSize: number
     fontFamily: string
     backgroundColor: string | null
+    stroke: null | {
+        color: string
+        lineJoin: 'bevel' | 'round' | 'miter'
+        lineWidth: number
+    }
 }
 
 export class TextSprite extends Sprite {
@@ -690,9 +696,11 @@ export class TextSprite extends Sprite {
             color: this.helper.ifEmpty(options.color, '#000'),
             round: this.helper.ifEmpty(options.round, 0),
             padding: this.helper.ifEmpty(options.padding, 0),
+            weight: this.helper.ifEmpty(options.weight, null),
             fontSize: this.helper.ifEmpty(options.fontSize, 18),
             fontFamily: this.helper.ifEmpty(options.fontFamily, 'serif'),
-            backgroundColor: this.helper.ifEmpty(options.backgroundColor, null)
+            backgroundColor: this.helper.ifEmpty(options.backgroundColor, null),
+            stroke: this.helper.ifEmpty(options.stroke, null)
         }
         this.render = () => {
             this.context.clearRect(0, 0, this.width, this.height)
@@ -710,10 +718,21 @@ export class TextSprite extends Sprite {
     }
 
     private drawText(context: CanvasRenderingContext2D, offsetX: number, offsetY: number) {
+        context.save()
         context.textBaseline = 'top'
-        context.font = `${this.options.fontSize}px ${this.options.fontFamily}`
+        context.font = `${this.options.weight ? `${this.options.weight}` : ''} ${this.options.fontSize}px ${this.options.fontFamily}`
+        if (this.options.stroke) {
+            context.lineJoin = this.options.stroke.lineJoin
+            context.lineWidth = this.options.stroke.lineWidth
+            context.strokeStyle = this.options.stroke.color
+            context.strokeText(this.text, Math.round(offsetX) + 0.5, Math.round(offsetY) + 0.5)
+        }
+        context.globalCompositeOperation = 'destination-out'
         context.fillStyle = this.options.color
         context.fillText(this.text || '', Math.round(offsetX) + 0.5, Math.round(offsetY) + 0.5)
+        context.globalCompositeOperation = 'source-over'
+        context.fillText(this.text || '', Math.round(offsetX) + 0.5, Math.round(offsetY) + 0.5)
+        context.restore()
     }
 
     private getByteLength(text: string) {
