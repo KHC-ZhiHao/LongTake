@@ -17,6 +17,14 @@ export class Store<T extends Sprite> extends Event<Channels<T>> {
         running: boolean
     }[] = []
 
+    get size() {
+        return this._list.length
+    }
+
+    get waitingSize() {
+        return this._list.filter(item => !item.running).length
+    }
+
     add(sprite: T) {
         const id = Date.now().toString() + helper.randInt(100000, 999999)
         this._list.push({

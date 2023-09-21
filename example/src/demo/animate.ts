@@ -159,12 +159,12 @@ export const animate: DemoAttr[] = [
     {
         name: 'sparkler',
         title: 'Sparkler',
-        desc: '點擊畫面可以繪製仙女棒。',
+        desc: '點擊畫面可以繪製仙女棒，這裡展示如何透過 store 優化粒子效能。',
         code: /* javascript */ `
             (longtake, LongTake) => {
                 class Trail extends LongTake.Sprite {
-                    constructor(color, x, y, tx, ty) {
-                        super()
+
+                    init(color, x, y, tx, ty) {
                         this.tx = Math.abs(x - tx)
                         this.ty = Math.abs(y - ty)
                         this.live = 100
@@ -178,6 +178,9 @@ export const animate: DemoAttr[] = [
                         this.setAnchor(0.5)
                         this.context.strokeStyle = color || 'yellow'
                         this.opacityLadder = 255 / this.live
+                        this.opacity = 255
+                        this.unCache()
+                        return this
                     }
 
                     update() {
@@ -239,13 +242,31 @@ export const animate: DemoAttr[] = [
                 let oldPosY = 0
                 let starting = false
                 let fireStore = new LongTake.Store()
+                let trailStore = new LongTake.Store()
 
-                for (let i = 0; i < 20; i++) {
-                    const fire = new Fire()
-                    const id = fireStore.add(fire)
-                    fire.on('remove', () => {
+                let getTrail = () => {
+                    let trail = trailStore.get()
+                    if (trail) {
+                        return trail
+                    }
+                    const newTrail = new Trail()
+                    const id = trailStore.add(newTrail)
+                    newTrail.on('remove', () => {
+                        trailStore.recycle(id)
+                    })
+                    return trailStore.get()
+                }
+                let getFire = () => {
+                    let fire = fireStore.get()
+                    if (fire) {
+                        return fire
+                    }
+                    const newFire = new Fire()
+                    const id = fireStore.add(newFire)
+                    newFire.on('remove', () => {
                         fireStore.recycle(id)
                     })
+                    return fireStore.get()
                 }
 
                 longtake.enableInteractive()
@@ -270,13 +291,10 @@ export const animate: DemoAttr[] = [
                 longtake.on('update', () => {
                     if (starting) {
                         let color = longtake.helper.getRandomColor()
-                        for (let i = 0; i < 3; i++) {
-                            let fire = fireStore.get()
-                            if (fire) {
-                                longtake.addChildren(fire.init(color, posX, posY))
-                            }
+                        for (let i = 0; i < 4; i++) {
+                            longtake.addChildren(getFire().init(color, posX, posY))
                         }
-                        longtake.addChildren(new Trail(color, posX, posY, oldPosX, oldPosY))
+                        longtake.addChildren(getTrail().init(color, posX, posY, oldPosX, oldPosY))
                         oldPosX = posX
                         oldPosY = posY
                     }

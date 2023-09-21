@@ -477,6 +477,18 @@ img.src = '/myimage.png'
 new LongTake.Store<Sprite>()
 ```
 
+### Properties
+
+#### size
+
+* readonly
+* type: number
+
+#### waitingSize
+
+* readonly
+* type: number
+
 ### Methods
 
 #### add(sprite: Sprite): string

@@ -13,6 +13,8 @@ export declare class Store<T extends Sprite> extends Event<Channels<T>> {
         sprite: T;
         running: boolean;
     }[];
+    get size(): number;
+    get waitingSize(): number;
     add(sprite: T): string;
     get(): null | T;
     getWithDetail(): null | {
