@@ -206,6 +206,10 @@ export class LongTake extends Event<Channels> {
         return this._stop === false
     }
 
+    get isColse() {
+        return this.remove
+    }
+
     /** 指定渲染幀率 */
 
     setFrame(frame: number) {

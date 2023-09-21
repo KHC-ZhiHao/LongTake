@@ -138,6 +138,7 @@ export declare class LongTake extends Event<Channels> {
     };
     get isInteractive(): boolean;
     get playing(): boolean;
+    get isColse(): boolean;
     /** 指定渲染幀率 */
     setFrame(frame: number): void;
     /** 指定更新率 */

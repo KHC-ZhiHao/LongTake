@@ -96,6 +96,27 @@ pointer 相關事件必須啟用 enableInteractive() 才會生效。
 
 幫助性物件。
 
+#### isInteractive
+
+是否啟用互動模式。
+
+* readonly
+* type: boolean
+
+#### playing
+
+是否正在運行中。
+
+* readonly
+* type: boolean
+
+#### isColse
+
+是否關閉。
+
+* readonly
+* type: boolean
+
 ### Methods
 
 #### setFrame(frame: number): void

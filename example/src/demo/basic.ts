@@ -168,11 +168,21 @@ export const basic: DemoAttr[] = [
                     longtake.setUpdateFrequency(1000 / rate)
                     status.fps = rate
                     const image = new Image()
+                    const text = new Text(rate + ' FPS')
                     image.src = 'images/KaohBear.png'
                     image.onload = () => {
-                        longtake.addChildren(new Text(rate + ' FPS'))
+                        longtake.addChildren(text)
                         longtake.addChildren(new Bear(image))
                     }
+                    let int = setInterval(() => {
+                        if (longtake.isColse === false) {
+                            LongTake.getDeviceFrameRate().then(rate => {
+                                text.setContent(rate + ' FPS')
+                            })
+                        } else {
+                            clearInterval(int)
+                        }
+                    }, 1000)
                 })
             }
         `
