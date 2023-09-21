@@ -51,11 +51,11 @@ export class LongTake extends Event<Channels> {
     private timeTick = 0
     private runningTime = 0
     private debug: Debug | null = null
-    private ticker: any = null
     private remove = false
     private frame = 1000 / 60
     private frameTime = 0
     private frameTimeBuffer = 0
+    private updateTimeBuffer = 0
     private updateFrequency = 1000 / 60
     /** 目前運行的canvas */
     private target: HTMLCanvasElement
@@ -66,13 +66,8 @@ export class LongTake extends Event<Channels> {
     /** 主要運行的container，由本核心驅動內部精靈的update和event */
     private container: Container
     private interactive = false
-    private requestUpdate = (callback: any) => setTimeout(callback, this.updateFrequency)
-    private computedRunningTime = setInterval(() => {
-        this.runningTime += 10
-    }, 10)
     private update = () => {
         if (this.remove === true) {
-            window.clearTimeout(this.ticker)
             return null
         }
         if (this._stop === false) {
@@ -83,16 +78,21 @@ export class LongTake extends Event<Channels> {
             timeTick: this.timeTick,
             runningTime: this.runningTime
         })
-        this.ticker = this.requestUpdate(this.update)
     }
     private renderFrame = (time: number) => {
         if (this.remove === false) {
             let diff = time - this.frameTime
             this.frameTime = time
+            this.runningTime += diff
             this.frameTimeBuffer += diff
+            this.updateTimeBuffer += diff
             if (this.frameTimeBuffer + 0.01 >= this.frame) {
                 this.frameTimeBuffer = 0
                 this.bitmapUpdate()
+            }
+            if (this.updateTimeBuffer >= this.updateFrequency) {
+                this.updateTimeBuffer = 0
+                this.update()
             }
             requestAnimationFrame(this.renderFrame)
         }
@@ -267,7 +267,6 @@ export class LongTake extends Event<Channels> {
         this.listenerGroup.close()
         this.listenerWindowGroup.close()
         this.container.stage.eachChildrenDeep(child => child._close())
-        clearInterval(this.computedRunningTime)
         if (this.interactive) {
             this.interactive = false
             this.target.style.touchAction = 'auto'
@@ -280,7 +279,7 @@ export class LongTake extends Event<Channels> {
         this.container.addChildren(sprite)
     }
 
-    /** 獲取運行時間(毫秒)，只會得到 10 的倍數結果 */
+    /** 獲取運行時間(毫秒) */
 
     getRunningTime() {
         return this.runningTime

@@ -91,7 +91,7 @@ export const animate: DemoAttr[] = [
     {
         name: 'bear-party',
         title: 'Bear Party',
-        desc: '點擊畫面能產生更多高熊。',
+        desc: '點擊畫面能產生更多高熊，提供裝置壓力測試用。',
         code: /* javascript */ `
             (longtake, LongTake) => {
                 let image = new Image()
@@ -298,7 +298,7 @@ export const animate: DemoAttr[] = [
                         oldPosX = posX
                         oldPosY = posY
                     }
-                }) 
+                })
             }
         `
     },

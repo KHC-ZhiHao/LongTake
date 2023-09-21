@@ -129,7 +129,7 @@ pointer 相關事件必須啟用 enableInteractive() 才會生效。
 
 #### getRunningTime(): number
 
-獲取運行時間(毫秒)，只會得到 10 的倍數結果。
+獲取運行時間(毫秒)。
 
 #### stop(): void
 

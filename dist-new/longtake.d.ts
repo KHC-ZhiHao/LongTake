@@ -44,11 +44,11 @@ export declare class LongTake extends Event<Channels> {
     private timeTick;
     private runningTime;
     private debug;
-    private ticker;
     private remove;
     private frame;
     private frameTime;
     private frameTimeBuffer;
+    private updateTimeBuffer;
     private updateFrequency;
     /** 目前運行的canvas */
     private target;
@@ -59,8 +59,6 @@ export declare class LongTake extends Event<Channels> {
     /** 主要運行的container，由本核心驅動內部精靈的update和event */
     private container;
     private interactive;
-    private requestUpdate;
-    private computedRunningTime;
     private update;
     private renderFrame;
     constructor(target: string | HTMLCanvasElement, width?: number, height?: number);
@@ -157,7 +155,7 @@ export declare class LongTake extends Event<Channels> {
     close(): void;
     /** 加入一個精靈至 Container 底下 */
     addChildren(sprite: Sprite): void;
-    /** 獲取運行時間(毫秒)，只會得到 10 的倍數結果 */
+    /** 獲取運行時間(毫秒) */
     getRunningTime(): number;
     /** 啟動互動模式 */
     enableInteractive(): null | undefined;
