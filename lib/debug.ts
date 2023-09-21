@@ -27,7 +27,7 @@ export class Debug extends Base {
     core: LongTake
     bitmap: Bitmap = {} as any
     options: DebugOptions
-    context: CanvasRenderingContext2D
+    context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
     selectSprite: Sprite | null = null
     listeners: any[] = []
     positionBitmap = new PositionBitmap()

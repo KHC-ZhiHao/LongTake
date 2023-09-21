@@ -2,11 +2,13 @@ import { Base } from './base'
 
 /** 為掌管位圖的物件 */
 
+const isSupportOffscreenCanvas = typeof OffscreenCanvas !== 'undefined'
+
 export class Bitmap extends Base {
     /** 內部指向的離屏 canvas */
-    readonly canvas: HTMLCanvasElement
+    readonly canvas: OffscreenCanvas | HTMLCanvasElement
     /** cavnas 2d context */
-    readonly context: CanvasRenderingContext2D
+    readonly context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
     /** 是否為快取狀態 */
     cache = false
     /** 由快取產生的圖片buffer */
@@ -16,8 +18,10 @@ export class Bitmap extends Base {
 
     constructor(width = 100, height = 100, element?: HTMLCanvasElement) {
         super('Bitmap')
-        this.canvas = element || document.createElement('canvas')
-        this.context = this.canvas.getContext('2d')!
+        let w = isNaN(width) ? 100 : width
+        let h = isNaN(height) ? 100 : height
+        this.canvas = element || (isSupportOffscreenCanvas ? new OffscreenCanvas(w, h) : document.createElement('canvas'))
+        this.context = this.canvas.getContext('2d')! as any
         this.imgBitmap = null
         this._width = this.canvas.width
         this._height = this.canvas.height
@@ -79,11 +83,13 @@ export class Bitmap extends Base {
                     this.imgBitmap = ImageBitmap
                 })
             } else {
-                let img = new Image()
-                img.onload = () => {
-                    this.imgBitmap = img
+                if ('toDataURL' in this.canvas) {
+                    let img = new Image()
+                    img.onload = () => {
+                        this.imgBitmap = img
+                    }
+                    img.src = this.canvas.toDataURL()
                 }
-                img.src = this.canvas.toDataURL()
             }
         } catch (error) {
             console.warn(error)

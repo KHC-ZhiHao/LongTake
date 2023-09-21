@@ -1,10 +1,10 @@
+/// <reference types="offscreencanvas" />
 import { Base } from './base';
-/** 為掌管位圖的物件 */
 export declare class Bitmap extends Base {
     /** 內部指向的離屏 canvas */
-    readonly canvas: HTMLCanvasElement;
+    readonly canvas: OffscreenCanvas | HTMLCanvasElement;
     /** cavnas 2d context */
-    readonly context: CanvasRenderingContext2D;
+    readonly context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
     /** 是否為快取狀態 */
     cache: boolean;
     /** 由快取產生的圖片buffer */
@@ -18,7 +18,7 @@ export declare class Bitmap extends Base {
     get height(): number;
     set height(val: number);
     /** 獲取渲染目標 */
-    getRenderTarget(): HTMLImageElement | HTMLCanvasElement | ImageBitmap;
+    getRenderTarget(): HTMLImageElement | HTMLCanvasElement | ImageBitmap | OffscreenCanvas;
     /** 調整畫布大小 */
     resize(width: number, height: number): void;
     /** 清空畫布 */

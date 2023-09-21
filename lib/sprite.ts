@@ -720,7 +720,7 @@ export class TextSprite extends Sprite {
         }
     }
 
-    private drawText(context: CanvasRenderingContext2D, offsetX: number, offsetY: number) {
+    private drawText(context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D, offsetX: number, offsetY: number) {
         context.save()
         context.textBaseline = 'top'
         context.font = `${this.options.weight ? `${this.options.weight}` : ''} ${this.options.fontSize}px ${this.options.fontFamily}`
@@ -755,6 +755,12 @@ export class TextSprite extends Sprite {
     }
 
     setContent(text: string) {
+        if (typeof text === 'number') {
+            text = (text as number).toString()
+        }
+        if (typeof text !== 'string') {
+            throw new Error('TextSprite setContent must be string or number.')
+        }
         let unit = this.options.fontSize + 14
         let padding = this.options.padding * 2
         let bitmap = new Bitmap(unit * this.getByteLength(text), unit)

@@ -1,3 +1,4 @@
+/// <reference types="offscreencanvas" />
 import { Base } from './base';
 import { Sprite } from './sprite';
 import { Bitmap } from './bitmap';
@@ -11,7 +12,7 @@ export declare class Debug extends Base {
     core: LongTake;
     bitmap: Bitmap;
     options: DebugOptions;
-    context: CanvasRenderingContext2D;
+    context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
     selectSprite: Sprite | null;
     listeners: any[];
     positionBitmap: PositionBitmap;

@@ -1,3 +1,4 @@
+/// <reference types="offscreencanvas" />
 import { Base } from './base';
 import { Sprite } from './sprite';
 import { Bitmap } from './bitmap';
@@ -10,7 +11,7 @@ export declare class Container extends Base {
     stage: Sprite;
     /** 主位圖 */
     bitmap: Bitmap;
-    context: CanvasRenderingContext2D;
+    context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
     constructor(width: number, height: number, core: LongTake);
     /** 位圖寬(與位圖同步) */
     get width(): number;

@@ -1,3 +1,4 @@
+/// <reference types="offscreencanvas" />
 import { Event } from './base';
 import { Bitmap } from './bitmap';
 import { Container } from './container';
@@ -47,7 +48,7 @@ export declare class Sprite extends Event<Channels> {
     };
     private updateForChild;
     constructor();
-    get context(): CanvasRenderingContext2D;
+    get context(): CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
     get helper(): {
         arc: number;
         rarc: number;

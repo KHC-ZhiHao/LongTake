@@ -12,7 +12,7 @@ export class Container extends Base {
     stage: Sprite
     /** 主位圖 */
     bitmap: Bitmap = {} as any
-    context: CanvasRenderingContext2D
+    context: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
     constructor(width: number, height: number, core: LongTake) {
         super('Container')
         this.core = core
