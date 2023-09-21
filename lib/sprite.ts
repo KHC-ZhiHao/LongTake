@@ -39,9 +39,9 @@ type BlendMode =
     | 'luminosity'
 
 type Channels = {
-    click: {}
-    remove: {}
-    inited: {}
+    click: any
+    remove: any
+    inited: any
 }
 
 /** 建立一個動畫精靈，為 LongTake 的驅動核心 */
@@ -79,7 +79,6 @@ export class Sprite extends Event<Channels> {
         anchorX: 0,
         anchorY: 0
     }
-
     private updateForChild = (child: Sprite) => {
         if (child._status.remove === false) {
             child._mainUpdate()
@@ -489,17 +488,21 @@ export class Sprite extends Event<Channels> {
             this._status.childrenDead = false
             this._children = this._children.filter((child) => {
                 if (child._status.remove) {
-                    child._close()
                     removeChild.push(child)
                 }
                 return !child._status.remove
             })
-            removeChild.forEach(child => child.emit('remove', {}))
+            removeChild.forEach(child => {
+                child._close()
+                child.emit('remove', {})
+            })
         }
     }
 
     _close() {
         this._main = null
+        this._status.remove = false
+        this._status.inited = false
         this.parent = null
     }
 

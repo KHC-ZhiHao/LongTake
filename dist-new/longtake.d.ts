@@ -1,4 +1,5 @@
 import { Event } from './base';
+import { Store } from './store';
 import { Loader } from './loader';
 import { Animate } from './animate';
 import { DebugOptions } from './debug';
@@ -108,6 +109,7 @@ export declare class LongTake extends Event<Channels> {
             color: string;
         }>) => void;
     };
+    static get Store(): typeof Store;
     static get Sprite(): typeof Sprite;
     static get ImageSprite(): typeof ImageSprite;
     static get TextSprite(): typeof TextSprite;

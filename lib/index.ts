@@ -1,3 +1,4 @@
+import { Store as _Store } from './store'
 import { helper as _helper } from './helper'
 import { Loader as _Loader } from './loader'
 import { Animate as _Animate } from './animate'
@@ -18,6 +19,7 @@ export type ImageSprite = _ImageSprite
 
 export const helper = _helper
 export const renderPack = _renderPack
+export const Store = _Store
 export const Sprite = _Sprite
 export const Loader = _Loader
 export const Animate = _Animate

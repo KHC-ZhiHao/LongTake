@@ -1,3 +1,4 @@
+import { Store as _Store } from './store';
 import { Loader as _Loader } from './loader';
 import { Animate as _Animate } from './animate';
 import { LongTake as _LongTake } from './longtake';
@@ -51,6 +52,7 @@ export declare const renderPack: {
         color: string;
     }>) => void;
 };
+export declare const Store: typeof _Store;
 export declare const Sprite: typeof _Sprite;
 export declare const Loader: typeof _Loader;
 export declare const Animate: typeof _Animate;

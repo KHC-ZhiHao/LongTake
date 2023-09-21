@@ -198,8 +198,13 @@ export const animate: DemoAttr[] = [
                 }
 
                 class Fire extends LongTake.Sprite {
-                    constructor(color, x, y) {
+                    constructor() {
                         super()
+                        this.resize(4, 12)
+                        this.setAnchor(0.5)
+                    }
+
+                    init(color, x, y) {
                         this.live = this.helper.randInt(10, 20)
                         this.speed = this.helper.randInt(2, 4)
                         this.ladder = 255 / this.live
@@ -207,8 +212,8 @@ export const animate: DemoAttr[] = [
                         this.y = y
                         this.color = color || 'yellow'
                         this.rotation = this.helper.randInt(0, 360)
-                        this.resize(4, 12)
-                        this.setAnchor(0.5)
+                        this.opacity = 255
+                        return this
                     }
 
                     update() {
@@ -233,6 +238,16 @@ export const animate: DemoAttr[] = [
                 let oldPosX = 0
                 let oldPosY = 0
                 let starting = false
+                let fireStore = new LongTake.Store()
+
+                for (let i = 0; i < 20; i++) {
+                    const fire = new Fire()
+                    const id = fireStore.add(fire)
+                    fire.on('remove', () => {
+                        fireStore.recycle(id)
+                    })
+                }
+
                 longtake.enableInteractive()
                 longtake.on('pointerdown', ({ x, y }) => {
                     if (starting === false) {
@@ -255,9 +270,12 @@ export const animate: DemoAttr[] = [
                 longtake.on('update', () => {
                     if (starting) {
                         let color = longtake.helper.getRandomColor()
-                        longtake.addChildren(new Fire(color, posX, posY))
-                        longtake.addChildren(new Fire(color, posX, posY))
-                        longtake.addChildren(new Fire(color, posX, posY))
+                        for (let i = 0; i < 3; i++) {
+                            let fire = fireStore.get()
+                            if (fire) {
+                                longtake.addChildren(fire.init(color, posX, posY))
+                            }
+                        }
                         longtake.addChildren(new Trail(color, posX, posY, oldPosX, oldPosY))
                         oldPosX = posX
                         oldPosY = posY

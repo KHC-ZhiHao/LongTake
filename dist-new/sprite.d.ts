@@ -7,9 +7,9 @@ import { Container } from './container';
  */
 declare type BlendMode = 'inherit' | 'source-over' | 'source-in' | 'source-out' | 'source-atop' | 'destination-over' | 'destination-in' | 'destination-out' | 'destination-atop' | 'lighter' | 'copy' | 'xor' | 'multiply' | 'screen' | 'overlay' | 'darken' | 'lighten' | 'color-dodge' | 'color-burn' | 'hard-light' | 'soft-light' | 'difference' | 'exclusion' | 'hue' | 'saturation' | 'color' | 'luminosity';
 declare type Channels = {
-    click: {};
-    remove: {};
-    inited: {};
+    click: any;
+    remove: any;
+    inited: any;
 };
 /** 建立一個動畫精靈，為 LongTake 的驅動核心 */
 export declare class Sprite extends Event<Channels> {

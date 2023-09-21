@@ -1,4 +1,5 @@
 import { Event } from './base'
+import { Store } from './store'
 import { Loader } from './loader'
 import { helper } from './helper'
 import { Animate } from './animate'
@@ -65,7 +66,7 @@ export class LongTake extends Event<Channels> {
     /** 主要運行的container，由本核心驅動內部精靈的update和event */
     private container: Container
     private interactive = false
-    private requestUpdate = (callback: any) => requestAnimationFrame(callback)
+    private requestUpdate = (callback: any) => setTimeout(callback, this.updateFrequency)
     private computedRunningTime = setInterval(() => {
         this.runningTime += 10
     }, 10)
@@ -158,7 +159,7 @@ export class LongTake extends Event<Channels> {
     }
 
     static get version() {
-        return '0.6.0'
+        return '0.5.6'
     }
 
     static get helper() {
@@ -167,6 +168,10 @@ export class LongTake extends Event<Channels> {
 
     static get renderPack() {
         return renderPack
+    }
+
+    static get Store() {
+        return Store
     }
 
     static get Sprite() {

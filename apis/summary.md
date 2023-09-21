@@ -10,6 +10,8 @@
 
 [Image Sprite](#imagesprite)
 
+[Store](#store)
+
 [Animate](#animate)
 
 [Loader](#loader)
@@ -17,6 +19,7 @@
 [Unit Helper](#unithelper)
 
 [Render Pack](#renderpack)
+
 
 ## LongTake
 
@@ -461,6 +464,43 @@ img.onload = () => {
 img.src = '/myimage.png'
 ```
 
+<!-- Store -->
+
+
+## Store (Beta)
+
+一個放置精靈組的倉庫，可參考demo的煙火，目的是將經常複用的精靈透過一個容器儲存起來防止頻繁的實例，且限制過量的產生精靈。
+
+### Constructor
+
+```ts
+new LongTake.Store<Sprite>()
+```
+
+### Methods
+
+#### add(sprite: Sprite): string
+
+新增一個精靈，並返回在 store 內的 id。
+
+#### get(): Sprite | null
+
+獲取一個沒被使用的精靈，此時的精靈會是已拾取狀態，下次 get 就不會再出現已拾取的精靈，所以完全沒有結果就返回 null。
+
+#### getWithDetail: null | { id: string, sprite: Sprite, recycle: () => void}
+
+獲取一個沒被使用的精靈，並返回細節，如果沒有就返回 null。
+
+#### recycle(id: string): void
+
+將精靈改成未拾取狀態。
+
+#### clear(): void
+
+清除 Store 內的精靈。
+
+<!-- Animate -->
+
 ## Animate
 
 動畫執行的載具。
@@ -520,6 +560,8 @@ new LongTake.Animate({
 #### restart(): void
 
 返回原始狀態。
+
+<!-- Loader -->
 
 ## Loader
 

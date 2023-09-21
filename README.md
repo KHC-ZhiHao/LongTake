@@ -18,7 +18,7 @@
     <br>
 </p>
 
-LongTake 是個輕巧、快速的繪製動畫的函式庫。
+LongTake 是個輕巧、快速的繪製 Web Canvas 動畫庫。
 
 [Demos](https://khc-zhihao.github.io/LongTake)
 
@@ -118,7 +118,7 @@ class Sprite extends LongTake.Sprite {
 
 ### 事件監聽
 
-LongTake 提供了基礎的事件監聽，可以建立簡單的互動模型。
+LongTake 提供了基礎的事件監聽，可以建立簡單的互動模型，但始終是簡易的互動，要複雜的話請慎重考慮。
 
 ```js
 let sprite = new LongTake.Sprite()
