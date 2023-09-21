@@ -1,5 +1,5 @@
 <template>
-    <el-button :size="size" :style="state.styles" :type="type" :disabled="disabled">
+    <el-button :style="state.styles" :type="type" :disabled="disabled">
         <el-icon v-if="icon" style="vertical-align: middle;" :class="hasSlot ? 'mr1' : ''">
             <component :is="icon"></component>
         </el-icon>
@@ -112,6 +112,8 @@ export default defineComponent({
             if (props.block) {
                 styles.push('display: block')
                 styles.push('width: 100%')
+            } else {
+                styles.push('width: 86px')
             }
             if (props.selected) {
                 styles.push('border: 2px solid grey')

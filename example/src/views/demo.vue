@@ -1,4 +1,10 @@
 <template>
+
+    <div style="position: fixed; top: 10px; right: 10px;">
+        <el-button @click="state.showNav = !state.showNav">
+            選單
+        </el-button>
+    </div>
     <el-container>
         <el-header>
             <div>
@@ -12,7 +18,7 @@
             </div>
         </el-header>
         <el-container>
-            <el-aside class="pa2" width="300px">
+            <el-aside v-if="state.showNav" class="pa2" width="300px">
                 <div class="pa2">Basic</div>
                 <div class="pa2 pt1 pb1" v-for="item of basic" :key="item.name">
                     <Botton block @click="load(item.name)">
@@ -84,6 +90,7 @@ export default defineComponent({
         //
 
         const state = self.data({
+            showNav: true,
             demo: null as DemoAttr,
             desc: '',
             code: '',

@@ -65,7 +65,7 @@ export class LongTake extends Event<Channels> {
     /** 主要運行的container，由本核心驅動內部精靈的update和event */
     private container: Container
     private interactive = false
-    private requestUpdate = (callback: any) => setTimeout(callback, this.updateFrequency)
+    private requestUpdate = (callback: any) => requestAnimationFrame(callback)
     private computedRunningTime = setInterval(() => {
         this.runningTime += 10
     }, 10)

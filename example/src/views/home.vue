@@ -5,16 +5,10 @@
             <div class="main-subtitle" :style="`color: ${state.color}`">輕巧、快速的繪製動畫</div>
             <div class="pt3">
                 <Botton
-                    icon="arrow-left-bold"
-                    @click="next(-1)"
-                    :color="state.color"
-                    :background-color="state.backgroundColor">
-                </Botton>
-                <Botton
                     @click="toApis"
                     :color="state.color"
                     :background-color="state.backgroundColor">
-                    APIs
+                    Apis
                 </Botton>
                 <Botton
                     @click="toDemo"
@@ -27,6 +21,14 @@
                     :color="state.color"
                     :background-color="state.backgroundColor">
                     GitHub
+                </Botton>
+            </div>
+            <div class="pt2">
+                <Botton
+                    icon="arrow-left-bold"
+                    @click="next(-1)"
+                    :color="state.color"
+                    :background-color="state.backgroundColor">
                 </Botton>
                 <Botton
                     icon="arrow-right-bold"
