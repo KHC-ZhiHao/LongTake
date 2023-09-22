@@ -94,7 +94,11 @@ export class LongTake extends Event<Channels> {
                 this.updateTimeBuffer = 0
                 this.update()
             }
-            requestAnimationFrame(this.renderFrame)
+            if (window.document.hidden) {
+                setTimeout(() => this.renderFrame(window.performance.now()), this.updateFrequency)
+            } else {
+                requestAnimationFrame(this.renderFrame)
+            }
         }
     }
     constructor(target: string | HTMLCanvasElement, width?: number, height?: number) {

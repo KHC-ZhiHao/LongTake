@@ -103,7 +103,7 @@ export declare class LongTake extends Event<Channels> {
             alpha: number;
         }>) => void;
         fillRoundRect: (sprite: Sprite, options?: Partial<{
-            round: number;
+            round: number; /** 指定渲染幀率 */
             color: string;
         }>) => void;
     };
