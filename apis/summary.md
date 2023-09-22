@@ -498,6 +498,31 @@ img.src = '/myimage.png'
 new LongTake.Store<Sprite>()
 ```
 
+### Static
+
+#### preGen(params: { preGenCount: number creater: () => Sprite }): { store, take: () => Sprite }
+
+這是一個封裝模式，主要是監聽精靈的 remove 事件是否觸發回收來建立整個自動回收機制，並且保證取物，preGenCount 指的是預先實作多少個精靈，看狀況使用，take 的內部實作如下。
+
+```ts
+function take() {
+    // 如果 store 還有資料，直接回傳
+    let target = store.get()
+    if (target) {
+        return target
+    }
+    // 沒有的話就新增一個
+    const newTarget = params.creater()
+    const id = store.add(newTarget)
+    // 監聽 remove 事件，如果觸發就回收
+    newTarget.on('remove', () => {
+        store.recycle(id)
+    })
+    // 保證取物
+    return store.get()
+}
+```
+
 ### Properties
 
 #### size

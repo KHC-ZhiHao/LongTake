@@ -17,6 +17,38 @@ export class Store<T extends Sprite> extends Event<Channels<T>> {
         running: boolean
     }[] = []
 
+    constructor() {
+        super('store')
+    }
+
+    static preGen<T extends Sprite>(params: {
+        preGenCount: number
+        creater: () => T
+    }) {
+        const store = new Store<T>()
+        const create = () => {
+            const newTarget = params.creater()
+            const id = store.add(newTarget)
+            newTarget.on('remove', () => {
+                store.recycle(id)
+            })
+        }
+        for (let i = 0; i < params.preGenCount; i++) {
+            create()
+        }
+        return {
+            store,
+            take: () => {
+                let target = store.get()
+                if (target) {
+                    return target
+                }
+                create()
+                return store.get()
+            }
+        }
+    }
+
     get size() {
         return this._list.length
     }

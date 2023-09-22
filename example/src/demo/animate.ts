@@ -244,30 +244,14 @@ export const animate: DemoAttr[] = [
                 let fireStore = new LongTake.Store()
                 let trailStore = new LongTake.Store()
 
-                let getTrail = () => {
-                    let trail = trailStore.get()
-                    if (trail) {
-                        return trail
-                    }
-                    const newTrail = new Trail()
-                    const id = trailStore.add(newTrail)
-                    newTrail.on('remove', () => {
-                        trailStore.recycle(id)
-                    })
-                    return trailStore.get()
-                }
-                let getFire = () => {
-                    let fire = fireStore.get()
-                    if (fire) {
-                        return fire
-                    }
-                    const newFire = new Fire()
-                    const id = fireStore.add(newFire)
-                    newFire.on('remove', () => {
-                        fireStore.recycle(id)
-                    })
-                    return fireStore.get()
-                }
+                let getTrail = LongTake.Store.preGen({
+                    preGenCount: 1000,
+                    creater: () => new Trail()
+                }).take
+                let getFire = LongTake.Store.preGen({
+                    preGenCount: 1000,
+                    creater: () => new Fire()
+                }).take
 
                 longtake.enableInteractive()
                 longtake.on('pointerdown', ({ x, y }) => {
