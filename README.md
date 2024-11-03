@@ -5,7 +5,7 @@
 <h1 align="center">LongTake</h1>
 <h3 align="center">Web Canvas Animate Library</h3>
 
-<p align="center">
+<h6 align="center">
     <a href="https://www.npmjs.com/package/longtake">
         <img src="https://img.shields.io/npm/v/longtake.svg">
     </a>
@@ -16,7 +16,7 @@
         <img src="https://img.shields.io/github/stars/KHC-ZhiHao/LongTake.svg?style=social">
     </a>
     <br>
-</p>
+</h6>
 
 LongTake 是個輕巧、快速的繪製 Web Canvas 動畫庫。
 
